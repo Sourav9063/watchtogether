@@ -1,3 +1,12 @@
-.video-player{
+.video-wrapper {
   width: 100%;
+}
+
+.video-player {
+  width: 100%;
+  border: none;
+}
+
+.video-player:focus {
+  outline: none;
 }

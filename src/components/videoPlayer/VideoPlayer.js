@@ -6,9 +6,11 @@ export default function VideoPlayer() {
   const videoPlayerRef = useRef(null);
   const subtitleRef = useRef(null);
   const [src, setSrc] = useState(null);
+  const [link, setLink] = useState(null);
   const handleChange = (event) => {
     const file = event.target.files[0];
     const url = URL.createObjectURL(file);
+    console.log("called");
     setSrc(file.name);
     videoPlayerRef.current.src = url;
   };
@@ -36,29 +38,71 @@ export default function VideoPlayer() {
 
   useEffect(() => {
     if (videoPlayerRef.current) {
-      //play pause
+      console.log(videoPlayerRef.current.textTracks);
+      videoPlayerRef.current.textTracks[0].mode = "showing";
+      console.log(videoPlayerRef.current.audioTracks);
       videoPlayerRef.current.addEventListener("play", playEvent);
       videoPlayerRef.current.addEventListener("pause", pauseEvent);
-      //time update
-      // videoPlayerRef.current.addEventListener("timeupdate", timeUpdateEvent);
-      //seek event
       videoPlayerRef.current.addEventListener("seeking", seekEvent);
     }
+    return () => {
+      if (videoPlayerRef.current) {
+        videoPlayerRef.current.removeEventListener("play", playEvent);
+        videoPlayerRef.current.removeEventListener("pause", pauseEvent);
+        videoPlayerRef.current.removeEventListener("seeking", seekEvent);
+      }
+    };
   }, [videoPlayerRef]);
 
+  useEffect(() => {
+    if (src) {
+      videoPlayerRef.current.currentTime = localStorage.getItem(src) || 0;
+      window.addEventListener("beforeunload", (e) => {
+        e.preventDefault();
+        localStorage.setItem(src, videoPlayerRef.current.currentTime);
+        return (e.returnValue = "Are you sure you want to close?");
+      });
+    }
+    return () => {};
+  }, [src]);
+
   return (
-    <>
+    <div className={styles["video-wrapper"]}>
+      <h1>Video Player</h1>
+      <form action="">
+        <input
+          type="text"
+          onChange={(e) => {
+            console.log(e.target.value);
+            setLink(e.target.value);
+            setSrc(e.target.value);
+          }}
+        />
+        <input
+          type="submit"
+          onClick={(e) => {
+            e.preventDefault();
+            console.log(src);
+            videoPlayerRef.current.src = link;
+          }}
+        />
+      </form>
+      <h3>Or</h3>
       <input
         type="file"
         accept="video/* .mkv .mp4 .webm .ogv"
         onChange={handleChange}
+        placeholder="Select Video"
       />
-      <input
+      {/* <input
         type="file"
         accept="text/vtt .vtt .srt"
         onChange={handleSubtitle}
-      />
+      /> */}
       <div>{src}</div>
+      {videoPlayerRef.current?.audioTracks?.map((track, index) => {
+        return <div key={index}>{index}</div>;
+      })}
       <video
         className={styles["video-player"]}
         ref={videoPlayerRef}
@@ -72,7 +116,7 @@ export default function VideoPlayer() {
           label="English"
         />
       </video>
-    </>
+    </div>
   );
 }
 
