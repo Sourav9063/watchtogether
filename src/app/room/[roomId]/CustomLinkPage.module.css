@@ -1,0 +1,10 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-inline: 6rem;
+  padding-block: 1rem;
+  min-height: 100vh;
+  min-width: 600px;
+}
