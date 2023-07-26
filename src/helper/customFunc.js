@@ -1,0 +1,50 @@
+export const randomId = (length) => {
+  var result = "";
+  var characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++)
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  return result;
+};
+
+export const getCustomLink = () => {
+  let customLink = localStorage.getItem("customLink");
+  if (!customLink) {
+    customLink = randomId(5);
+    localStorage.setItem("customLink", customLink);
+  }
+  return "/room/" + customLink;
+};
+
+export async function handleFileUpload(file) {
+  if (!file) {
+    console.log("No file selected.");
+    return;
+  }
+
+  const url = "https://api.bayfiles.com/upload";
+
+  // Create a FormData object and append the file to it.
+  const formData = new FormData();
+  formData.append("file", file);
+
+  // Make the POST request using fetch.
+  console.log("fetching");
+  fetch(url, {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => {
+      console.log(response.status);
+      return response.json();
+    })
+    .then((data) => {
+      console.log("File uploaded successfully.");
+      console.log(data);
+      localStorage.setItem("uploadData", JSON.stringify(data));
+    })
+    .catch((error) => {
+      console.error("Error uploading file:", error);
+    });
+}
