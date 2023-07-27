@@ -16,6 +16,8 @@
   align-items: center;
   gap: 0.6em;
   font-weight: bold;
+  border: #635bff7f solid var(--arrow-stroke);
+  cursor: pointer;
 }
 
 .button .arrow-wrapper {

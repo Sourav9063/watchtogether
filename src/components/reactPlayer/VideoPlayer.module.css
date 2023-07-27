@@ -1,0 +1,18 @@
+.video-wrapper {
+  width: 100%;
+}
+
+.video-player {
+  width: 100%;
+  border: none;
+}
+
+.video-player:focus {
+  outline: none;
+}
+
+.title {
+  font-weight: bold;
+  margin-block: .5rem;
+  text-align: center;
+}
