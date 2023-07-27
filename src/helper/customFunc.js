@@ -14,7 +14,7 @@ export const getCustomLink = () => {
     customLink = randomId(5);
     localStorage.setItem("customLink", customLink);
   }
-  return "/room/" + customLink;
+  return customLink;
 };
 
 export async function handleFileUpload(file) {
@@ -48,3 +48,19 @@ export async function handleFileUpload(file) {
       console.error("Error uploading file:", error);
     });
 }
+
+export const isURL = (url) => {
+  if (!url) return false;
+  return (!url && url.includes("http://")) || url.includes("https://");
+};
+
+export const getAllQueryParams = (url) => {
+  const query = url.split("?")[1];
+  const params = query.split("&");
+  const obj = {};
+  params.forEach((param) => {
+    const [key, value] = param.split("=");
+    obj[key] = value;
+  });
+  return obj;
+};
