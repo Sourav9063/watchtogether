@@ -4,7 +4,7 @@ import style from "./CustomLink.module.css";
 import { getCustomLink } from "@/helper/customFunc";
 import { useRouter } from "next/navigation";
 
-export default function CustomLink({ name, duration, className }) {
+export default function CustomLink({ name, duration, socketId, className }) {
   const [text, setText] = useState("Copy Joining Link");
   const classnames = `${style["button"]} ${className ? className : ""}`;
   return (

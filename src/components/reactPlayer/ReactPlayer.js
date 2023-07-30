@@ -4,8 +4,12 @@ import styles from "./VideoPlayer.module.css";
 import ReactPlayer from "react-player";
 import CustomLink from "../customButtons/CustomLink";
 import { useSearchParams } from "next/navigation";
-import { isURL } from "@/helper/customFunc";
-
+import { getCustomLink, isURL } from "@/helper/customFunc";
+import { io } from "socket.io-client";
+import { Constants } from "@/helper/CONSTANTS";
+let socket;
+export { socket };
+let controlBySocket = false;
 export default function ReactVideoPlayer() {
   const videoPlayerRef = useRef(null);
   const searchParams = useSearchParams();
@@ -15,10 +19,12 @@ export default function ReactVideoPlayer() {
   // console.log(searchParams.get("duration"));
 
   const [src, setSrc] = useState(
-    isURL(searchParams.get("name")) ? searchParams.get("name") : null
+    isURL(searchParams.get("name")) ? searchParams.get("name") : ""
   );
-  const [link, setLink] = useState(isURL(searchParams.get("name")) ? "" : null);
+  const [play, setPlay] = useState(true);
+  const [link, setLink] = useState(isURL(searchParams.get("name")) ? "" : "");
   const [seekCalled, setSeekCalled] = useState(false);
+  const [socketId, setSocketId] = useState(null);
   const handleChange = (event) => {
     const file = event.target.files[0];
     const url = URL.createObjectURL(file);
@@ -27,13 +33,55 @@ export default function ReactVideoPlayer() {
     setSrc(url);
   };
   const playEvent = () => {
+    console.log(controlBySocket);
     console.log("play" + videoPlayerRef.current.getCurrentTime());
+    if (controlBySocket) {
+      controlBySocket = false;
+      return;
+    }
+    socket.emit(
+      "playerControl",
+      {
+        type: Constants.playerActions.PLAY,
+        time: videoPlayerRef.current.getCurrentTime(),
+      },
+      searchParams.get("room") || getCustomLink()
+    );
   };
   const pauseEvent = () => {
+    console.log(controlBySocket);
+
     console.log("pause" + videoPlayerRef.current.getCurrentTime());
+    if (controlBySocket) {
+      controlBySocket = false;
+      return;
+    }
+    socket.emit(
+      "playerControl",
+      {
+        type: Constants.playerActions.PAUSE,
+        time: videoPlayerRef.current.getCurrentTime(),
+      },
+      searchParams.get("room") || getCustomLink()
+    );
   };
   const seekEvent = (event) => {
+    console.log(controlBySocket);
+
     console.log("seek" + event);
+
+    if (controlBySocket) {
+      controlBySocket = false;
+      return;
+    }
+    socket.emit(
+      "playerControl",
+      {
+        type: Constants.playerActions.SEEK,
+        time: videoPlayerRef.current.getCurrentTime(),
+      },
+      searchParams.get("room") || getCustomLink()
+    );
   };
 
   useEffect(() => {
@@ -60,13 +108,72 @@ export default function ReactVideoPlayer() {
       return (e.returnValue = "Are you sure you want to close?");
     });
     return () => {};
-  }, [videoPlayerRef]);
+  }, [videoPlayerRef, searchParams]);
+
+  const socketInitializer = async () => {
+    // We call this just to make sure we turn on the websocket server
+    await fetch("/api/socket");
+    console.log("call");
+
+    socket = io(undefined, {
+      path: "/api/socket_io",
+    });
+    socket.on("connect", () => {
+      console.log("Connected", socket.id);
+      setSocketId(socket.id);
+      socket.emit("joinRoom", searchParams.get("room") || getCustomLink());
+    });
+
+    socket.on("playerControl", (data) => {
+      console.log(data);
+      controlBySocket = true;
+      switch (data.type) {
+        case Constants.playerActions.PLAY:
+          videoPlayerRef.current?.seekTo(data.time);
+          setPlay(true);
+          break;
+        case Constants.playerActions.PAUSE:
+          setPlay(false);
+          break;
+        case Constants.playerActions.SEEK:
+        default:
+          break;
+      }
+    });
+  };
+
+  const sendMessageHandler = async (e) => {
+    if (!socket) return;
+    const value = e.target.value;
+    socket.emit("createdMessage", value);
+  };
+
+  useEffect(() => {
+    try {
+      socketInitializer();
+    } catch (e) {
+      console.log(e);
+    }
+  }, []);
 
   return (
     <div className={styles["video-wrapper"]}>
-      {videoPlayerRef.current?.name && (
+      <button
+        onClick={() => {
+          console.log(searchParams.get("room") || getCustomLink());
+          try {
+          } catch (e) {
+            console.log(e);
+          }
+        }}
+      >
+        Click
+      </button>
+      {socketId && <div>{socketId}</div>}
+      {videoPlayerRef.current?.name && socketId && (
         <CustomLink
           name={videoPlayerRef.current.name}
+          socketId={socketId}
           duration={videoPlayerRef.current.getDuration()}
         />
       )}
@@ -117,7 +224,7 @@ export default function ReactVideoPlayer() {
           ref={videoPlayerRef}
           url={src}
           controls
-          playing={true}
+          playing={play}
           light={true}
           onReady={(player) => {
             if (!seekCalled) {
