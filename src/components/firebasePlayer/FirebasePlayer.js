@@ -124,6 +124,7 @@ export default function FirebaseVideoPlayer() {
         switch (data.type) {
           case Constants.playerActions.PLAY:
             videoPlayerRef.current.seekTo(data.time);
+            setPlay(true);
             break;
           case Constants.playerActions.PAUSE:
             // videoPlayerRef.current.seekTo(data.time);
