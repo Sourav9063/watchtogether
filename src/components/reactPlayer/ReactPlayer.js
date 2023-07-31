@@ -13,6 +13,8 @@ let controlBySocket = false;
 export default function ReactVideoPlayer() {
   const videoPlayerRef = useRef(null);
   const searchParams = useSearchParams();
+  const [action, setAction] = useState(null);
+  const [time, setTime] = useState(null);
   //http://localhost:3000/?room=2nj1S&name=https://www.youtube.com/watch?v=1z_Chhbl1-g&duration=1073
   // console.log(searchParams.get("room"));
   // console.log(searchParams.get("name"));
@@ -33,10 +35,11 @@ export default function ReactVideoPlayer() {
     setSrc(url);
   };
   const playEvent = () => {
-    console.log(controlBySocket);
+    console.log(controlBySocket + " " + socket?.id);
+
     console.log("play" + videoPlayerRef.current.getCurrentTime());
     if (controlBySocket) {
-      controlBySocket = false;
+      // controlBySocket = false;
       return;
     }
     socket.emit(
@@ -49,11 +52,11 @@ export default function ReactVideoPlayer() {
     );
   };
   const pauseEvent = () => {
-    console.log(controlBySocket);
+    console.log(controlBySocket + " " + socket?.id);
 
     console.log("pause" + videoPlayerRef.current.getCurrentTime());
     if (controlBySocket) {
-      controlBySocket = false;
+      // controlBySocket = false;
       return;
     }
     socket.emit(
@@ -66,12 +69,12 @@ export default function ReactVideoPlayer() {
     );
   };
   const seekEvent = (event) => {
-    console.log(controlBySocket);
+    console.log(controlBySocket + " " + socket?.id);
 
     console.log("seek" + event);
 
     if (controlBySocket) {
-      controlBySocket = false;
+      // controlBySocket = false;
       return;
     }
     socket.emit(
@@ -127,6 +130,9 @@ export default function ReactVideoPlayer() {
     socket.on("playerControl", (data) => {
       console.log(data);
       controlBySocket = true;
+      setAction(data.type);
+      setTime(data.time);
+      console.log(controlBySocket);
       switch (data.type) {
         case Constants.playerActions.PLAY:
           videoPlayerRef.current?.seekTo(data.time);
@@ -136,6 +142,11 @@ export default function ReactVideoPlayer() {
           setPlay(false);
           break;
         case Constants.playerActions.SEEK:
+          videoPlayerRef.current?.seekTo(data.time);
+          break;
+        case Constants.playerActions.URLCHANGE:
+          isURL(data.url) && setSrc(data.url);
+          break;
         default:
           break;
       }
@@ -170,6 +181,8 @@ export default function ReactVideoPlayer() {
         Click
       </button>
       {socketId && <div>{socketId}</div>}
+      {action && <div>{action}</div>}
+      {time && <div>{time}</div>}
       {videoPlayerRef.current?.name && socketId && (
         <CustomLink
           name={videoPlayerRef.current.name}
@@ -192,8 +205,17 @@ export default function ReactVideoPlayer() {
           className={styles["link-submit"]}
           onClick={(e) => {
             e.preventDefault();
-            if (link) {
+            if (link && isURL(link)) {
               videoPlayerRef.current.name = link;
+              socket.emit(
+                "playerControl",
+                {
+                  type: Constants.playerActions.URLCHANGE,
+                  time: 0,
+                  url: link,
+                },
+                searchParams.get("room") || getCustomLink()
+              );
               setSrc(link);
             }
           }}
@@ -225,8 +247,8 @@ export default function ReactVideoPlayer() {
           url={src}
           controls
           playing={play}
-          light={true}
           onReady={(player) => {
+            controlBySocket = false;
             if (!seekCalled) {
               player.seekTo(
                 localStorage.getItem(videoPlayerRef.current.name) || 0

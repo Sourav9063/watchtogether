@@ -3,5 +3,6 @@ export const Constants = {
     PLAY: "PLAY",
     PAUSE: "PAUSE",
     SEEK: "SEEK",
+    URLCHANGE: "URLCHANGE",
   },
 };
