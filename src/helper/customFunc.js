@@ -7,12 +7,15 @@ export const randomId = (length) => {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   return result;
 };
+export const randomIdWithTimeStamp = (length) => {
+  return randomId(length) + Date.now().toString();
+};
 
 export const getCustomLink = () => {
-  let customLink = localStorage.getItem("customLink");
+  let customLink = localStorage.getItem("randomIdWithTimeStamp");
   if (!customLink) {
-    customLink = randomId(5);
-    localStorage.setItem("customLink", customLink);
+    customLink = randomIdWithTimeStamp(5);
+    localStorage.setItem("randomIdWithTimeStamp", customLink);
   }
   return customLink;
 };
