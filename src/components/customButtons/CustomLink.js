@@ -14,12 +14,12 @@ export default function CustomLink({ name, duration, currentTime, className }) {
       onClick={() => {
         try {
           console.log(getCustomLink());
-          setRoom(getCustomLink(), {
-            roomId: getCustomLink(),
-            url: name,
-            duration: duration,
-            currentTime: currentTime,
-          });
+          // setRoom(getCustomLink(), {
+          //   roomId: getCustomLink(),
+          //   url: name,
+          //   duration: duration,
+          //   currentTime: currentTime,
+          // });
 
           const link =
             window.location.href +

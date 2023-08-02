@@ -24,10 +24,11 @@ export default function RootLayout({ children }) {
         draggable
         pauseOnHover
         theme="dark"
-        bodyStyle={{
+        toastStyle={{
           backdropFilter: "blur(10px)",
-          backgroundColor: "rgba(0,0,0,0.5)",
+          backgroundColor: "rgba(0,0,0,0.4)",
         }}
+        bodyStyle={{}}
         progressStyle={{ height: "2px" }}
       />
       <body className={inter.className}>{children}</body>

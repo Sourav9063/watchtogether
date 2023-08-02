@@ -1,3 +1,4 @@
+"use client";
 import { db, setChat } from "@/db/dbConnection";
 import { getCustomLink } from "@/helper/customFunc";
 import { onValue, ref } from "firebase/database";
@@ -7,6 +8,8 @@ import { toast } from "react-toastify";
 
 export default function MessageBox() {
   const searchParams = useSearchParams();
+
+  const [showChangeName, setShowChangeName] = useState(false);
 
   const [message, setMessage] = useState(null);
   const [msgFrom, setMsgFrom] = useState(getCustomLink());
@@ -48,17 +51,34 @@ export default function MessageBox() {
           setMessage("");
         }}
       >
-        <h3>From:</h3>
-        <h3>{msgFrom}</h3>
-        <input
-          id="msgFrom"
-          type="text"
-          value={msgFrom}
-          onChange={(e) => {
-            setMsgFrom(e.target.value);
-          }}
-        />
-        <br />
+        <h4>{`From: ${msgFrom}`}</h4>
+
+        <div>
+          <button
+            style={{
+              padding: ".5rem",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+            }}
+            onClick={() => {
+              setShowChangeName(!showChangeName);
+            }}
+          >
+            ChangeName:
+          </button>
+          {showChangeName && (
+            <div>
+              <input
+                id="msgFrom"
+                type="text"
+                value={msgFrom}
+                onChange={(e) => {
+                  setMsgFrom(e.target.value);
+                }}
+              />
+            </div>
+          )}
+        </div>
 
         <input
           type="text"

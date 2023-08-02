@@ -79,7 +79,14 @@ export default function FirebaseVideoPlayer() {
   };
 
   useEffect(() => {
+    console.log("useEffect");
     setSeekCalled(false);
+    setRoom(searchParams.get("room") || getCustomLink(), {
+      roomId: searchParams.get("room") || getCustomLink(),
+      url: src,
+      duration: videoPlayerRef.current.getDuration(),
+      currentTime: videoPlayerRef.current.getCurrentTime(),
+    });
     return () => {};
   }, [src]);
 
@@ -105,15 +112,13 @@ export default function FirebaseVideoPlayer() {
 
   useEffect(() => {
     const roomId = searchParams.get("room") || getCustomLink();
-    const query = ref(db, "rooms/" + roomId);
-    onValue(query, (snapshot) => {
-      const data = snapshot.val();
-      if (snapshot.exists()) {
-        if (searchParams.get("room")) {
-          setSrc(data.url);
-        }
-      }
-    });
+    // const query = ref(db, "rooms/" + roomId);
+    // onValue(query, (snapshot) => {
+    //   const data = snapshot.val();
+    //   if (snapshot.exists()) {
+    //     setSrc(data.url);
+    //   }
+    // });
     const playerAction = ref(db, "actions/" + roomId);
     onValue(playerAction, (snapshot) => {
       const data = snapshot.val();
@@ -140,51 +145,50 @@ export default function FirebaseVideoPlayer() {
   }, []);
 
   return (
-    <div className={styles["video-wrapper"]}>
-      {action && <div>{action}</div>}
-      {time && <div>{time}</div>}
-      {videoPlayerRef.current?.name && (
-        <CustomLink
-          name={videoPlayerRef.current.name}
-          duration={videoPlayerRef.current.getDuration()}
-          currentTime={videoPlayerRef.current.getCurrentTime()}
-        />
-      )}
-      <h1>Share Play</h1>
-      <div className={styles["control-wrapper"]}>
-        <form action="">
-          <input
-            className={styles["input-link"]}
-            type="text"
-            value={link}
-            onChange={(e) => {
-              setLink(e.target.value);
-            }}
+    <>
+      <section>
+        {videoPlayerRef.current?.name && !searchParams.get("room") && (
+          <CustomLink
+            name={videoPlayerRef.current.name}
+            duration={videoPlayerRef.current.getDuration()}
+            currentTime={videoPlayerRef.current.getCurrentTime()}
           />
-          <input
-            type="submit"
-            className={styles["link-submit"]}
-            onClick={(e) => {
-              e.preventDefault();
-              console.log(link);
-              console.log(isURL(link));
-              if (link && isURL(link)) {
-                videoPlayerRef.current.name = link;
-                setSrc(link);
-              }
-            }}
-          />
-        </form>
-        <MessageBox />
-      </div>
-
-      <h3>Or</h3>
-      <input
-        type="file"
-        accept="video/* .mkv .mp4 .webm .ogv"
-        onInput={handleChange}
-        placeholder="Select Video"
-      />
+        )}
+        <div className={styles["control-wrapper"]}>
+          <form action="">
+            <h2>Choose Source</h2>
+            <input
+              className={styles["input-link"]}
+              type="text"
+              value={link}
+              onChange={(e) => {
+                setLink(e.target.value);
+              }}
+            />
+            <input
+              type="submit"
+              className={styles["link-submit"]}
+              onClick={(e) => {
+                e.preventDefault();
+                console.log(link);
+                console.log(isURL(link));
+                if (link && isURL(link)) {
+                  videoPlayerRef.current.name = link;
+                  setSrc(link);
+                }
+              }}
+            />
+            <h3>Or</h3>
+            <input
+              type="file"
+              accept="video/* .mkv .mp4 .webm .ogv"
+              onInput={handleChange}
+              placeholder="Select Video"
+            />
+          </form>
+          <MessageBox />
+        </div>
+      </section>
 
       {/* <input
         type="file"
@@ -197,7 +201,7 @@ export default function FirebaseVideoPlayer() {
       <div className={styles["video-wrapper"]}>
         <ReactPlayer
           width={"100%"}
-          height={"70vh"}
+          height={"100%"}
           className={styles["video-player"]}
           ref={videoPlayerRef}
           url={src}
@@ -220,7 +224,7 @@ export default function FirebaseVideoPlayer() {
           }}
         ></ReactPlayer>
       </div>
-    </div>
+    </>
   );
 }
 

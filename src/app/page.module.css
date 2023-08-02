@@ -1,9 +1,15 @@
 .main {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   padding-inline: 6rem;
   padding-block: 1rem;
   min-height: 100vh;
+}
+
+@media screen and (max-width: 768px) {
+  .main {
+    padding-inline: .5rem;
+  }
 }

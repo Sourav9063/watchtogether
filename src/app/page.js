@@ -6,6 +6,7 @@ export default function Home() {
   return (
     <>
       <main className={styles.main}>
+        <h1>Sync Play</h1>
         {false ? <ReactVideoPlayer /> : <FirebaseVideoPlayer />}
       </main>
     </>
