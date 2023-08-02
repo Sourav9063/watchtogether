@@ -4,10 +4,12 @@ import styles from "../reactPlayer/VideoPlayer.module.css";
 import ReactPlayer from "react-player";
 import CustomLink from "../customButtons/CustomLink";
 import { useSearchParams } from "next/navigation";
-import { getCustomLink, isURL } from "@/helper/customFunc";
+import { getCustomLink, isURL, secondsToHMS } from "@/helper/customFunc";
 import { db, getRoomRef, setRoom, setRoomAction } from "@/db/dbConnection";
 import { onValue, ref } from "firebase/database";
 import { Constants } from "@/helper/CONSTANTS";
+import { toast } from "react-toastify";
+import MessageBox from "../message/MessageBox";
 
 let controlBySocket = false;
 export default function FirebaseVideoPlayer() {
@@ -22,7 +24,6 @@ export default function FirebaseVideoPlayer() {
   const [play, setPlay] = useState(true);
   const [link, setLink] = useState(isURL(searchParams.get("name")) ? "" : "");
   const [seekCalled, setSeekCalled] = useState(false);
-  const [socketId, setSocketId] = useState(null);
   const handleChange = (event) => {
     const file = event.target.files[0];
     const url = URL.createObjectURL(file);
@@ -120,6 +121,7 @@ export default function FirebaseVideoPlayer() {
         if (data.by === getCustomLink()) {
           return;
         }
+        toast(`${data.type} by Someone at ${secondsToHMS(data.time)}`);
         controlBySocket = true;
         switch (data.type) {
           case Constants.playerActions.PLAY:
@@ -127,13 +129,9 @@ export default function FirebaseVideoPlayer() {
             setPlay(true);
             break;
           case Constants.playerActions.PAUSE:
-            // videoPlayerRef.current.seekTo(data.time);
             setPlay(false);
             break;
-          // case Constants.playerActions.SEEK:
-          //   videoPlayerRef.current.seekTo(data.time);
-          //   setPlay(false);
-          //   break;
+
           default:
             break;
         }
@@ -153,29 +151,32 @@ export default function FirebaseVideoPlayer() {
         />
       )}
       <h1>Share Play</h1>
-      <form action="">
-        <input
-          className={styles["input-link"]}
-          type="text"
-          value={link}
-          onChange={(e) => {
-            setLink(e.target.value);
-          }}
-        />
-        <input
-          type="submit"
-          className={styles["link-submit"]}
-          onClick={(e) => {
-            e.preventDefault();
-            console.log(link);
-            console.log(isURL(link));
-            if (link && isURL(link)) {
-              videoPlayerRef.current.name = link;
-              setSrc(link);
-            }
-          }}
-        />
-      </form>
+      <div className={styles["control-wrapper"]}>
+        <form action="">
+          <input
+            className={styles["input-link"]}
+            type="text"
+            value={link}
+            onChange={(e) => {
+              setLink(e.target.value);
+            }}
+          />
+          <input
+            type="submit"
+            className={styles["link-submit"]}
+            onClick={(e) => {
+              e.preventDefault();
+              console.log(link);
+              console.log(isURL(link));
+              if (link && isURL(link)) {
+                videoPlayerRef.current.name = link;
+                setSrc(link);
+              }
+            }}
+          />
+        </form>
+        <MessageBox />
+      </div>
 
       <h3>Or</h3>
       <input
@@ -213,7 +214,7 @@ export default function FirebaseVideoPlayer() {
           }}
           onPlay={playEvent}
           onPause={pauseEvent}
-          onSeek={seekEvent}
+          // onSeek={seekEvent}
           onBufferEnd={(e) => {
             setPlay(true);
           }}

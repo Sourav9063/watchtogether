@@ -67,3 +67,18 @@ export const getAllQueryParams = (url) => {
   });
   return obj;
 };
+
+export function secondsToHMS(seconds) {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+
+  const formattedTime =
+    hours > 0
+      ? `${hours.toString().padStart(2, "0")}:`
+      : "" +
+        `${minutes.toString().padStart(2, "0")}:${remainingSeconds
+          .toString()
+          .padStart(2, "0")}`;
+  return formattedTime;
+}

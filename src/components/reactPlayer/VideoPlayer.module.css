@@ -1,5 +1,6 @@
 .video-wrapper {
   width: 100%;
+  aspect-ratio: 16/9;
 }
 
 .video-player {
@@ -15,4 +16,19 @@
   font-weight: bold;
   margin-block: .5rem;
   text-align: center;
+}
+
+.control-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-block: .5rem;
+}
+
+@media screen and (max-width: 768px) {
+  .control-wrapper {
+    flex-direction: column;
+  }
+
+
 }

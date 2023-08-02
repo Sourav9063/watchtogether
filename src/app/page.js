@@ -4,8 +4,10 @@ import ReactVideoPlayer from "@/components/reactPlayer/ReactPlayer";
 
 export default function Home() {
   return (
-    <main className={styles.main}>
-      {false ? <ReactVideoPlayer /> : <FirebaseVideoPlayer />}
-    </main>
+    <>
+      <main className={styles.main}>
+        {false ? <ReactVideoPlayer /> : <FirebaseVideoPlayer />}
+      </main>
+    </>
   );
 }

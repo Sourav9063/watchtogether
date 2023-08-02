@@ -76,3 +76,10 @@
     color-scheme: dark;
   }
 }
+
+input {
+  font-size: 14px;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}

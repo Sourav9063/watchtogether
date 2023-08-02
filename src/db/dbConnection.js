@@ -9,7 +9,6 @@ const firebaseConfig = {
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_messagingSenderId,
   appId: process.env.NEXT_PUBLIC_FIREBASE_appId,
 };
-console.log(firebaseConfig);
 
 const app = initializeApp(firebaseConfig);
 
@@ -31,6 +30,14 @@ export const setRoomAction = async (roomId, data) => {
     await set(ref(db, "actions/" + roomId), data);
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const setChat = async (roomId, data) => {
+  try {
+    await set(ref(db, "chats/" + roomId), data);
+  } catch (e) {
+    console.log(e);
   }
 };
 
