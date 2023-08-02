@@ -18,7 +18,7 @@ export default function MessageBox() {
     const roomId = searchParams.get("room") || getCustomLink();
 
     const chatRef = ref(db, "chats/" + roomId);
-    onValue(chatRef, (snapshot) => {
+    return onValue(chatRef, (snapshot) => {
       const data = snapshot.val();
       if (snapshot.exists()) {
         if (data.from === getCustomLink()) {
@@ -29,8 +29,6 @@ export default function MessageBox() {
         });
       }
     });
-
-    return () => {};
   }, []);
 
   return (

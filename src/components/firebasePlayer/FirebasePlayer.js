@@ -120,7 +120,7 @@ export default function FirebaseVideoPlayer() {
     //   }
     // });
     const playerAction = ref(db, "actions/" + roomId);
-    onValue(playerAction, (snapshot) => {
+    return onValue(playerAction, (snapshot) => {
       const data = snapshot.val();
       if (snapshot.exists()) {
         if (data.by === getCustomLink()) {
