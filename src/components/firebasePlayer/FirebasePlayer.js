@@ -86,6 +86,7 @@ export default function FirebaseVideoPlayer() {
       type: Constants.playerActions.URLCHANGE,
       url: src,
       by: getCustomLink(),
+      time: videoPlayerRef.current.getCurrentTime(),
     });
   };
 
@@ -173,9 +174,20 @@ export default function FirebaseVideoPlayer() {
           });
           break;
         case Constants.playerActions.URLCHANGE:
-          toast(`${data.type} by Someone to ${data.url}`);
-          setSrc(data.url);
-          videoPlayerRef.current.seekTo(0);
+          if (isURL(data.url)) {
+            toast(`${data.type} by Someone to "${data.url}"`);
+            setSrc(data.url);
+            videoPlayerRef.current.seekTo(0);
+          } else {
+            toast.error(
+              "Playing a local file named: " +
+                data.url +
+                " .Choose from your local files to play it.",
+              {
+                autoClose: 10000,
+              }
+            );
+          }
           break;
         default:
           break;
