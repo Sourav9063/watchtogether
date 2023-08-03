@@ -19,6 +19,8 @@
   font-weight: bold;
   margin-block: .5rem;
   text-align: center;
+  max-width: 100vw;
+  overflow: hidden;
 }
 
 .control-wrapper {
@@ -34,6 +36,7 @@
   border: 1px solid #ccc;
   padding: 1rem;
   min-height: 100%;
+  max-width: 100vw;
 }
 
 @media screen and (max-width: 768px) {

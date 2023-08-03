@@ -82,6 +82,7 @@ input {
   padding: 8px;
   border-radius: 8px;
   border: 1px solid #ccc;
+  max-width: calc(100vw - 16px);
 }
 
 .message>* {
