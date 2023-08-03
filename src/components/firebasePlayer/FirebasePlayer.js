@@ -77,6 +77,14 @@ export default function FirebaseVideoPlayer() {
       by: getCustomLink(),
     });
   };
+  const urlChangeEvent = async (src) => {
+    console.log("urlChange");
+    await setRoomAction(searchParams.get("room") || getCustomLink(), {
+      type: Constants.playerActions.URLCHANGE,
+      url: src,
+      by: getCustomLink(),
+    });
+  };
 
   useEffect(() => {
     console.log("useEffect");
@@ -126,17 +134,28 @@ export default function FirebaseVideoPlayer() {
         if (data.by === getCustomLink()) {
           return;
         }
-        toast(`${data.type} by Someone at ${secondsToHMS(data.time)}`);
+
         controlBySocket = true;
         switch (data.type) {
           case Constants.playerActions.PLAY:
+            toast(`${data.type} by Someone at ${secondsToHMS(data.time)}`);
             videoPlayerRef.current.seekTo(data.time);
             setPlay(true);
             break;
           case Constants.playerActions.PAUSE:
+            toast(`${data.type} by Someone at ${secondsToHMS(data.time)}`);
             setPlay(false);
             break;
-
+          case Constants.playerActions.CHAT:
+            toast(`${data.name} said "${data.message}"`, {
+              autoClose: 10000,
+            });
+            break;
+          case Constants.playerActions.URLCHANGE:
+            toast(`${data.type} by Someone to ${data.url}`);
+            setSrc(data.url);
+            videoPlayerRef.current.seekTo(0);
+            break;
           default:
             break;
         }
@@ -175,6 +194,7 @@ export default function FirebaseVideoPlayer() {
                 if (link && isURL(link)) {
                   videoPlayerRef.current.name = link;
                   setSrc(link);
+                  urlChangeEvent(link);
                 }
               }}
             />

@@ -1,5 +1,6 @@
 "use client";
-import { db, setChat } from "@/db/dbConnection";
+import { db, setChat, setRoomAction } from "@/db/dbConnection";
+import { Constants } from "@/helper/CONSTANTS";
 import { getCustomLink } from "@/helper/customFunc";
 import { onValue, ref } from "firebase/database";
 import { useSearchParams } from "next/navigation";
@@ -14,22 +15,19 @@ export default function MessageBox() {
   const [message, setMessage] = useState(null);
   const [msgFrom, setMsgFrom] = useState(getCustomLink());
 
-  useEffect(() => {
-    const roomId = searchParams.get("room") || getCustomLink();
+  // useEffect(() => {
+  //   const roomId = searchParams.get("room") || getCustomLink();
 
-    const chatRef = ref(db, "chats/" + roomId);
-    return onValue(chatRef, (snapshot) => {
-      const data = snapshot.val();
-      if (snapshot.exists()) {
-        if (data.from === getCustomLink()) {
-          return;
-        }
-        toast(`${data.name} said "${data.message}"`, {
-          autoClose: 10000,
-        });
-      }
-    });
-  }, []);
+  //   const chatRef = ref(db, "chats/" + roomId);
+  //   return onValue(chatRef, (snapshot) => {
+  //     const data = snapshot.val();
+  //     if (snapshot.exists()) {
+  //       if (data.from === getCustomLink()) {
+  //         return;
+  //       }
+  //     }
+  //   });
+  // }, []);
 
   return (
     <div>
@@ -41,8 +39,9 @@ export default function MessageBox() {
             return;
           }
           const roomId = searchParams.get("room") || getCustomLink();
-          setChat(roomId, {
-            from: getCustomLink(),
+          setRoomAction(roomId, {
+            type: Constants.playerActions.CHAT,
+            by: getCustomLink(),
             name: msgFrom,
             message: message,
           });
@@ -58,7 +57,9 @@ export default function MessageBox() {
               borderRadius: "5px",
               border: "1px solid #ccc",
             }}
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
               setShowChangeName(!showChangeName);
             }}
           >
@@ -70,6 +71,9 @@ export default function MessageBox() {
                 id="msgFrom"
                 type="text"
                 value={msgFrom}
+                onBlur={() => {
+                  setShowChangeName(false);
+                }}
                 onChange={(e) => {
                   setMsgFrom(e.target.value);
                 }}

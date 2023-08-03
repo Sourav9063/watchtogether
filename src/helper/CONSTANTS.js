@@ -4,5 +4,6 @@ export const Constants = {
     PAUSE: "PAUSE",
     SEEK: "SEEK",
     URLCHANGE: "URLCHANGE",
+    CHAT: "CHAT",
   },
 };
