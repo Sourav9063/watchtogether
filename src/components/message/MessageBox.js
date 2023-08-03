@@ -1,11 +1,10 @@
 "use client";
-import { db, setChat, setRoomAction } from "@/db/dbConnection";
+import { dbR, setChat, setRoomAction } from "@/db/dbConnection";
 import { Constants } from "@/helper/CONSTANTS";
 import { getCustomLink } from "@/helper/customFunc";
-import { onValue, ref } from "firebase/database";
+
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 
 export default function MessageBox() {
   const searchParams = useSearchParams();
@@ -32,56 +31,41 @@ export default function MessageBox() {
   return (
     <div>
       <h2>Messaging</h2>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!message) {
-            return;
-          }
-          const roomId = searchParams.get("room") || getCustomLink();
-          setRoomAction(roomId, {
-            type: Constants.playerActions.CHAT,
-            by: getCustomLink(),
-            name: msgFrom,
-            message: message,
-          });
-          setMessage("");
-        }}
-      >
-        <h4>{`From: ${msgFrom}`}</h4>
+      <h4>{`From: ${msgFrom}`}</h4>
 
-        <div>
-          <button
-            style={{
-              padding: ".5rem",
-              borderRadius: "5px",
-              border: "1px solid #ccc",
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              setShowChangeName(!showChangeName);
-            }}
-          >
-            ChangeName:
-          </button>
-          {showChangeName && (
-            <div>
-              <input
-                id="msgFrom"
-                type="text"
-                value={msgFrom}
-                onBlur={() => {
-                  setShowChangeName(false);
-                }}
-                onChange={(e) => {
-                  setMsgFrom(e.target.value);
-                }}
-              />
-            </div>
-          )}
-        </div>
+      <div>
+        <button
+          style={{
+            padding: ".5rem",
+            borderRadius: "5px",
+            border: "1px solid #ccc",
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            setShowChangeName(!showChangeName);
+          }}
+        >
+          ChangeName:
+        </button>
+        {showChangeName && (
+          <div>
+            <input
+              id="msgFrom"
+              type="text"
+              value={msgFrom}
+              onBlur={() => {
+                setShowChangeName(false);
+              }}
+              onChange={(e) => {
+                setMsgFrom(e.target.value);
+              }}
+            />
+          </div>
+        )}
+      </div>
 
+      <form action="">
         <input
           type="text"
           value={message}
@@ -89,7 +73,24 @@ export default function MessageBox() {
             setMessage(e.target.value);
           }}
         />
-        <input type="submit" value="Send" />
+        <input
+          type="submit"
+          value="Send"
+          onClick={(e) => {
+            e.preventDefault();
+            if (!message) {
+              return;
+            }
+            const roomId = searchParams.get("room") || getCustomLink();
+            setRoomAction(roomId, {
+              type: Constants.playerActions.CHAT,
+              by: getCustomLink(),
+              name: msgFrom,
+              message: message,
+            });
+            setMessage("");
+          }}
+        />
       </form>
     </div>
   );

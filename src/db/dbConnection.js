@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set } from "firebase/database";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_apiKey,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_authDomain,
@@ -12,22 +13,65 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-export const db = getDatabase(app);
-// export const dbRef = ref(db);
-// export const dbRefChild = (child) => ref(db, child + "/");
-export const roomsRef = ref(db, "rooms/");
-export const getRoomRef = (roomId) => ref(db, "rooms/" + roomId);
+// export const dbR = getDatabase(app);
+// // export const dbRef = ref(db);
+// // export const dbRefChild = (child) => ref(db, child + "/");
+// export const roomsRef = ref(dbR, "rooms/");
+// export const getRoomRef = (roomId) => ref(dbR, "rooms/" + roomId);
+
+// export const setRoomR = async (roomId, data) => {
+//   try {
+//     await set(ref(dbR, "rooms/" + roomId), data);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+// export const setRoomActionR = async (roomId, data) => {
+//   try {
+//     await set(ref(dbR, "actions/" + roomId), data);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+
+// export const setChatR = async (roomId, data) => {
+//   try {
+//     await set(ref(dbR, "chats/" + roomId), data);
+//   } catch (e) {
+//     console.log(e);
+//   }
+// };
+
+// export const getRoomR = async (roomId) => {
+//   try {
+//     const roomRef = ref(dbR, "rooms/" + roomId);
+//     const snapshot = await get(roomRef);
+//     if (snapshot.exists()) {
+//       console.log(snapshot.val());
+//       return snapshot.val();
+//     } else {
+//       console.log("No data available");
+//     }
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+
+export const db = getFirestore(app);
+const roomsCollection = "rooms";
+const actionsCollection = "actions";
+const chatsCollection = "chats";
 
 export const setRoom = async (roomId, data) => {
   try {
-    await set(ref(db, "rooms/" + roomId), data);
+    await setDoc(doc(db, roomsCollection, roomId), data);
   } catch (error) {
     console.log(error);
   }
 };
 export const setRoomAction = async (roomId, data) => {
   try {
-    await set(ref(db, "actions/" + roomId), data);
+    await setDoc(doc(db, actionsCollection, roomId), data);
   } catch (error) {
     console.log(error);
   }
@@ -35,23 +79,8 @@ export const setRoomAction = async (roomId, data) => {
 
 export const setChat = async (roomId, data) => {
   try {
-    await set(ref(db, "chats/" + roomId), data);
+    await setDoc(doc(db, chatsCollection, roomId), data);
   } catch (e) {
     console.log(e);
-  }
-};
-
-export const getRoom = async (roomId) => {
-  try {
-    const roomRef = ref(db, "rooms/" + roomId);
-    const snapshot = await get(roomRef);
-    if (snapshot.exists()) {
-      console.log(snapshot.val());
-      return snapshot.val();
-    } else {
-      console.log("No data available");
-    }
-  } catch (error) {
-    console.log(error);
   }
 };

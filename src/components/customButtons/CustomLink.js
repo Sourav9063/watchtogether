@@ -2,10 +2,11 @@
 import React, { useState } from "react";
 import style from "./CustomLink.module.css";
 import { getCustomLink } from "@/helper/customFunc";
-import { useRouter } from "next/navigation";
-import { getRoom, setRoom } from "@/db/dbConnection";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function CustomLink({ name, duration, currentTime, className }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [text, setText] = useState("Copy Joining Link");
   const classnames = `${style["button"]} ${className ? className : ""}`;
   return (
@@ -20,15 +21,13 @@ export default function CustomLink({ name, duration, currentTime, className }) {
           //   duration: duration,
           //   currentTime: currentTime,
           // });
+          console.log(window.location);
+          console.log(router);
+          console.log(searchParams.get);
 
-          const link =
-            window.location.href +
-            "?room=" +
-            getCustomLink() +
-            "&name=" +
-            name +
-            "&duration=" +
-            duration;
+          const roomId = searchParams.get("room") || getCustomLink();
+
+          const link = window.location.origin + "?room=" + roomId;
           navigator.clipboard.writeText(link);
           setText("Copied!");
           setTimeout(() => {

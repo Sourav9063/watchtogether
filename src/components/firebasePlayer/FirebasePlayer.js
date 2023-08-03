@@ -5,19 +5,16 @@ import ReactPlayer from "react-player";
 import CustomLink from "../customButtons/CustomLink";
 import { useSearchParams } from "next/navigation";
 import { getCustomLink, isURL, secondsToHMS } from "@/helper/customFunc";
-import { db, getRoomRef, setRoom, setRoomAction } from "@/db/dbConnection";
-import { onValue, ref } from "firebase/database";
+import { db, setRoom, setRoomAction } from "@/db/dbConnection";
 import { Constants } from "@/helper/CONSTANTS";
 import { toast } from "react-toastify";
 import MessageBox from "../message/MessageBox";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 
 let controlBySocket = false;
 export default function FirebaseVideoPlayer() {
   const videoPlayerRef = useRef(null);
   const searchParams = useSearchParams();
-  const [action, setAction] = useState(null);
-  const [time, setTime] = useState(null);
-
   const [src, setSrc] = useState(
     isURL(searchParams.get("name")) ? searchParams.get("name") : ""
   );
@@ -28,7 +25,7 @@ export default function FirebaseVideoPlayer() {
     const file = event.target.files[0];
     const url = URL.createObjectURL(file);
     videoPlayerRef.current.name = file.name;
-    console.log("first");
+    urlChangeEvent(file.name);
     setSrc(url);
   };
   const playEvent = async () => {
@@ -79,6 +76,12 @@ export default function FirebaseVideoPlayer() {
   };
   const urlChangeEvent = async (src) => {
     console.log("urlChange");
+    await setRoom(searchParams.get("room") || getCustomLink(), {
+      roomId: searchParams.get("room") || getCustomLink(),
+      url: src,
+      duration: videoPlayerRef.current.getDuration(),
+      currentTime: videoPlayerRef.current.getCurrentTime(),
+    });
     await setRoomAction(searchParams.get("room") || getCustomLink(), {
       type: Constants.playerActions.URLCHANGE,
       url: src,
@@ -89,12 +92,6 @@ export default function FirebaseVideoPlayer() {
   useEffect(() => {
     console.log("useEffect");
     setSeekCalled(false);
-    setRoom(searchParams.get("room") || getCustomLink(), {
-      roomId: searchParams.get("room") || getCustomLink(),
-      url: src,
-      duration: videoPlayerRef.current.getDuration(),
-      currentTime: videoPlayerRef.current.getCurrentTime(),
-    });
     return () => {};
   }, [src]);
 
@@ -120,45 +117,68 @@ export default function FirebaseVideoPlayer() {
 
   useEffect(() => {
     const roomId = searchParams.get("room") || getCustomLink();
-    // const query = ref(db, "rooms/" + roomId);
-    // onValue(query, (snapshot) => {
-    //   const data = snapshot.val();
-    //   if (snapshot.exists()) {
-    //     setSrc(data.url);
-    //   }
-    // });
-    const playerAction = ref(db, "actions/" + roomId);
-    return onValue(playerAction, (snapshot) => {
-      const data = snapshot.val();
-      if (snapshot.exists()) {
-        if (data.by === getCustomLink()) {
-          return;
-        }
 
-        controlBySocket = true;
-        switch (data.type) {
-          case Constants.playerActions.PLAY:
-            toast(`${data.type} by Someone at ${secondsToHMS(data.time)}`);
-            videoPlayerRef.current.seekTo(data.time);
-            setPlay(true);
-            break;
-          case Constants.playerActions.PAUSE:
-            toast(`${data.type} by Someone at ${secondsToHMS(data.time)}`);
-            setPlay(false);
-            break;
-          case Constants.playerActions.CHAT:
-            toast(`${data.name} said "${data.message}"`, {
-              autoClose: 10000,
-            });
-            break;
-          case Constants.playerActions.URLCHANGE:
-            toast(`${data.type} by Someone to ${data.url}`);
+    const playerAction = doc(db, "actions", roomId);
+    const roomDoc = doc(db, "rooms", roomId);
+
+    getDoc(roomDoc)
+      .then((doc) => {
+        if (doc.exists()) {
+          const data = doc.data();
+          console.log(data);
+          if (!data.url || data.url === src) return;
+          if (!isURL(data.url)) {
+            toast.error(
+              "Playing a local file named: " +
+                data.url +
+                " .Choose from your local files to play it.",
+              {
+                autoClose: 10000,
+              }
+            );
+          } else {
+            toast.success("Playing " + data.url);
             setSrc(data.url);
-            videoPlayerRef.current.seekTo(0);
-            break;
-          default:
-            break;
+            setLink(data.url);
+            videoPlayerRef.current.seekTo(data.currentTime);
+            setPlay(true);
+          }
         }
+      })
+      .catch((error) => {
+        console.log("Error getting document:", error);
+      });
+
+    return onSnapshot(playerAction, (snapshot) => {
+      const data = snapshot.data();
+
+      console.log(data);
+      if (!data || data.by === getCustomLink()) {
+        return;
+      }
+      controlBySocket = true;
+      switch (data.type) {
+        case Constants.playerActions.PLAY:
+          toast(`${data.type} by Someone at ${secondsToHMS(data.time)}`);
+          videoPlayerRef.current.seekTo(data.time);
+          setPlay(true);
+          break;
+        case Constants.playerActions.PAUSE:
+          toast(`${data.type} by Someone at ${secondsToHMS(data.time)}`);
+          setPlay(false);
+          break;
+        case Constants.playerActions.CHAT:
+          toast(`${data.name} said "${data.message}"`, {
+            autoClose: 10000,
+          });
+          break;
+        case Constants.playerActions.URLCHANGE:
+          toast(`${data.type} by Someone to ${data.url}`);
+          setSrc(data.url);
+          videoPlayerRef.current.seekTo(0);
+          break;
+        default:
+          break;
       }
     });
   }, []);
@@ -166,7 +186,7 @@ export default function FirebaseVideoPlayer() {
   return (
     <>
       <section>
-        {videoPlayerRef.current?.name && !searchParams.get("room") && (
+        {(videoPlayerRef.current?.name || src) && (
           <CustomLink
             name={videoPlayerRef.current.name}
             duration={videoPlayerRef.current.getDuration()}
@@ -216,7 +236,7 @@ export default function FirebaseVideoPlayer() {
         onChange={handleSubtitle}
       /> */}
       <div className={styles["title"]}>
-        {videoPlayerRef.current?.name || ""}
+        {videoPlayerRef.current?.name || src || ""}
       </div>
       <div className={styles["video-wrapper"]}>
         <ReactPlayer
@@ -286,3 +306,48 @@ onChange={handleChange}
 //     );
 //   };
 // }, [videoPlayerRef]);
+
+// useEffect(() => {
+//   const roomId = searchParams.get("room") || getCustomLink();
+//   // const query = ref(db, "rooms/" + roomId);
+//   // onValue(query, (snapshot) => {
+//   //   const data = snapshot.val();
+//   //   if (snapshot.exists()) {
+//   //     setSrc(data.url);
+//   //   }
+//   // });
+//   // const playerAction = ref(dbR, "actions/" + roomId);
+//   // return onValue(playerAction, (snapshot) => {
+//   //   const data = snapshot.val();
+//   //   if (snapshot.exists()) {
+//   //     if (data.by === getCustomLink()) {
+//   //       return;
+//   //     }
+
+//   //     controlBySocket = true;
+//   //     switch (data.type) {
+//   //       case Constants.playerActions.PLAY:
+//   //         toast(`${data.type} by Someone at ${secondsToHMS(data.time)}`);
+//   //         videoPlayerRef.current.seekTo(data.time);
+//   //         setPlay(true);
+//   //         break;
+//   //       case Constants.playerActions.PAUSE:
+//   //         toast(`${data.type} by Someone at ${secondsToHMS(data.time)}`);
+//   //         setPlay(false);
+//   //         break;
+//   //       case Constants.playerActions.CHAT:
+//   //         toast(`${data.name} said "${data.message}"`, {
+//   //           autoClose: 10000,
+//   //         });
+//   //         break;
+//   //       case Constants.playerActions.URLCHANGE:
+//   //         toast(`${data.type} by Someone to ${data.url}`);
+//   //         setSrc(data.url);
+//   //         videoPlayerRef.current.seekTo(0);
+//   //         break;
+//   //       default:
+//   //         break;
+//   //     }
+//   //   }
+//   // });
+// }, []);
