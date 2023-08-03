@@ -11,8 +11,12 @@ export default function MessageBox() {
 
   const [showChangeName, setShowChangeName] = useState(false);
 
-  const [message, setMessage] = useState(null);
-  const [msgFrom, setMsgFrom] = useState(getCustomLink());
+  const [message, setMessage] = useState("");
+  const [msgFrom, setMsgFrom] = useState("");
+  useEffect(() => {
+    setMsgFrom(getCustomLink());
+    return () => {};
+  }, []);
 
   // useEffect(() => {
   //   const roomId = searchParams.get("room") || getCustomLink();
