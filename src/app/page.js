@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <>
       <main className={styles.main}>
-        <Link href={"/"}>
+        <Link href={"/"} style={{ textDecoration: "none" }}>
           <h1>Sync Play</h1>
         </Link>
         {false ? <ReactVideoPlayer /> : <FirebaseVideoPlayer />}

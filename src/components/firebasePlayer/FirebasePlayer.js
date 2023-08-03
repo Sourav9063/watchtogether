@@ -198,7 +198,7 @@ export default function FirebaseVideoPlayer() {
                 }
               }}
             />
-            <h3>Or</h3>
+            <div>Or</div>
             <input
               type="file"
               accept="video/* .mkv .mp4 .webm .ogv"
