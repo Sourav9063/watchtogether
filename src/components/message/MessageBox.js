@@ -33,9 +33,9 @@ export default function MessageBox() {
   // }, []);
 
   return (
-    <div>
+    <div className="message">
       <h2>Messaging</h2>
-      <h4>{`From: ${msgFrom}`}</h4>
+      <div>{`From: ${msgFrom}`}</div>
 
       <div>
         <button
@@ -50,7 +50,7 @@ export default function MessageBox() {
             setShowChangeName(!showChangeName);
           }}
         >
-          ChangeName:
+          Change Name
         </button>
         {showChangeName && (
           <div>
@@ -58,9 +58,6 @@ export default function MessageBox() {
               id="msgFrom"
               type="text"
               value={msgFrom}
-              onBlur={() => {
-                setShowChangeName(false);
-              }}
               onChange={(e) => {
                 setMsgFrom(e.target.value);
               }}
@@ -93,6 +90,7 @@ export default function MessageBox() {
               message: message,
             });
             setMessage("");
+            setShowChangeName(false);
           }}
         />
       </form>

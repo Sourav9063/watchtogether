@@ -21,13 +21,9 @@ export default function CustomLink({ name, duration, currentTime, className }) {
           //   duration: duration,
           //   currentTime: currentTime,
           // });
-          console.log(window.location);
-          console.log(router);
-          console.log(searchParams.get);
-
           const roomId = searchParams.get("room") || getCustomLink();
 
-          const link = window.location.origin + "?room=" + roomId;
+          const link = window.location.origin + "/?room=" + roomId;
           navigator.clipboard.writeText(link);
           setText("Copied!");
           setTimeout(() => {

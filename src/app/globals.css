@@ -80,6 +80,10 @@
 input {
   font-size: 14px;
   padding: 8px;
-  border-radius: 5px;
+  border-radius: 8px;
   border: 1px solid #ccc;
+}
+
+.message>* {
+  margin-bottom: 4px;
 }
