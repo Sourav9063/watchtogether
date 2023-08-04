@@ -15,6 +15,13 @@
   outline: none;
 }
 
+.input-wrapper {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #9000ff65;
+  margin-bottom: 10px;
+}
+
 .title {
   font-weight: bold;
   margin-block: .5rem;
@@ -27,16 +34,16 @@
   display: flex;
   justify-content: space-evenly;
   align-items: stretch;
-  margin-block: .5rem;
+  margin-top: .5rem;
   gap: 1rem;
 }
 
 .control-wrapper>* {
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  padding: 1rem;
+  border-radius: 5px;
   min-height: 100%;
   max-width: 100vw;
+  width: 100%;
+  overflow: hidden;
 }
 
 @media screen and (max-width: 768px) {
@@ -48,5 +55,16 @@
     height: 100%;
   }
 
+}
 
+.toast-msg {
+  background-color: rgba(144, 0, 255, 0.4) !important;
+}
+
+.toast-play {
+  background-color: rgba(0, 255, 217, 0.4) !important;
+}
+
+.toast-pause {
+  background-color: rgba(255, 0, 85, 0.4) !important;
 }

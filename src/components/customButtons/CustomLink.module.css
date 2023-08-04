@@ -2,22 +2,23 @@
   --primary-color: #111;
   --secondary-color: #fff;
   --hover-color: #645bff;
-  ;
   --arrow-width: 10px;
   --arrow-stroke: 2px;
   box-sizing: border-box;
   border: 0;
-  border-radius: 8px;
+  border-radius: 5px;
   color: var(--secondary-color);
   padding: 8px;
   background: var(--primary-color);
   display: flex;
+  justify-content: center;
   transition: 0.2s background;
   align-items: center;
   gap: 0.6em;
   font-weight: bold;
-  border: #635bff7f solid var(--arrow-stroke);
+  border: #9000ff65 solid var(--arrow-stroke);
   cursor: pointer;
+  margin-top: 5px;
 }
 
 .button .arrow-wrapper {

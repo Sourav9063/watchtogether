@@ -80,9 +80,41 @@
 input {
   font-size: 14px;
   padding: 8px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+  border: 1px solid #9000ff65;
   max-width: calc(100vw - 16px);
+}
+
+button {
+  --primary-color: #111;
+  --secondary-color: #fff;
+  --hover-color: #645bff;
+  --arrow-width: 10px;
+  --arrow-stroke: 2px;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 5px;
+  color: var(--secondary-color);
+  padding: 8px;
+  background: var(--primary-color);
+  display: flex;
+  justify-content: center;
+  transition: 0.2s background;
+  align-items: center;
+  gap: 0.6em;
+  font-weight: bold;
+  border: #9000ff65 solid var(--arrow-stroke);
+  cursor: pointer;
+  margin-top: 4px;
+  padding: .5rem;
+  border-radius: 5px;
+  width: 100%;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: var(--hover-color);
 }
 
 .message>* {
