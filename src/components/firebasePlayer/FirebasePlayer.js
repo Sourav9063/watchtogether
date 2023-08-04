@@ -126,7 +126,7 @@ export default function FirebaseVideoPlayer() {
       .then((doc) => {
         if (doc.exists()) {
           const data = doc.data();
-          console.log(data);
+
           if (!data.url || data.url === src) return;
           if (!isURL(data.url)) {
             toast.error(
@@ -157,8 +157,6 @@ export default function FirebaseVideoPlayer() {
 
     return onSnapshot(playerAction, (snapshot) => {
       const data = snapshot.data();
-
-      console.log(data);
       if (!data || data.by === getCustomLink()) {
         return;
       }
@@ -176,8 +174,8 @@ export default function FirebaseVideoPlayer() {
               },
             }
           );
-          videoPlayerRef.current.seekTo(data.time);
           setPlay(true);
+          videoPlayerRef.current.seekTo(data.time);
           break;
         case Constants.playerActions.PAUSE:
           toast(

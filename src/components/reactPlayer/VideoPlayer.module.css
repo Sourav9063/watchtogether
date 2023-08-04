@@ -49,6 +49,7 @@
 @media screen and (max-width: 768px) {
   .control-wrapper {
     flex-direction: column;
+    gap: 4px;
   }
 
   .video-player {
