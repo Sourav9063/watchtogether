@@ -135,6 +135,11 @@ export default function FirebaseVideoPlayer() {
                 " .Choose from your local files to play it.",
               {
                 autoClose: 10000,
+                className: styles["toast-pause"],
+                progressStyle: {
+                  background: "#ff0055",
+                  height: "2px",
+                },
               }
             );
           } else {
@@ -158,33 +163,62 @@ export default function FirebaseVideoPlayer() {
         return;
       }
       controlBySocket = true;
+      const name = data.username ? data.username : data.by;
       switch (data.type) {
         case Constants.playerActions.PLAY:
-          toast(`${data.type} by Someone at ${secondsToHMS(data.time)}`);
+          toast(
+            `Played by ${name || "someone"} at ${secondsToHMS(data.time)}`,
+            {
+              className: styles["toast-play"],
+              progressStyle: {
+                background: "#00ffd9",
+                height: "2px",
+              },
+            }
+          );
           videoPlayerRef.current.seekTo(data.time);
           setPlay(true);
           break;
         case Constants.playerActions.PAUSE:
-          toast(`${data.type} by Someone at ${secondsToHMS(data.time)}`);
+          toast(
+            `Paused by  ${name || "someone"} at ${secondsToHMS(data.time)}`,
+            {
+              className: styles["toast-pause"],
+              progressStyle: {
+                background: "#ff0055",
+                height: "2px",
+              },
+            }
+          );
           setPlay(false);
           break;
         case Constants.playerActions.CHAT:
           toast(`${data.name} said "${data.message}"`, {
             autoClose: 10000,
+            className: styles["toast-msg"],
+            progressStyle: {
+              background: "#9000ff",
+              height: "2px",
+            },
           });
           break;
         case Constants.playerActions.URLCHANGE:
           if (isURL(data.url)) {
-            toast(`${data.type} by Someone to "${data.url}"`);
+            toast(`URL changed by ${name || "someone"} to "${data.url}"`);
             setSrc(data.url);
             videoPlayerRef.current.seekTo(0);
           } else {
             toast.error(
               "Playing a local file named: " +
                 data.url +
-                " .Choose from your local files to play it.",
+                " .Choose the video from your storage.",
               {
                 autoClose: 10000,
+                className: styles["toast-pause"],
+                progressStyle: {
+                  background: "#ff0055",
+                  height: "2px",
+                },
               }
             );
           }
@@ -207,36 +241,43 @@ export default function FirebaseVideoPlayer() {
         )}
         <div className={styles["control-wrapper"]}>
           <form action="">
-            <h2>Choose Source</h2>
-            <input
-              className={styles["input-link"]}
-              type="text"
-              value={link}
-              onChange={(e) => {
-                setLink(e.target.value);
-              }}
-            />
-            <input
-              type="submit"
-              className={styles["link-submit"]}
-              onClick={(e) => {
-                e.preventDefault();
-                console.log(link);
-                console.log(isURL(link));
-                if (link && isURL(link)) {
-                  videoPlayerRef.current.name = link;
-                  setSrc(link);
-                  urlChangeEvent(link);
-                }
-              }}
-            />
-            <div>Or</div>
-            <input
-              type="file"
-              accept="video/* .mkv .mp4 .webm .ogv"
-              onInput={handleChange}
-              placeholder="Select Video"
-            />
+            <h3>Choose Source</h3>
+            <div className={styles["input-wrapper"]}>
+              <div>Paste Video Link</div>
+              <input
+                className={styles["input-link"]}
+                type="text"
+                value={link}
+                onChange={(e) => {
+                  setLink(e.target.value);
+                }}
+              />
+              <button
+                type="submit"
+                className={styles["link-submit"]}
+                onClick={(e) => {
+                  e.preventDefault();
+                  console.log(link);
+                  console.log(isURL(link));
+                  if (link && isURL(link)) {
+                    videoPlayerRef.current.name = link;
+                    setSrc(link);
+                    urlChangeEvent(link);
+                  }
+                }}
+              >
+                Set Video
+              </button>
+            </div>
+            <div className={styles["input-wrapper"]}>
+              <div>Or, Select Local Video</div>
+              <input
+                type="file"
+                accept="video/* .mkv .mp4 .webm .ogv"
+                onInput={handleChange}
+                placeholder="Select Video"
+              />
+            </div>
           </form>
           <MessageBox />
         </div>

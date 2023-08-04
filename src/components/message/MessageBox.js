@@ -34,25 +34,16 @@ export default function MessageBox() {
 
   return (
     <div className="message">
-      <h2>Messaging</h2>
-      <div>{`From: ${msgFrom}`}</div>
-
-      <div>
-        <button
-          style={{
-            padding: ".5rem",
-            borderRadius: "5px",
-            border: "1px solid #ccc",
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            setShowChangeName(!showChangeName);
-          }}
-        >
-          Change Name
-        </button>
-        {showChangeName && (
+      <h3>Messaging</h3>
+      <div
+        style={{
+          border: "1px solid  #9000ff65",
+          padding: "6px",
+          borderRadius: "5px",
+          marginBottom: "10px",
+        }}
+      >
+        {showChangeName ? (
           <div>
             <input
               id="msgFrom"
@@ -63,10 +54,30 @@ export default function MessageBox() {
               }}
             />
           </div>
+        ) : (
+          <div>{`From: ${msgFrom}`}</div>
         )}
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            setShowChangeName(!showChangeName);
+          }}
+        >
+          Change Name
+        </button>
       </div>
 
-      <form action="">
+      <form
+        action=""
+        style={{
+          border: "1px solid #9000ff65",
+          padding: "6px",
+          borderRadius: "5px",
+        }}
+      >
+        <div>Message:</div>
         <input
           type="text"
           value={message}
@@ -74,7 +85,7 @@ export default function MessageBox() {
             setMessage(e.target.value);
           }}
         />
-        <input
+        <button
           type="submit"
           value="Send"
           onClick={(e) => {
@@ -92,7 +103,9 @@ export default function MessageBox() {
             setMessage("");
             setShowChangeName(false);
           }}
-        />
+        >
+          Send
+        </button>
       </form>
     </div>
   );
