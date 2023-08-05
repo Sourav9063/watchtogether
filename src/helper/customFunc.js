@@ -54,7 +54,7 @@ export async function handleFileUpload(file) {
 
 export const isURL = (url) => {
   if (!url) return false;
-  return (!url && url.includes("http://")) || url.includes("https://");
+  return url.includes("http://") || url.includes("https://");
 };
 
 export const getAllQueryParams = (url) => {
