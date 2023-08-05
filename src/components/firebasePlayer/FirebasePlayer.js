@@ -12,6 +12,7 @@ import MessageBox from "../message/MessageBox";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 
 let controlBySocket = false;
+let seekCalledG = false;
 export default function FirebaseVideoPlayer() {
   const videoPlayerRef = useRef(null);
   const searchParams = useSearchParams();
@@ -30,8 +31,6 @@ export default function FirebaseVideoPlayer() {
   };
   const playEvent = async () => {
     console.log("play");
-    console.log(controlBySocket + getCustomLink());
-
     if (controlBySocket) {
       controlBySocket = false;
       return;
@@ -44,12 +43,16 @@ export default function FirebaseVideoPlayer() {
       by: getCustomLink(),
     });
   };
-  const pauseEvent = async () => {
+  const pauseEvent = async (e) => {
+    console.log(e);
     console.log("pause");
-    console.log(controlBySocket + getCustomLink());
-
+    console.log(seekCalledG);
     if (controlBySocket) {
       controlBySocket = false;
+      return;
+    }
+    if (seekCalledG) {
+      seekCalledG = false;
       return;
     }
     console.log("pause called");
@@ -204,7 +207,6 @@ export default function FirebaseVideoPlayer() {
           if (isURL(data.url)) {
             toast(`URL changed by ${name || "someone"} to "${data.url}"`);
             setSrc(data.url);
-            videoPlayerRef.current.seekTo(0);
           } else {
             toast.error(
               "Playing a local file named: " +
@@ -240,7 +242,7 @@ export default function FirebaseVideoPlayer() {
         <div className={styles["control-wrapper"]}>
           <form action="">
             <h3>Choose Source</h3>
-            <div className={styles["input-wrapper"]}>
+            <div className={`${styles["input-wrapper"]} input-wrapper `}>
               <div>Paste Video Link</div>
               <input
                 className={styles["input-link"]}
@@ -261,13 +263,22 @@ export default function FirebaseVideoPlayer() {
                     videoPlayerRef.current.name = link;
                     setSrc(link);
                     urlChangeEvent(link);
+                  } else {
+                    toast.error("Please input correct URL", {
+                      autoClose: 2000,
+                      className: styles["toast-pause"],
+                      progressStyle: {
+                        background: "#ff0055",
+                        height: "2px",
+                      },
+                    });
                   }
                 }}
               >
                 Set Video
               </button>
             </div>
-            <div className={styles["input-wrapper"]}>
+            <div className={`${styles["input-wrapper"]} input-wrapper `}>
               <div>Or, Select Local Video</div>
               <input
                 type="file"
@@ -309,7 +320,9 @@ export default function FirebaseVideoPlayer() {
           }}
           onPlay={playEvent}
           onPause={pauseEvent}
-          // onSeek={seekEvent}
+          onSeek={(e) => {
+            seekCalledG = true;
+          }}
           onBufferEnd={(e) => {
             setPlay(true);
           }}
