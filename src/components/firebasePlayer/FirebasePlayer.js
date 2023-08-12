@@ -10,6 +10,8 @@ import { Constants } from "@/helper/CONSTANTS";
 import { toast } from "react-toastify";
 import MessageBox from "../message/MessageBox";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { default as toWebVTT } from "srt-webvtt";
+// import sth from "./sth.vtt";
 
 let controlBySocket = false;
 let seekCalledG = false;
@@ -28,6 +30,16 @@ export default function FirebaseVideoPlayer() {
     videoPlayerRef.current.name = file.name;
     urlChangeEvent(file.name);
     setSrc(url);
+  };
+
+  const handleSubChange = async (event) => {
+    const file = event.target.files[0];
+    const textTrackUrl = await toWebVTT(file);
+
+    const track = document.querySelector("track");
+    const video = document.querySelector("video");
+    track.src = textTrackUrl;
+    video.textTracks[0].mode = "show";
   };
   const playEvent = async () => {
     console.log("play");
@@ -242,53 +254,64 @@ export default function FirebaseVideoPlayer() {
         <div className={styles["control-wrapper"]}>
           <form action="">
             <h3>Choose Source</h3>
-            <div className={`${styles["input-wrapper"]} input-wrapper `}>
-              <div>Paste Video Link</div>
-              <input
-                className={styles["input-link"]}
-                type="text"
-                value={link}
-                onChange={(e) => {
-                  setLink(e.target.value);
-                }}
-              />
-              <button
-                type="submit"
-                className={styles["link-submit"]}
-                onClick={(e) => {
-                  e.preventDefault();
-                  console.log(link);
-                  console.log(isURL(link));
-                  if (link && isURL(link)) {
-                    videoPlayerRef.current.name = link;
-                    setSrc(link);
-                    urlChangeEvent(link);
-                  } else {
-                    toast.error("Please input correct URL", {
-                      autoClose: 2000,
-                      className: styles["toast-pause"],
-                      progressStyle: {
-                        background: "#ff0055",
-                        height: "2px",
-                      },
-                    });
-                  }
-                }}
-              >
-                Set Video
-              </button>
-            </div>
-            <div className={`${styles["input-wrapper"]} input-wrapper `}>
-              <div>Or, Select Local Video</div>
-              <input
-                type="file"
-                accept="video/* .mkv .mp4 .webm .ogv"
-                onInput={handleChange}
-                placeholder="Select Video"
-              />
+            <div className={styles["all-input-wrapper"]}>
+              <div className={`${styles["input-wrapper"]} input-wrapper `}>
+                <div>Paste Video Link</div>
+                <input
+                  className={styles["input-link"]}
+                  type="text"
+                  value={link}
+                  onChange={(e) => {
+                    setLink(e.target.value);
+                  }}
+                />
+                <button
+                  type="submit"
+                  className={styles["link-submit"]}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log(link);
+                    console.log(isURL(link));
+                    if (link && isURL(link)) {
+                      videoPlayerRef.current.name = link;
+                      setSrc(link);
+                      urlChangeEvent(link);
+                    } else {
+                      toast.error("Please input correct URL", {
+                        autoClose: 2000,
+                        className: styles["toast-pause"],
+                        progressStyle: {
+                          background: "#ff0055",
+                          height: "2px",
+                        },
+                      });
+                    }
+                  }}
+                >
+                  Set Video
+                </button>
+                <p className={styles["notice"]}>
+                  *Make sure the link is accessible by all.
+                </p>
+              </div>
+              <div className={`${styles["input-wrapper"]} input-wrapper `}>
+                <div>Or, Select Local Video</div>
+                <input
+                  type="file"
+                  accept="video/* .mkv .mp4 .webm .ogv"
+                  onInput={handleChange}
+                  placeholder="Select Video"
+                />
+                <div>Select Subtitle</div>
+                <input
+                  type="file"
+                  accept="text/vtt .vtt .srt"
+                  onInput={handleSubChange}
+                  placeholder="Select Subtitle"
+                />
+              </div>
             </div>
           </form>
-          <MessageBox />
         </div>
       </section>
 
@@ -326,8 +349,26 @@ export default function FirebaseVideoPlayer() {
           onBufferEnd={(e) => {
             setPlay(true);
           }}
+          config={{
+            file: {
+              attributes: {
+                crossOrigin: "true",
+              },
+              tracks: [
+                {
+                  kind: "subtitles",
+                  // src: "https://prod.fitflexapp.com/files/captions/2021/11/18/23-b2j0oOsJ.vtt",
+                  src: "https://sourav9063.github.io/static-json/vtt/sth.vtt",
+                  srcLang: "en",
+                  default: true,
+                  mode: "show",
+                },
+              ],
+            },
+          }}
         ></ReactPlayer>
       </div>
+      <MessageBox />
     </>
   );
 }

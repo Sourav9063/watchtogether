@@ -34,79 +34,78 @@ export default function MessageBox() {
 
   return (
     <div className="message">
-      <h3>Messaging</h3>
-      <div
-        style={{
-          border: "1px solid  #9000ff65",
-          padding: "6px",
-          borderRadius: "5px",
-          marginBottom: "10px",
-        }}
-      >
-        {showChangeName ? (
-          <div>
-            <input
-              id="msgFrom"
-              type="text"
-              value={msgFrom}
-              onChange={(e) => {
-                setMsgFrom(e.target.value);
-              }}
-            />
-          </div>
-        ) : (
-          <div>{`From: ${msgFrom}`}</div>
-        )}
-
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            setShowChangeName(!showChangeName);
+      <h3 style={{ marginBlock: "5px" }}>Messaging</h3>
+      <div className="messageBox">
+        <form
+          action=""
+          style={{
+            border: "1px solid #9000ff65",
+            padding: "6px",
+            borderRadius: "5px",
           }}
         >
-          Change Name
-        </button>
+          <div style={{ marginBottom: "5px" }}>Message:</div>
+          <input
+            type="text"
+            value={message}
+            onChange={(e) => {
+              setMessage(e.target.value);
+            }}
+          />
+          <button
+            type="submit"
+            value="Send"
+            onClick={(e) => {
+              e.preventDefault();
+              if (!message) {
+                return;
+              }
+              const roomId = searchParams.get("room") || getCustomLink();
+              setRoomAction(roomId, {
+                type: Constants.playerActions.CHAT,
+                by: getCustomLink(),
+                name: msgFrom,
+                message: message,
+              });
+              setMessage("");
+              setShowChangeName(false);
+            }}
+          >
+            Send
+          </button>
+        </form>
+        <div
+          style={{
+            border: "1px solid  #9000ff65",
+            padding: "6px",
+            borderRadius: "5px",
+          }}
+        >
+          {showChangeName ? (
+            <div>
+              <input
+                id="msgFrom"
+                type="text"
+                value={msgFrom}
+                onChange={(e) => {
+                  setMsgFrom(e.target.value);
+                }}
+              />
+            </div>
+          ) : (
+            <div>{`From: ${msgFrom}`}</div>
+          )}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              setShowChangeName(!showChangeName);
+            }}
+          >
+            Change Name
+          </button>
+        </div>
       </div>
-
-      <form
-        action=""
-        style={{
-          border: "1px solid #9000ff65",
-          padding: "6px",
-          borderRadius: "5px",
-        }}
-      >
-        <div>Message:</div>
-        <input
-          type="text"
-          value={message}
-          onChange={(e) => {
-            setMessage(e.target.value);
-          }}
-        />
-        <button
-          type="submit"
-          value="Send"
-          onClick={(e) => {
-            e.preventDefault();
-            if (!message) {
-              return;
-            }
-            const roomId = searchParams.get("room") || getCustomLink();
-            setRoomAction(roomId, {
-              type: Constants.playerActions.CHAT,
-              by: getCustomLink(),
-              name: msgFrom,
-              message: message,
-            });
-            setMessage("");
-            setShowChangeName(false);
-          }}
-        >
-          Send
-        </button>
-      </form>
     </div>
   );
 }

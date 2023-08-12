@@ -84,6 +84,7 @@ input {
   width: 100%;
   border: 1px solid #9000ff65;
   max-width: calc(100vw - 16px);
+  background-color: #ffffff15;
 }
 
 button {
@@ -117,10 +118,19 @@ button:hover {
   background-color: var(--hover-color);
 }
 
-.message>*>* {
+.input-wrapper>* {
   margin-bottom: 4px;
 }
 
-.input-wrapper>* {
-  margin-bottom: 4px;
+.messageBox {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media screen and (max-width: 600px) {
+  .messageBox {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
 }

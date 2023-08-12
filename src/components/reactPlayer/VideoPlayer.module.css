@@ -15,11 +15,17 @@
   outline: none;
 }
 
+.all-input-wrapper {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+}
+
+
 .input-wrapper {
   padding: 8px;
   border-radius: 5px;
   border: 1px solid #9000ff65;
-  margin-bottom: 10px;
 }
 
 .title {
@@ -46,7 +52,20 @@
   overflow: hidden;
 }
 
+.notice {
+  font-size: 12px;
+  color: rgba(255, 0, 0, 0.5);
+  text-align: center;
+
+}
+
 @media screen and (max-width: 768px) {
+  .all-input-wrapper {
+    grid-template-columns: 1fr;
+    gap: 4px;
+
+  }
+
   .control-wrapper {
     flex-direction: column;
     gap: 4px;
