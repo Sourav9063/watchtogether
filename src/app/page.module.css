@@ -6,12 +6,14 @@
   padding-inline: 2rem;
   padding-block: 1rem;
   min-height: 100vh;
+  /* --left-color: rgba(204, 0, 187, 0.25);
+  --right-color: rgba(0, 70, 209, 0.25); */
   /* background: linear-gradient(218.73deg, rgba(204, 0, 187, 0.25) 0%, rgba(201, 32, 184, 0) 50%),
     linear-gradient(321.27deg, rgba(0, 70, 209, 0) 50%, rgba(0, 70, 209, 0.25) 100%); */
 
-  background: linear-gradient(38.73deg, rgba(204, 0, 187, 0.25) 0%, rgba(201, 32, 184, 0) 50%), linear-gradient(141.27deg, rgba(0, 70, 209, 0) 50%, rgba(0, 70, 209, 0.25) 100%);
-  ;
-  ;
+  background: linear-gradient(38.73deg, var(--left-color) 0%, rgba(201, 32, 184, 0) 50%), linear-gradient(141.27deg, rgba(0, 70, 209, 0) 50%, var(--right-color) 100%);
+  background-color: rgb(var(--background-end-rgb));
+
 }
 
 @media screen and (max-width: 768px) {

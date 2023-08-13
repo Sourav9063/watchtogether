@@ -3,8 +3,14 @@ import React, { useEffect, useRef, useState } from "react";
 import styles from "../reactPlayer/VideoPlayer.module.css";
 import ReactPlayer from "react-player";
 import CustomLink from "../customButtons/CustomLink";
+import styleMain from "@/app/page.module.css";
 import { useSearchParams } from "next/navigation";
-import { getCustomLink, isURL, secondsToHMS } from "@/helper/customFunc";
+import {
+  getCustomLink,
+  isURL,
+  randomRGBA,
+  secondsToHMS,
+} from "@/helper/customFunc";
 import { db, setRoom, setRoomAction } from "@/db/dbConnection";
 import { Constants } from "@/helper/CONSTANTS";
 import { toast } from "react-toastify";
@@ -169,6 +175,10 @@ export default function FirebaseVideoPlayer() {
       .catch((error) => {
         console.log("Error getting document:", error);
       });
+
+    const main = document.querySelector("." + styleMain.main);
+    main.style.setProperty("--left-color", randomRGBA());
+    main.style.setProperty("--right-color", randomRGBA());
 
     return onSnapshot(playerAction, (snapshot) => {
       const data = snapshot.data();
