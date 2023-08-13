@@ -134,3 +134,7 @@ button:hover {
     gap: 4px;
   }
 }
+
+body::-webkit-scrollbar {
+  width: 0;
+}
