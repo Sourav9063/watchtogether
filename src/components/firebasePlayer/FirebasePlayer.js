@@ -20,7 +20,6 @@ import { default as toWebVTT } from "srt-webvtt";
 // import sth from "./sth.vtt";
 
 let controlBySocket = false;
-let seekCalledG = false;
 export default function FirebaseVideoPlayer() {
   const videoPlayerRef = useRef(null);
   const searchParams = useSearchParams();
@@ -62,18 +61,11 @@ export default function FirebaseVideoPlayer() {
     });
   };
   const pauseEvent = async (e) => {
-    console.log(e);
-    console.log("pause");
-    console.log(seekCalledG);
     if (controlBySocket) {
       controlBySocket = false;
       return;
     }
-    if (seekCalledG) {
-      seekCalledG = false;
-      return;
-    }
-    console.log("pause called");
+
     await setRoomAction(searchParams.get("room") || getCustomLink(), {
       type: Constants.playerActions.PAUSE,
       time: videoPlayerRef.current.getCurrentTime(),
@@ -112,7 +104,6 @@ export default function FirebaseVideoPlayer() {
   };
 
   useEffect(() => {
-    console.log("useEffect");
     setSeekCalled(false);
     return () => {};
   }, [src]);
@@ -353,9 +344,9 @@ export default function FirebaseVideoPlayer() {
           }}
           onPlay={playEvent}
           onPause={pauseEvent}
-          onSeek={(e) => {
-            seekCalledG = true;
-          }}
+          // onSeek={(e) => {
+
+          // }}
           onBufferEnd={(e) => {
             setPlay(true);
           }}
