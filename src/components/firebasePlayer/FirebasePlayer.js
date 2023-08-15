@@ -219,7 +219,9 @@ export default function FirebaseVideoPlayer() {
         case Constants.playerActions.URLCHANGE:
           if (isURL(data.url)) {
             toast(`URL changed by ${name || "someone"} to "${data.url}"`);
+            setSrc("");
             setSrc(data.url);
+            setLink(data.url);
           } else {
             toast.error(
               "Playing a local file named: " +
@@ -276,7 +278,6 @@ export default function FirebaseVideoPlayer() {
                     if (link && isURL(link)) {
                       videoPlayerRef.current.name = link;
                       setSrc(link);
-                      urlChangeEvent(link);
                     } else {
                       toast.error("Please input correct URL", {
                         autoClose: 2000,
@@ -290,6 +291,31 @@ export default function FirebaseVideoPlayer() {
                   }}
                 >
                   Set Video
+                </button>
+                <button
+                  type="button"
+                  className={styles["link-submit"]}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log(link);
+                    console.log(isURL(link));
+                    if (link && isURL(link)) {
+                      videoPlayerRef.current.name = link;
+                      setSrc(link);
+                      urlChangeEvent(link);
+                    } else {
+                      toast.error("Please input correct URL", {
+                        autoClose: 2000,
+                        className: styles["toast-pause"],
+                        progressStyle: {
+                          background: "#ff0055",
+                          height: "2px",
+                        },
+                      });
+                    }
+                  }}
+                >
+                  Sync URL
                 </button>
                 <p className={styles["notice"]}>
                   *Make sure the link is accessible by all.
