@@ -325,7 +325,16 @@ export default function FirebaseVideoPlayer() {
                 <div>Or, Select Local Video</div>
                 <input
                   type="file"
-                  accept="video/* .mkv .mp4 .webm .ogv"
+                  accept="'video/mp4,.mp4,
+                  video/avi,.avi,
+                  video/mpeg,.mpeg,.mpg,
+                  video/3gpp,.3gp,.divx,
+                  video/x-flv,.flv,
+                  video/x-matroska,.mkv,
+                  video/quicktime,.mov,
+                  audio/ogg,.ogg,
+                  video/webm,.webm,
+                  video/x-ms-wmv,.wmv'"
                   onInput={handleChange}
                   placeholder="Select Video"
                 />
