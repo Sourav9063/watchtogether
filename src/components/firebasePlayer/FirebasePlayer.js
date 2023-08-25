@@ -17,10 +17,12 @@ import { toast } from "react-toastify";
 import MessageBox from "../message/MessageBox";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { default as toWebVTT } from "srt-webvtt";
+import useOnlineStatus from "@/helper/hooks/useOnlineStatus";
 // import sth from "./sth.vtt";
 
 let controlBySocket = false;
 export default function FirebaseVideoPlayer() {
+  const isOnline = useOnlineStatus();
   const videoPlayerRef = useRef(null);
   const searchParams = useSearchParams();
   const [src, setSrc] = useState(
@@ -356,9 +358,17 @@ export default function FirebaseVideoPlayer() {
         accept="text/vtt .vtt .srt"
         onChange={handleSubtitle}
       /> */}
-      <div className={styles["title"]}>
-        {videoPlayerRef.current?.name || src || ""}
-      </div>
+      {!isOnline && (
+        <div className={`${styles["title"]} ${styles["color-red"]} `}>
+          You are currently offline! <br></br> Controls will not be synced!!
+        </div>
+      )}
+      {videoPlayerRef.current?.name ||
+        (src && (
+          <div className={styles["title"]}>
+            {videoPlayerRef.current?.name || src || ""}
+          </div>
+        ))}
       <div className={styles["video-wrapper"]}>
         <ReactPlayer
           width={"100%"}

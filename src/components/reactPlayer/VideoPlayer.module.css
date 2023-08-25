@@ -59,6 +59,10 @@
 
 }
 
+.color-red {
+  color: red;
+}
+
 @media screen and (max-width: 768px) {
   .all-input-wrapper {
     grid-template-columns: 1fr;

@@ -27,6 +27,7 @@ export default function RootLayout({ children }) {
         toastStyle={{
           backdropFilter: "blur(10px)",
           backgroundColor: "rgba(0,123,167,0.4)",
+          minHeight: "0px",
         }}
         closeButton={<Close />}
         bodyStyle={{}}
