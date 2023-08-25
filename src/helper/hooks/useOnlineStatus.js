@@ -16,7 +16,6 @@ export default function useOnlineStatus() {
 
     toast(`You are connected!`, {
       position: "top-right",
-      autoClose: false,
       className: styles["toast-play"],
       progressStyle: {
         background: "#00ffd9",
