@@ -369,7 +369,11 @@ export default function FirebaseVideoPlayer() {
             {videoPlayerRef.current?.name || src || ""}
           </div>
         ))}
-      <div className={styles["video-wrapper"]}>
+      <div
+        className={`${styles["video-wrapper"]} ${
+          !src ? styles["video-wrapper-null"] : ""
+        } `}
+      >
         <ReactPlayer
           width={"100%"}
           height={"100%"}

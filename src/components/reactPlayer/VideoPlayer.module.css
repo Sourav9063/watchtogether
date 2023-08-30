@@ -1,7 +1,12 @@
 .video-wrapper {
   width: 100%;
   aspect-ratio: 16/9;
+  transition: width .7s ease;
 
+}
+
+.video-wrapper-null {
+  width: 100px;
 }
 
 .video-player {
