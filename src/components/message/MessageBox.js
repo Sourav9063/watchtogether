@@ -33,8 +33,8 @@ export default function MessageBox() {
   // }, []);
 
   return (
-    <div className="message">
-      <h3 style={{ marginBlock: "5px" }}>Messaging</h3>
+    <div style={{ maxWidth: "100vw", width: "300px", maxWidth: "100%" }}>
+      <h3 style={{ marginBottom: "5px" }}>Messaging</h3>
       <div className="messageBox">
         <form
           action=""

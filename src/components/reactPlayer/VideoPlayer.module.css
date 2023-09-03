@@ -1,12 +1,23 @@
 .video-wrapper {
-  width: 100%;
+  width: 85%;
+  max-height: 90vh;
   aspect-ratio: 16/9;
   transition: width .7s ease;
 
 }
 
 .video-wrapper-null {
-  width: 100px;
+  width: 0px;
+}
+
+.video-and-message {
+  display: flex;
+  justify-content: center;
+  width: 100vw;
+  padding-inline: 1rem;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  margin-top: .5rem;
 }
 
 .video-player {
@@ -75,9 +86,20 @@
 
   }
 
+  .video-and-message {
+    flex-direction: column-reverse;
+    gap: 1rem;
+    align-items: center;
+    padding: .5rem;
+  }
+
   .control-wrapper {
     flex-direction: column;
     gap: 4px;
+  }
+
+  .video-wrapper {
+    width: 100%;
   }
 
   .video-player {

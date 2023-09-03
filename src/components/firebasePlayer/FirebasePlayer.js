@@ -363,62 +363,62 @@ export default function FirebaseVideoPlayer() {
           You are currently offline! <br></br> Controls will not be synced!!
         </div>
       )}
-      {videoPlayerRef.current?.name ||
-        (src && (
-          <div className={styles["title"]}>
-            {videoPlayerRef.current?.name || src || ""}
-          </div>
-        ))}
-      <div
-        className={`${styles["video-wrapper"]} ${
-          !src ? styles["video-wrapper-null"] : ""
-        } `}
-      >
-        <ReactPlayer
-          width={"100%"}
-          height={"100%"}
-          className={styles["video-player"]}
-          ref={videoPlayerRef}
-          url={src}
-          controls
-          playing={play}
-          onReady={(player) => {
-            controlBySocket = false;
-            if (!seekCalled) {
-              player.seekTo(
-                localStorage.getItem(videoPlayerRef.current.name) || 0
-              );
-              setSeekCalled(true);
-            }
-          }}
-          onPlay={playEvent}
-          onPause={pauseEvent}
-          // onSeek={(e) => {
-
-          // }}
-          onBufferEnd={(e) => {
-            setPlay(true);
-          }}
-          config={{
-            file: {
-              attributes: {
-                crossOrigin: "true",
-              },
-              tracks: [
-                {
-                  kind: "subtitles",
-                  // src: "https://prod.fitflexapp.com/files/captions/2021/11/18/23-b2j0oOsJ.vtt",
-                  src: "https://sourav9063.github.io/static-json/vtt/sth.vtt",
-                  srcLang: "en",
-                  default: true,
-                  mode: "show",
+      {(videoPlayerRef.current?.name || src) && (
+        <div className={styles["title"]}>
+          {videoPlayerRef.current?.name || ""}
+        </div>
+      )}
+      <div className={styles["video-and-message"]}>
+        <div
+          className={`${styles["video-wrapper"]} ${
+            !src ? styles["video-wrapper-null"] : ""
+          } `}
+        >
+          <ReactPlayer
+            width={"100%"}
+            height={"100%"}
+            className={styles["video-player"]}
+            ref={videoPlayerRef}
+            url={src}
+            controls
+            playing={play}
+            onReady={(player) => {
+              controlBySocket = false;
+              if (!seekCalled) {
+                player.seekTo(
+                  localStorage.getItem(videoPlayerRef.current.name) || 0
+                );
+                setSeekCalled(true);
+              }
+            }}
+            onPlay={playEvent}
+            onPause={pauseEvent}
+            // onSeek={(e) => {
+            // }}
+            onBufferEnd={(e) => {
+              setPlay(true);
+            }}
+            config={{
+              file: {
+                attributes: {
+                  crossOrigin: "true",
                 },
-              ],
-            },
-          }}
-        ></ReactPlayer>
+                tracks: [
+                  {
+                    kind: "subtitles",
+                    // src: "https://prod.fitflexapp.com/files/captions/2021/11/18/23-b2j0oOsJ.vtt",
+                    src: "https://sourav9063.github.io/static-json/vtt/sth.vtt",
+                    srcLang: "en",
+                    default: true,
+                    mode: "show",
+                  },
+                ],
+              },
+            }}
+          ></ReactPlayer>
+        </div>
+        <MessageBox />
       </div>
-      <MessageBox />
     </>
   );
 }
