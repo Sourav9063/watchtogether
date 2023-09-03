@@ -96,6 +96,8 @@
   .control-wrapper {
     flex-direction: column;
     gap: 4px;
+    width: 300px;
+    max-width: 100%;
   }
 
   .video-wrapper {
