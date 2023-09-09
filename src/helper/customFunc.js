@@ -20,6 +20,10 @@ export const getCustomLink = () => {
   return customLink;
 };
 
+export const getUserNameOrCustomLink = () => {
+  return localStorage.getItem("userName") || getCustomLink();
+};
+
 export async function handleFileUpload(file) {
   if (!file) {
     console.log("No file selected.");
