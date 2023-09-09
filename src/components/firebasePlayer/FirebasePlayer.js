@@ -29,6 +29,7 @@ export default function FirebaseVideoPlayer() {
   const [src, setSrc] = useState(
     isURL(searchParams.get("name")) ? searchParams.get("name") : ""
   );
+  const [showJoinLink, setShowJoinLink] = useState(false);
   const [play, setPlay] = useState(true);
   const [link, setLink] = useState(isURL(searchParams.get("name")) ? "" : "");
   const [seekCalled, setSeekCalled] = useState(false);
@@ -95,19 +96,25 @@ export default function FirebaseVideoPlayer() {
   };
   const urlChangeEvent = async (src) => {
     console.log("urlChange");
-    await setRoom(searchParams.get("room") || getCustomLink(), {
-      roomId: searchParams.get("room") || getCustomLink(),
-      url: src,
-      duration: videoPlayerRef.current.getDuration(),
-      currentTime: videoPlayerRef.current.getCurrentTime(),
-    });
-    await setRoomAction(searchParams.get("room") || getCustomLink(), {
-      type: Constants.playerActions.URLCHANGE,
-      url: src,
-      by: getCustomLink(),
-      time: videoPlayerRef.current.getCurrentTime(),
-      username: getUserNameOrCustomLink(),
-    });
+    try {
+      await setRoom(searchParams.get("room") || getCustomLink(), {
+        roomId: searchParams.get("room") || getCustomLink(),
+        url: src,
+        duration: videoPlayerRef.current.getDuration(),
+        currentTime: videoPlayerRef.current.getCurrentTime(),
+      });
+      await setRoomAction(searchParams.get("room") || getCustomLink(), {
+        type: Constants.playerActions.URLCHANGE,
+        url: src,
+        by: getCustomLink(),
+        time: videoPlayerRef.current.getCurrentTime(),
+        username: getUserNameOrCustomLink(),
+      });
+      setShowJoinLink(true);
+    } catch (e) {
+      console.log(e);
+      setShowJoinLink(false);
+    }
   };
 
   useEffect(() => {
@@ -168,6 +175,7 @@ export default function FirebaseVideoPlayer() {
             videoPlayerRef.current.seekTo(data.currentTime);
             setPlay(true);
           }
+          setShowJoinLink(true);
         }
       })
       .catch((error) => {
@@ -254,7 +262,7 @@ export default function FirebaseVideoPlayer() {
   return (
     <>
       <section>
-        {(videoPlayerRef.current?.name || src) && (
+        {(videoPlayerRef.current?.name || src) && showJoinLink && (
           <CustomLink
             name={videoPlayerRef.current.name}
             duration={videoPlayerRef.current.getDuration()}
@@ -284,6 +292,9 @@ export default function FirebaseVideoPlayer() {
                     console.log(isURL(link));
                     if (link && isURL(link)) {
                       videoPlayerRef.current.name = link;
+                      if (!src) {
+                        urlChangeEvent(link);
+                      }
                       setSrc(link);
                     } else {
                       toast.error("Please input correct URL", {
