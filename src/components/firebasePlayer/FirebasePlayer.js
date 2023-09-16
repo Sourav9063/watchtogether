@@ -214,7 +214,6 @@ export default function FirebaseVideoPlayer() {
             }
           );
           setPlay(false);
-          videoPlayerRef.current.seekTo(data.time);
           break;
         case Constants.playerActions.CHAT:
           controlBySocketRef.current = false;
