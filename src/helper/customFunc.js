@@ -21,7 +21,7 @@ export const getCustomLink = () => {
 };
 
 export const getUserNameOrCustomLink = () => {
-  return localStorage.getItem("userName") || getCustomLink();
+  return localStorage.getItem("userName") || getCustomLink().slice(0, 5);
 };
 
 export async function handleFileUpload(file) {
