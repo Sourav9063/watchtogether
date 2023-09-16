@@ -19,6 +19,7 @@ export default function RootLayout({ children }) {
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
+        limit={6}
         rtl={false}
         pauseOnFocusLoss
         draggable
