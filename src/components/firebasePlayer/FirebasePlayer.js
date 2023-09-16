@@ -19,12 +19,11 @@ import MessageBox from "../message/MessageBox";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { default as toWebVTT } from "srt-webvtt";
 import useOnlineStatus from "@/helper/hooks/useOnlineStatus";
-// import sth from "./sth.vtt";
 
-let controlBySocket = false;
 export default function FirebaseVideoPlayer() {
   const isOnline = useOnlineStatus();
   const videoPlayerRef = useRef(null);
+  const controlBySocketRef = useRef(false);
   const searchParams = useSearchParams();
   const [src, setSrc] = useState(
     isURL(searchParams.get("name")) ? searchParams.get("name") : ""
@@ -51,13 +50,12 @@ export default function FirebaseVideoPlayer() {
     video.textTracks[0].mode = "show";
   };
   const playEvent = async () => {
-    console.log("play");
-    if (controlBySocket) {
-      controlBySocket = false;
+    setPlay(true);
+    if (controlBySocketRef.current) {
+      controlBySocketRef.current = false;
       return;
     }
 
-    console.log("play called");
     await setRoomAction(searchParams.get("room") || getCustomLink(), {
       type: Constants.playerActions.PLAY,
       time: videoPlayerRef.current.getCurrentTime(),
@@ -66,8 +64,9 @@ export default function FirebaseVideoPlayer() {
     });
   };
   const pauseEvent = async (e) => {
-    if (controlBySocket) {
-      controlBySocket = false;
+    setPlay(false);
+    if (controlBySocketRef.current) {
+      controlBySocketRef.current = false;
       return;
     }
 
@@ -79,12 +78,8 @@ export default function FirebaseVideoPlayer() {
     });
   };
   const seekEvent = async (event) => {
-    setPlay(false);
-    console.log(controlBySocket + " ");
-    console.log("seek" + event);
-
-    if (controlBySocket) {
-      controlBySocket = false;
+    if (controlBySocketRef.current) {
+      controlBySocketRef.current = false;
       return;
     }
     await setRoomAction(searchParams.get("room") || getCustomLink(), {
@@ -144,7 +139,6 @@ export default function FirebaseVideoPlayer() {
 
   useEffect(() => {
     const roomId = searchParams.get("room") || getCustomLink();
-
     const playerAction = doc(db, "actions", roomId);
     const roomDoc = doc(db, "rooms", roomId);
 
@@ -173,7 +167,6 @@ export default function FirebaseVideoPlayer() {
             setSrc(data.url);
             setLink(data.url);
             videoPlayerRef.current.seekTo(data.currentTime);
-            setPlay(true);
           }
           setShowJoinLink(true);
         }
@@ -191,10 +184,10 @@ export default function FirebaseVideoPlayer() {
       if (!data || data.by === getCustomLink()) {
         return;
       }
-      controlBySocket = true;
       const name = data.username ? data.username : data.by;
       switch (data.type) {
         case Constants.playerActions.PLAY:
+          controlBySocketRef.current = true;
           toast(
             `Played by ${name || "someone"} at ${secondsToHMS(data.time)}`,
             {
@@ -209,6 +202,7 @@ export default function FirebaseVideoPlayer() {
           videoPlayerRef.current.seekTo(data.time);
           break;
         case Constants.playerActions.PAUSE:
+          controlBySocketRef.current = true;
           toast(
             `Paused by  ${name || "someone"} at ${secondsToHMS(data.time)}`,
             {
@@ -220,8 +214,10 @@ export default function FirebaseVideoPlayer() {
             }
           );
           setPlay(false);
+          videoPlayerRef.current.seekTo(data.time);
           break;
         case Constants.playerActions.CHAT:
+          controlBySocketRef.current = false;
           toast(`${name}: ${data.message}`, {
             autoClose: 10000,
             className: styles["toast-msg"],
@@ -233,6 +229,7 @@ export default function FirebaseVideoPlayer() {
           });
           break;
         case Constants.playerActions.URLCHANGE:
+          controlBySocketRef.current = false;
           if (isURL(data.url)) {
             toast(`URL changed by ${name || "someone"} to "${data.url}"`);
             setSrc("");
@@ -289,8 +286,6 @@ export default function FirebaseVideoPlayer() {
                   className={styles["link-submit"]}
                   onClick={(e) => {
                     e.preventDefault();
-                    console.log(link);
-                    console.log(isURL(link));
                     if (link && isURL(link)) {
                       videoPlayerRef.current.name = link;
                       if (!src) {
@@ -316,8 +311,6 @@ export default function FirebaseVideoPlayer() {
                   className={styles["link-submit"]}
                   onClick={(e) => {
                     e.preventDefault();
-                    console.log(link);
-                    console.log(isURL(link));
                     if (link && isURL(link)) {
                       videoPlayerRef.current.name = link;
                       setSrc(link);
@@ -400,7 +393,7 @@ export default function FirebaseVideoPlayer() {
             controls
             playing={play}
             onReady={(player) => {
-              controlBySocket = false;
+              controlBySocketRef.current = false;
               if (!seekCalled) {
                 player.seekTo(
                   localStorage.getItem(videoPlayerRef.current.name) || 0
@@ -412,9 +405,6 @@ export default function FirebaseVideoPlayer() {
             onPause={pauseEvent}
             // onSeek={(e) => {
             // }}
-            onBufferEnd={(e) => {
-              setPlay(true);
-            }}
             config={{
               file: {
                 attributes: {
