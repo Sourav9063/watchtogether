@@ -140,11 +140,11 @@ export default function FirebaseVideoPlayer() {
 
   useEffect(() => {
     const roomId = searchParams.get("room") || getCustomLink();
-    console.log(roomId);
     const playerAction = doc(db, "actions", roomId);
     const roomDoc = doc(db, "rooms", roomId);
     setSrc(personalSrc);
     setLink(personalSrc);
+    setShowJoinLink(true);
     getDoc(roomDoc)
       .then((doc) => {
         if (doc.exists()) {
