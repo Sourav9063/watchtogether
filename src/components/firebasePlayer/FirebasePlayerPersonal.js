@@ -1,4 +1,6 @@
 "use client";
+//ssh-keygen
+//ssh -R 80:localhost:3000 localhost.run
 import React, { useEffect, useRef, useState } from "react";
 import styles from "../reactPlayer/VideoPlayer.module.css";
 import ReactPlayer from "react-player";
@@ -20,8 +22,10 @@ import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { default as toWebVTT } from "srt-webvtt";
 import useOnlineStatus from "@/helper/hooks/useOnlineStatus";
 
-export default function FirebaseVideoPlayer() {
+export default function FirebaseVideoPlayerPersonal() {
   const personalSrc = "/video.mp4";
+  const personalSub = "/video.srt";
+  const isSubbed = useRef(false);
   const isOnline = useOnlineStatus();
   const videoPlayerRef = useRef(null);
   const controlBySocketRef = useRef(false);
@@ -42,16 +46,20 @@ export default function FirebaseVideoPlayer() {
   };
 
   const handleSubChange = async (event) => {
-    const file = event.target.files[0];
-    const textTrackUrl = await toWebVTT(file);
-
     const track = document.querySelector("track");
+    if (!track) return;
+    const file = await fetch(personalSub).then((res) => res.blob());
+    const textTrackUrl = await toWebVTT(file);
     const video = document.querySelector("video");
     track.src = textTrackUrl;
     video.textTracks[0].mode = "show";
+    isSubbed.current = true;
   };
   const playEvent = async () => {
     setPlay(true);
+    if (!isSubbed.current) {
+      await handleSubChange();
+    }
     if (controlBySocketRef.current) {
       controlBySocketRef.current = false;
       return;
@@ -144,6 +152,7 @@ export default function FirebaseVideoPlayer() {
     const roomDoc = doc(db, "rooms", roomId);
     setSrc(personalSrc);
     setLink(personalSrc);
+    handleSubChange();
     setShowJoinLink(true);
     getDoc(roomDoc)
       .then((doc) => {
@@ -269,7 +278,7 @@ export default function FirebaseVideoPlayer() {
             currentTime={videoPlayerRef.current.getCurrentTime()}
           />
         )}
-        <div className={styles["control-wrapper"]}>
+        {/* <div className={styles["control-wrapper"]}>
           <form action="">
             <h3>Choose Source</h3>
             <div className={styles["all-input-wrapper"]}>
@@ -362,7 +371,7 @@ export default function FirebaseVideoPlayer() {
               </div>
             </div>
           </form>
-        </div>
+        </div> */}
       </section>
 
       {/* <input
