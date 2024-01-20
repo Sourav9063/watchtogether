@@ -38,8 +38,8 @@ export const getIframeObjectFromUrl = ({ url }) => {
     return {
       type: type,
       id: id || "",
-      season: season || "",
-      episode: episode || "",
+      season: Number(season) || "",
+      episode: Number(episode) || "",
     };
   } else {
     return null;
@@ -68,7 +68,7 @@ export const getSeasonAndEpisode = ({ id }) => {
   const tvDataParsed = JSON.parse(tvData);
   const tvShow = tvDataParsed[id];
   return tvShow
-    ? { season: tvShow.season, episode: tvShow.episode }
+    ? { season: Number(tvShow.season), episode: Number(tvShow.episode) }
     : defaultResponse;
 };
 
@@ -100,3 +100,11 @@ export const setSeasonAndEpisode = ({ type, id, season, episode }) => {
 //     );
 //   }
 // };
+
+export const itrSeEp = ({ state, itrSe = 0, itrEp = 0 }) => {
+  const { season, episode } = state;
+  return {
+    season: Math.max(1, Number(season) + itrSe),
+    episode: itrSe != 0 ? 1 : Math.max(1, Number(episode) + itrEp),
+  };
+};
