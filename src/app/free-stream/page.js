@@ -14,7 +14,6 @@ export default function Personal() {
         <IframeWrapper />
         <p
           style={{
-            margin: "1rem",
             marginTop: "auto",
           }}
         >
@@ -35,6 +34,17 @@ export default function Personal() {
             target="_blank"
           >
             Adblock.
+          </Link>
+        </p>
+        <p style={{ margin: "1rem" }}>
+          For mobile use{" "}
+          <Link
+            href={
+              "https://play.google.com/store/apps/details?id=com.brave.browser"
+            }
+            target="_blank"
+          >
+            Brave Browser
           </Link>
         </p>
         <Link
