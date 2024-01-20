@@ -34,6 +34,17 @@ export default function VideoSrc() {
           "*If current server doesn't work please try other servers. You can download from some server."
         }
       </p>
+      <button
+        className={styles["focus"]}
+        onClick={(e) => {
+          e.preventDefault();
+          document
+            .querySelector("#iframe-player iframe")
+            ?.scrollIntoView({ behavior: "smooth" });
+        }}
+      >
+        Focus
+      </button>
     </div>
   );
 }

@@ -25,6 +25,9 @@
 .src {
   margin-inline: 10vw;
 }
+.src > p {
+  margin-bottom: 0.5rem;
+}
 
 .src-list {
   padding-block: 0.5rem;
