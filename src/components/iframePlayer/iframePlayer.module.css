@@ -17,5 +17,10 @@
   .season-episode {
     flex-direction: column;
     align-items: flex-start;
+    margin-inline: 0.5rem;
+  }
+  .iframe {
+    width: 100vw;
+    height: 50vh;
   }
 }
