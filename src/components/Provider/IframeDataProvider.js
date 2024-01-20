@@ -27,16 +27,20 @@ export const useIframeUrl = () => {
   const [iframeUrl, setIframeUrl] = useContext(IframeDataContext).iframeUrl;
 
   useEffect(() => {
-    const existing = localStorage.getItem("iframeUrl");
-    if (existing) {
-      setIframeUrl(JSON.parse(existing));
+    if (!iframeUrl) {
+      const existing = localStorage.getItem("iframeUrl");
+      if (existing) {
+        setIframeUrl(JSON.parse(existing));
+      }
+    } else {
+      localStorage.setItem("iframeUrl", JSON.stringify(iframeUrl));
     }
 
     const main = document.querySelector("." + styleMain.main);
     main.style.setProperty("--left-color", randomRGBA());
     main.style.setProperty("--right-color", randomRGBA());
     return () => {};
-  }, []);
+  }, [iframeUrl]);
 
   return [iframeUrl, setIframeUrl];
 };
