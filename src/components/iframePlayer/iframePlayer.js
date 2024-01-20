@@ -12,9 +12,11 @@ export default function IframePlayer() {
     <div id="wrapper">
       {iframeUrl && iframeUrl.type && (
         <>
-          <div className={`${styles["iframe-wrapper"]} ${styles[""]} `}>
+          <div
+            id="iframe-player"
+            className={`${styles["iframe-wrapper"]} ${styles[""]} `}
+          >
             <iframe
-              id="iframe-player"
               allowfullscreen="true"
               webkitallowfullscreen="true"
               mozallowfullscreen="true"

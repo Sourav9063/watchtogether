@@ -3,13 +3,14 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding-block: 0.2rem;
 }
 .iframe {
   border: none;
-  width: calc(100vw - 1rem);
-  max-height: 100vh;
+  width: calc(100vw - 0.4rem);
+  max-height: calc(100vh - 0.4rem);
   aspect-ratio: 16/9;
-  margin-block: 1rem;
+  margin-bottom: 1rem;
   /* padding-block: 0.5rem; */
   border-radius: 5px;
 }
