@@ -1,3 +1,26 @@
+https://syncplay.vercel.app/
+A hobby project made using NextJs and Socket.io where
+Multiple people can join your room via an invitation link and watch videos together with shared controls like Play, Pause, Seek, Source change, etc.
+Both local videos and cloud-stored videos are supported.
+.
+.
+Join my room and watch ["পুতুলের প্রতিশোধ"](https://syncplay.vercel.app/?room=u6OzJ1691951165217) with me.🤣🤣🤣
+
+
+
+
+
+
+
+https://github.com/Sourav9063/watchtogether/assets/53114581/4827debc-3649-44fa-a8bf-4c4c5af3abd1
+
+
+
+
+
+
+
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
