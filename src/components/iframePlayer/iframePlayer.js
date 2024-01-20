@@ -14,6 +14,9 @@ export default function IframePlayer() {
           {url.type == "tv" && <SeasonEpisodeSelector id={url.id} />}
           <div className={`${styles["iframe-wrapper"]} ${styles[""]} `}>
             <iframe
+              allowfullscreen="true"
+              webkitallowfullscreen="true"
+              mozallowfullscreen="true"
               className={`${styles["iframe"]} ${styles[""]} `}
               src={getIframeUrl({ iframeUrl: url })}
             />
