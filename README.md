@@ -8,11 +8,12 @@ Join my room and watch ["পুতুলের প্রতিশোধ"](https:
 
 
 
-
-
-
-
 https://github.com/Sourav9063/watchtogether/assets/53114581/4827debc-3649-44fa-a8bf-4c4c5af3abd1
+
+
+![Screenshot (28)](https://github.com/Sourav9063/watchtogether/assets/53114581/e001ce11-948d-40e0-9c54-9f3bca1bf32f)
+
+
 
 
 
