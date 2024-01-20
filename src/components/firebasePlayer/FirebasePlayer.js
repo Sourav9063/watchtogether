@@ -7,6 +7,7 @@ import styleMain from "@/app/page.module.css";
 import { useSearchParams } from "next/navigation";
 import {
   getCustomLink,
+  getUserNameOrCustomLink,
   isURL,
   randomRGBA,
   secondsToHMS,
@@ -60,6 +61,7 @@ export default function FirebaseVideoPlayer() {
       type: Constants.playerActions.PLAY,
       time: videoPlayerRef.current.getCurrentTime(),
       by: getCustomLink(),
+      username: getUserNameOrCustomLink(),
     });
   };
   const pauseEvent = async (e) => {
@@ -72,6 +74,7 @@ export default function FirebaseVideoPlayer() {
       type: Constants.playerActions.PAUSE,
       time: videoPlayerRef.current.getCurrentTime(),
       by: getCustomLink(),
+      username: getUserNameOrCustomLink(),
     });
   };
   const seekEvent = async (event) => {
@@ -87,6 +90,7 @@ export default function FirebaseVideoPlayer() {
       type: Constants.playerActions.SEEK,
       time: videoPlayerRef.current.getCurrentTime(),
       by: getCustomLink(),
+      username: getUserNameOrCustomLink(),
     });
   };
   const urlChangeEvent = async (src) => {
@@ -102,6 +106,7 @@ export default function FirebaseVideoPlayer() {
       url: src,
       by: getCustomLink(),
       time: videoPlayerRef.current.getCurrentTime(),
+      username: getUserNameOrCustomLink(),
     });
   };
 

@@ -1,7 +1,7 @@
 "use client";
-import { dbR, setChat, setRoomAction } from "@/db/dbConnection";
+import { setRoomAction } from "@/db/dbConnection";
 import { Constants } from "@/helper/CONSTANTS";
-import { getCustomLink } from "@/helper/customFunc";
+import { getCustomLink, getUserNameOrCustomLink } from "@/helper/customFunc";
 
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -14,7 +14,7 @@ export default function MessageBox() {
   const [message, setMessage] = useState("");
   const [msgFrom, setMsgFrom] = useState("");
   useEffect(() => {
-    setMsgFrom(getCustomLink());
+    setMsgFrom(getUserNameOrCustomLink());
     return () => {};
   }, []);
 
@@ -64,6 +64,7 @@ export default function MessageBox() {
               setRoomAction(roomId, {
                 type: Constants.playerActions.CHAT,
                 by: getCustomLink(),
+                username: getUserNameOrCustomLink(),
                 name: msgFrom,
                 message: message,
               });
@@ -99,6 +100,7 @@ export default function MessageBox() {
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
+              localStorage.setItem("userName", msgFrom);
               setShowChangeName(!showChangeName);
             }}
           >
