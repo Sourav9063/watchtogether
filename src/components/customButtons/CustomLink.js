@@ -15,7 +15,7 @@ export default function CustomLink({ name, duration, currentTime, className }) {
       onClick={() => {
         try {
           const roomId = searchParams.get("room") || getCustomLink();
-          const link = window.location.origin + "/?room=" + roomId;
+          const link = window.location.href + "/?room=" + roomId;
           navigator.clipboard.writeText(link);
           setText("Copied!");
           setTimeout(() => {
