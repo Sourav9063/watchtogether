@@ -25,6 +25,7 @@ export default function SeasonEpisodeSelector({ id }) {
     setSeason(iframeUrl.season);
     setEpisode(iframeUrl.episode);
   }, [iframeUrl]);
+  if (!iframeUrl || iframeUrl.type != "tv") return null;
 
   return (
     <div className={`${styles["season-episode"]} ${styles[""]} `}>
