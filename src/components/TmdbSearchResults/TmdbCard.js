@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./TmdbSearchResults.module.css";
 import { useIframeUrl } from "../Provider/IframeDataProvider";
+import { getSeasonAndEpisode } from "@/helper/iframeFunc";
 
 export default function TmdbCard({ details }) {
   const [, setIframeUrl] = useIframeUrl();
@@ -19,8 +20,7 @@ export default function TmdbCard({ details }) {
                 ...state,
                 type: "tv",
                 id: details.id,
-                season: 1,
-                episode: 1,
+                ...getSeasonAndEpisode({ id: details.id }),
               };
             });
           }

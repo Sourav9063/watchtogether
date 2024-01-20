@@ -13,6 +13,7 @@ import {
   getIframeObjectFromUrl,
   getIframeUrlForQuery,
   isIframeObjectValid,
+  setSeasonAndEpisode,
 } from "@/helper/iframeFunc";
 import config from "@/config";
 export const IframeDataContext = createContext({});
@@ -63,11 +64,11 @@ export const useIframeUrl = () => {
   }, []);
 
   useEffect(() => {
-    console.log(iframeUrl);
     if (isIframeObjectValid({ iframeObj: iframeUrl })) {
       const { baseUrl, ...rest } = iframeUrl;
       localStorage.setItem("iframeUrl", JSON.stringify(rest));
       window.history.pushState(null, null, getIframeUrlForQuery({ iframeUrl }));
+      setSeasonAndEpisode({ ...iframeUrl });
     }
 
     const main = document.querySelector("." + styleMain.main);
