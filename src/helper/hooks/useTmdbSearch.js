@@ -12,8 +12,13 @@ export const useTmdbSearch = () => {
   const [query] = useQuery();
   const debounce = useDebounce(query, 1500);
   useEffect(() => {
+    setStatus("loading");
+    if (!query) {
+      setStatus("idle");
+    }
+  }, [query]);
+  useEffect(() => {
     if (debounce) {
-      setStatus("loading");
       const fn = async () => {
         try {
           const [movieRes, tvRes] = await Promise.all([
@@ -66,8 +71,10 @@ export const useTmdbSearch = () => {
             }
           }
           setSearchResults(combinedResults);
+          setStatus("success");
         } catch (err) {
           console.log(err);
+          setStatus("error");
         }
       };
       fn();
@@ -76,38 +83,38 @@ export const useTmdbSearch = () => {
   return status;
 };
 
-export const useTmdbDetails = ({ type = "tv", id }) => {
-  const [details, setDetails] = useState(null);
-  useEffect(() => {
-    fetch(
-      `https://api.themoviedb.org/3/${type}/${id}?api_key=${config.personal.tmdbApiKey}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setDetails(data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [id, type]);
-  return details;
-};
+// export const useTmdbDetails = ({ type = "tv", id }) => {
+//   const [details, setDetails] = useState(null);
+//   useEffect(() => {
+//     fetch(
+//       `https://api.themoviedb.org/3/${type}/${id}?api_key=${config.personal.tmdbApiKey}`
+//     )
+//       .then((res) => res.json())
+//       .then((data) => {
+//         console.log(data);
+//         setDetails(data);
+//       })
+//       .catch((err) => {
+//         console.log(err);
+//       });
+//   }, [id, type]);
+//   return details;
+// };
 
-export const useTmdbGetSeasonsEpisodes = ({ type = "tv", id, season }) => {
-  const [seasonsEpisodes, setSeasonsEpisodes] = useState(null);
-  useEffect(() => {
-    fetch(
-      `https://api.themoviedb.org/3/${type}/${id}/season/${season}?api_key=${config.personal.tmdbApiKey}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setSeasonsEpisodes(data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [id, type, season]);
-  return seasonsEpisodes;
-};
+// export const useTmdbGetSeasonsEpisodes = ({ type = "tv", id, season }) => {
+//   const [seasonsEpisodes, setSeasonsEpisodes] = useState(null);
+//   useEffect(() => {
+//     fetch(
+//       `https://api.themoviedb.org/3/${type}/${id}/season/${season}?api_key=${config.personal.tmdbApiKey}`
+//     )
+//       .then((res) => res.json())
+//       .then((data) => {
+//         console.log(data);
+//         setSeasonsEpisodes(data);
+//       })
+//       .catch((err) => {
+//         console.log(err);
+//       });
+//   }, [id, type, season]);
+//   return seasonsEpisodes;
+// };

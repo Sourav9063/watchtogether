@@ -1,9 +1,12 @@
-.search {
+.search-wrapper {
+  margin-bottom: 2rem;
   max-width: 1200px;
   width: 100%;
+}
+.search {
   display: flex;
   align-items: center;
-  margin-block: 8rem;
+  margin-top: 8rem;
   gap: 1rem;
 }
 
@@ -13,4 +16,10 @@
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 1rem;
+}
+
+.status {
+  margin-top: 1rem;
+  text-align: center;
+  min-height: 2rem;
 }
