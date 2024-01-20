@@ -24,7 +24,7 @@ export default function VideoSrc() {
                 });
               }}
             >
-              Source {index + 1}
+              Source {index + 1} {config.iframe.url2 === url ? "(Anime)" : ""}
             </button>
           );
         })}
