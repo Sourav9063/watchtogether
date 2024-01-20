@@ -14,7 +14,7 @@ export default function TmdbCard({ details }) {
           } else {
             setIframeUrl({ type: "tv", id: details.id, season: 1, episode: 1 });
           }
-          window.scrollTo(0, 0);
+          window.scrollTo({ top: 0, behavior: "smooth" });
         }}
       >
         <div className={`${styles["img-title"]} ${styles[""]} `}>
