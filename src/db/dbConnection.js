@@ -67,6 +67,7 @@ export const setRoom = async (roomId, data) => {
     await setDoc(doc(db, roomsCollection, roomId), data);
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 export const setRoomAction = async (roomId, data) => {
@@ -74,6 +75,7 @@ export const setRoomAction = async (roomId, data) => {
     await setDoc(doc(db, actionsCollection, roomId), data);
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 
