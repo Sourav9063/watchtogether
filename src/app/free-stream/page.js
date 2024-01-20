@@ -40,6 +40,7 @@ export default function Personal() {
         <Link
           href={"https://github.com/Sourav9063/watchtogether"}
           target="_blank"
+          style={{ textDecoration: "none", marginBottom: "1.5rem" }}
         >
           Please give it a star!⭐
         </Link>
