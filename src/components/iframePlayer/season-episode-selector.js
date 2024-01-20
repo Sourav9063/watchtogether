@@ -15,7 +15,7 @@ export default function SeasonEpisodeSelector({ id }) {
         season: season,
         episode: episode,
       }));
-    }, 1500);
+    }, 500);
     return () => {
       clearTimeout(timeOut);
     };
