@@ -3,17 +3,17 @@ import { useIframeUrl } from "../Provider/IframeDataProvider";
 import styles from "./iframePlayer.module.css";
 
 export default function SeasonEpisodeSelector({ id }) {
-  const [url, setUrl] = useIframeUrl();
-  const [season, setSeason] = useState(url.season);
-  const [episode, setEpisode] = useState(url.episode);
+  const [iframeUrl, setIframeUrl] = useIframeUrl();
+  const [season, setSeason] = useState(iframeUrl.season);
+  const [episode, setEpisode] = useState(iframeUrl.episode);
   useEffect(() => {
     const timeOut = setTimeout(() => {
-      setUrl((state) => ({
+      setIframeUrl((state) => ({
         ...state,
         season: season,
         episode: episode,
       }));
-    }, 2000);
+    }, 1500);
     return () => {
       clearTimeout(timeOut);
     };

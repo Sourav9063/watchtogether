@@ -6,19 +6,21 @@ import { getIframeUrl } from "@/helper/iframeFunc";
 import SeasonEpisodeSelector from "./season-episode-selector";
 
 export default function IframePlayer() {
-  const [url] = useIframeUrl();
+  const [iframeUrl] = useIframeUrl();
   return (
     <div id="wrapper">
-      {url && (
+      {iframeUrl && (
         <>
-          {url.type == "tv" && <SeasonEpisodeSelector id={url.id} />}
+          {iframeUrl.type == "tv" && (
+            <SeasonEpisodeSelector id={iframeUrl.id} />
+          )}
           <div className={`${styles["iframe-wrapper"]} ${styles[""]} `}>
             <iframe
               allowfullscreen="true"
               webkitallowfullscreen="true"
               mozallowfullscreen="true"
               className={`${styles["iframe"]} ${styles[""]} `}
-              src={getIframeUrl({ iframeUrl: url })}
+              src={getIframeUrl({ iframeUrl: iframeUrl })}
             />
           </div>
         </>
