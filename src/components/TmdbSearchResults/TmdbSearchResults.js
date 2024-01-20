@@ -11,7 +11,7 @@ export default function TmdbSearchResults() {
   useEffect(() => {
     if (!!searchResults) {
       document
-        .getElementById("scroll-pos")
+        .getElementById("search-pos")
         ?.scrollIntoView({ behavior: "smooth" });
     }
 

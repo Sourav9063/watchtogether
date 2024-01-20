@@ -7,7 +7,7 @@ export default function TmdbSearch() {
   const [query, setQuery] = useQuery();
   const status = useTmdbSearch();
   return (
-    <div id="scroll-pos" className={styles["search-wrapper"]}>
+    <div id="search-pos" className={styles["search-wrapper"]}>
       <div className={`${styles["search"]} ${styles[""]} `}>
         <h1>Search</h1>
         <input
