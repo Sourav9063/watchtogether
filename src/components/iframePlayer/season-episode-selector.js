@@ -6,7 +6,9 @@ export default function SeasonEpisodeSelector({ id }) {
   const [iframeUrl, setIframeUrl] = useIframeUrl();
   const [season, setSeason] = useState(iframeUrl.season);
   const [episode, setEpisode] = useState(iframeUrl.episode);
+  const [change, setChange] = useState({ value: 0 });
   useEffect(() => {
+    if (change.value == 0) return;
     const timeOut = setTimeout(() => {
       setIframeUrl((state) => ({
         ...state,
@@ -17,7 +19,7 @@ export default function SeasonEpisodeSelector({ id }) {
     return () => {
       clearTimeout(timeOut);
     };
-  }, [season, episode]);
+  }, [change]);
 
   return (
     <div className={`${styles["season-episode"]} ${styles[""]} `}>
@@ -27,6 +29,7 @@ export default function SeasonEpisodeSelector({ id }) {
         value={season}
         onChange={(e) => {
           setSeason(e.target.value);
+          setChange({ value: 1 });
         }}
       />
       <h3>Episode:</h3>
@@ -35,6 +38,7 @@ export default function SeasonEpisodeSelector({ id }) {
         value={episode}
         onChange={(e) => {
           setEpisode(e.target.value);
+          setChange({ value: 1 });
         }}
       />
     </div>
