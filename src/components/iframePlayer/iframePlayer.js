@@ -4,12 +4,13 @@ import styles from "./iframePlayer.module.css";
 import { useIframeUrl } from "../Provider/IframeDataProvider";
 import { getIframeUrl } from "@/helper/iframeFunc";
 import SeasonEpisodeSelector from "./season-episode-selector";
+import VideoSrc from "./video-src";
 
 export default function IframePlayer() {
   const [iframeUrl] = useIframeUrl();
   return (
     <div id="wrapper">
-      {iframeUrl && (
+      {iframeUrl && iframeUrl.type && (
         <>
           {iframeUrl.type == "tv" && (
             <SeasonEpisodeSelector id={iframeUrl.id} />
@@ -23,6 +24,7 @@ export default function IframePlayer() {
               src={getIframeUrl({ iframeUrl: iframeUrl })}
             />
           </div>
+          <VideoSrc />
         </>
       )}
     </div>

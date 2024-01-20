@@ -23,10 +23,10 @@ export const useTmdbSearch = () => {
         try {
           const [movieRes, tvRes] = await Promise.all([
             fetch(
-              `https://api.themoviedb.org/3/search/movie?api_key=${config.personal.tmdbApiKey}&query=${debounce}`
+              `https://api.themoviedb.org/3/search/movie?api_key=${config.tmdbApiKey}&query=${debounce}`
             ),
             fetch(
-              `https://api.themoviedb.org/3/search/tv?api_key=${config.personal.tmdbApiKey}&query=${debounce}`
+              `https://api.themoviedb.org/3/search/tv?api_key=${config.tmdbApiKey}&query=${debounce}`
             ),
           ]);
           const [movieData, tvData] = await Promise.all([
@@ -87,7 +87,7 @@ export const useTmdbSearch = () => {
 //   const [details, setDetails] = useState(null);
 //   useEffect(() => {
 //     fetch(
-//       `https://api.themoviedb.org/3/${type}/${id}?api_key=${config.personal.tmdbApiKey}`
+//       `https://api.themoviedb.org/3/${type}/${id}?api_key=${config.tmdbApiKey}`
 //     )
 //       .then((res) => res.json())
 //       .then((data) => {
@@ -105,7 +105,7 @@ export const useTmdbSearch = () => {
 //   const [seasonsEpisodes, setSeasonsEpisodes] = useState(null);
 //   useEffect(() => {
 //     fetch(
-//       `https://api.themoviedb.org/3/${type}/${id}/season/${season}?api_key=${config.personal.tmdbApiKey}`
+//       `https://api.themoviedb.org/3/${type}/${id}/season/${season}?api_key=${config.tmdbApiKey}`
 //     )
 //       .then((res) => res.json())
 //       .then((data) => {

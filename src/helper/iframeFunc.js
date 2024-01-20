@@ -4,10 +4,10 @@ export const spacer = "-";
 
 export const getIframeUrl = ({ iframeUrl, full = true }) => {
   if (iframeUrl.type == "movie") {
-    return (full ? config.personal.url : "") + "/movie/" + iframeUrl.id;
+    return (full ? iframeUrl.baseUrl : "") + "/movie/" + iframeUrl.id;
   } else {
     return (
-      (full ? config.personal.url : "") +
+      (full ? iframeUrl.baseUrl : "") +
       "/tv/" +
       iframeUrl.id +
       "/" +

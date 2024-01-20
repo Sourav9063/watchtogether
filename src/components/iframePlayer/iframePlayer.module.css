@@ -12,6 +12,15 @@
   margin-top: 1rem;
   width: min(90vw, 800px);
 }
+.src {
+  margin-block: 1rem;
+}
+
+.src-list {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
 
 @media (max-width: 800px) {
   .season-episode {
@@ -22,5 +31,8 @@
   .iframe {
     width: 100vw;
     height: 40vh;
+  }
+  .src {
+    margin: 1rem;
   }
 }

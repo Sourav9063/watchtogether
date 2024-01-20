@@ -26,7 +26,7 @@ export default function Personal() {
           >
             uBlock
           </Link>
-          , or {""}
+          {", or "}
           <Link
             href={
               "https://chromewebstore.google.com/detail/adblock-%E2%80%94-best-ad-blocker/gighmmpiobklfepjocnamgkkbiglidom"

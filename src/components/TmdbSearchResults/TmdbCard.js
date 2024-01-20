@@ -10,9 +10,19 @@ export default function TmdbCard({ details }) {
         className={`${styles["card"]} ${styles[""]} `}
         onClick={() => {
           if (details.type == "movie") {
-            setIframeUrl({ type: "movie", id: details.id });
+            setIframeUrl((state) => {
+              return { ...state, type: "movie", id: details.id };
+            });
           } else {
-            setIframeUrl({ type: "tv", id: details.id, season: 1, episode: 1 });
+            setIframeUrl((state) => {
+              return {
+                ...state,
+                type: "tv",
+                id: details.id,
+                season: 1,
+                episode: 1,
+              };
+            });
           }
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}
@@ -27,10 +37,10 @@ export default function TmdbCard({ details }) {
                   details?.first_air_date?.substring(0, 4)}
               </p>
             }
-            {details?.vote_average && (
+            {!!details?.vote_average && details?.vote_average > 0 && (
               <p>
                 <span>Rating: </span>
-                {details.vote_average?.toFixed(1)}
+                <span>{details.vote_average?.toFixed(1)}</span>
               </p>
             )}
           </div>

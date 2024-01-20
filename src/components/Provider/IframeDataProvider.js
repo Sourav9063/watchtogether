@@ -14,9 +14,12 @@ import {
   getIframeUrlForQuery,
   isIframeObjectValid,
 } from "@/helper/iframeFunc";
+import config from "@/config";
 export const IframeDataContext = createContext({});
 export default function IframeDataProvider({ children }) {
-  const [iframeUrl, setIframeUrl] = useState(null);
+  const [iframeUrl, setIframeUrl] = useState({
+    baseUrl: config.iframe.urls[0],
+  });
   const [query, setQuery] = useState(null);
   const [searchResults, setSearchResults] = useState(null);
 
@@ -39,16 +42,20 @@ export const useIframeUrl = () => {
   const [iframeUrl, setIframeUrl] = useContext(IframeDataContext).iframeUrl;
 
   useEffect(() => {
-    if (!iframeUrl) {
+    if (!iframeUrl.type) {
       const iframeObj = getIframeObjectFromUrl({
         url: window.location.search,
       });
       if (isIframeObjectValid({ iframeObj })) {
-        setIframeUrl(iframeObj);
+        setIframeUrl((state) => {
+          return { ...state, ...iframeObj };
+        });
       } else {
         const existing = localStorage.getItem("iframeUrl");
         if (existing) {
-          setIframeUrl(JSON.parse(existing));
+          setIframeUrl((state) => {
+            return { ...state, ...JSON.parse(existing) };
+          });
         }
       }
     }
@@ -56,8 +63,10 @@ export const useIframeUrl = () => {
   }, []);
 
   useEffect(() => {
+    console.log(iframeUrl);
     if (isIframeObjectValid({ iframeObj: iframeUrl })) {
-      localStorage.setItem("iframeUrl", JSON.stringify(iframeUrl));
+      const { baseUrl, ...rest } = iframeUrl;
+      localStorage.setItem("iframeUrl", JSON.stringify(rest));
       window.history.pushState(null, null, getIframeUrlForQuery({ iframeUrl }));
     }
 
