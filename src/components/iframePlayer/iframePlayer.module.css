@@ -88,10 +88,19 @@
   right: 0px;
   min-height: 50px;
   min-width: 150px;
+  margin-right: 0.2rem;
+  margin-top: 0.2rem;
 }
 .hover-se-ep > .wrapper {
   display: none;
   border-radius: 5px;
+  background: linear-gradient(
+      218.73deg,
+      var(--left-color) 0%,
+      rgba(201, 32, 184, 0) 50%
+    ),
+    linear-gradient(321.27deg, rgba(0, 70, 209, 0) 50%, var(--right-color) 100%);
+  background-color: rgb(var(--background-end-rgb));
 }
 .hover-se-ep > .wrapper > div {
   margin: 0;

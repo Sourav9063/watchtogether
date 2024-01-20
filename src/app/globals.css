@@ -8,7 +8,7 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
-  --background-transparent: rgba(255, 255, 255, 0.4);
+  --background-transparent: rgba(255, 255, 255, 0.65);
 
   --primary-glow: conic-gradient(
     from 180deg at 50% 50%,

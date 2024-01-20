@@ -22,3 +22,13 @@
   /* max-height: 100vh;
   overflow-y: scroll; */
 }
+/* 
+.main button {
+  background: linear-gradient(
+      218.73deg,
+      var(--left-color) 0%,
+      rgba(201, 32, 184, 0) 50%
+    ),
+    linear-gradient(321.27deg, rgba(0, 70, 209, 0) 50%, var(--right-color) 100%);
+  background-color: var(--background-transparent);
+} */
