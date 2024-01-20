@@ -16,31 +16,18 @@ import {
   setSeasonAndEpisode,
 } from "@/helper/iframeFunc";
 import config from "@/config";
+import { getLocalStorage } from "@/helper/functions/localStorageFn";
+import { Constants } from "@/helper/CONSTANTS";
 export const IframeDataContext = createContext({});
 export default function IframeDataProvider({ children }) {
   const [iframeUrl, setIframeUrl] = useState({
     baseUrl: config.iframe.urls[0],
   });
   const [query, setQuery] = useState(null);
-  const [searchResults, setSearchResults] = useState(null);
-
-  return (
-    <IframeDataContext.Provider
-      value={{
-        iframeUrl: [iframeUrl, setIframeUrl],
-        query: [query, setQuery],
-        searchResults: [searchResults, setSearchResults],
-      }}
-    >
-      {children}
-    </IframeDataContext.Provider>
-  );
-}
-
-export const useGlobalState = () => useContext(IframeDataContext);
-
-export const useIframeUrl = () => {
-  const [iframeUrl, setIframeUrl] = useContext(IframeDataContext).iframeUrl;
+  const [searchResults, setSearchResults] = useState({
+    type: "HISTORY",
+    value: [],
+  });
 
   useEffect(() => {
     if (!iframeUrl.type) {
@@ -63,6 +50,18 @@ export const useIframeUrl = () => {
     return () => {};
   }, []);
 
+  useLayoutEffect(() => {
+    const watchHistory = getLocalStorage({
+      key: Constants.LocalStorageKey.WATCH_HISTORY,
+      emptyReturn: [],
+    });
+    setSearchResults((state) => {
+      return { ...state, value: watchHistory };
+    });
+
+    return () => {};
+  }, []);
+
   useEffect(() => {
     if (isIframeObjectValid({ iframeObj: iframeUrl })) {
       const { baseUrl, ...rest } = iframeUrl;
@@ -80,7 +79,23 @@ export const useIframeUrl = () => {
     return () => {};
   }, [iframeUrl]);
 
-  return [iframeUrl, setIframeUrl];
+  return (
+    <IframeDataContext.Provider
+      value={{
+        iframeUrl: [iframeUrl, setIframeUrl],
+        query: [query, setQuery],
+        searchResults: [searchResults, setSearchResults],
+      }}
+    >
+      {children}
+    </IframeDataContext.Provider>
+  );
+}
+
+export const useGlobalState = () => useContext(IframeDataContext);
+
+export const useIframeUrl = () => {
+  return useContext(IframeDataContext).iframeUrl;
 };
 
 export const useQuery = () => {

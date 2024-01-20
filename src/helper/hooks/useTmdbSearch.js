@@ -5,6 +5,8 @@ import {
 import config from "@/config";
 import { useEffect, useState } from "react";
 import { useDebounce } from "./useDebounce";
+import { getLocalStorage } from "../functions/localStorageFn";
+import { Constants } from "../CONSTANTS";
 
 export const useTmdbSearch = () => {
   const [status, setStatus] = useState("idle"); // "idle" | "loading" | "success" | "error"
@@ -15,6 +17,13 @@ export const useTmdbSearch = () => {
     setStatus("loading");
     if (!query) {
       setStatus("idle");
+      setSearchResults({
+        type: "HISTORY",
+        value: getLocalStorage({
+          key: Constants.LocalStorageKey.WATCH_HISTORY,
+          emptyReturn: [],
+        }),
+      });
     }
   }, [query]);
   useEffect(() => {
@@ -70,7 +79,7 @@ export const useTmdbSearch = () => {
               combinedResults.push(movieData.results[i]);
             }
           }
-          setSearchResults(combinedResults);
+          setSearchResults({ type: "SEARCH", value: combinedResults });
           setStatus("success");
         } catch (err) {
           console.log(err);

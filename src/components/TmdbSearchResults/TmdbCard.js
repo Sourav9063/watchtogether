@@ -2,50 +2,110 @@ import React from "react";
 import styles from "./TmdbSearchResults.module.css";
 import { useIframeUrl } from "../Provider/IframeDataProvider";
 import { getSeasonAndEpisode } from "@/helper/iframeFunc";
+import {
+  addValueLocalStorageArray,
+  removeValueLocalStorageArray,
+} from "@/helper/functions/localStorageFn";
+import { Constants } from "@/helper/CONSTANTS";
 
-export default function TmdbCard({ details }) {
+export default function TmdbCard({ details, cardType, setSearchResults }) {
   const [, setIframeUrl] = useIframeUrl();
+  const {
+    type,
+    id,
+    vote_average,
+    title,
+    poster_image_url,
+    release_date,
+    first_air_date,
+  } = details;
   return (
     <>
       <button
         className={`${styles["card"]} ${styles[""]} `}
-        onClick={() => {
-          if (details.type == "movie") {
+        onClick={(e) => {
+          e.stopPropagation();
+          addValueLocalStorageArray({
+            key: Constants.LocalStorageKey.WATCH_HISTORY,
+            value: {
+              type,
+              id,
+              vote_average,
+              title,
+              poster_image_url,
+              release_date,
+              first_air_date,
+            },
+          });
+          if (type == "movie") {
             setIframeUrl((state) => {
-              return { ...state, type: "movie", id: details.id };
+              return { ...state, type: "movie", id: id };
             });
           } else {
             setIframeUrl((state) => {
               return {
                 ...state,
                 type: "tv",
-                id: details.id,
-                ...getSeasonAndEpisode({ id: details.id }),
+                id: id,
+                ...getSeasonAndEpisode({ id: id }),
               };
             });
           }
-          window.scrollTo({ top: 0, behavior: "smooth" });
         }}
       >
+        {/* cross svg */}
+        {cardType == "HISTORY" && (
+          <button
+            className={`${styles["cross"]} ${styles[""]} `}
+            onClick={(e) => {
+              e.stopPropagation();
+              removeValueLocalStorageArray({
+                key: Constants.LocalStorageKey.WATCH_HISTORY,
+                value: {
+                  type,
+                  id,
+                  vote_average,
+                  title,
+                  poster_image_url,
+                  release_date,
+                  first_air_date,
+                },
+              });
+              setSearchResults((state) => {
+                return {
+                  ...state,
+                  value: state.value.filter((item) => item.id != id),
+                };
+              });
+            }}
+          >
+            <svg viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M13.414 12l4.293-4.293a1 1 0 10-1.414-1.414L12 10.586 7.707 6.293a1 1 0 00-1.414 1.414L10.586 12l-4.293 4.293a1 1 0 001.414 1.414L12 13.414l4.293 4.293a1 1 0 001.414-1.414L13.414 12z"
+              ></path>
+            </svg>
+          </button>
+        )}
         <div className={`${styles["img-title"]} ${styles[""]} `}>
-          <img src={details.poster_image_url} />
+          <img src={poster_image_url} />
           <div className={`${styles["title"]} ${styles[""]} `}>
-            <h2>{details.title}</h2>
+            <h2>{title}</h2>
             {
               <p>
-                {details?.release_date?.substring(0, 4) ||
-                  details?.first_air_date?.substring(0, 4)}
+                {release_date?.substring(0, 4) ||
+                  first_air_date?.substring(0, 4)}
               </p>
             }
-            {!!details?.vote_average && details?.vote_average > 0 && (
+            {!!vote_average && vote_average > 0 && (
               <p>
                 <span>Rating: </span>
-                <span>{details.vote_average?.toFixed(1)}</span>
+                <span>{vote_average?.toFixed(1)}</span>
               </p>
             )}
           </div>
         </div>
-        <h4>{details.type == "tv" ? "Series" : "Movie"}</h4>
+        <h4>{type == "tv" ? "Series" : "Movie"}</h4>
       </button>
     </>
   );

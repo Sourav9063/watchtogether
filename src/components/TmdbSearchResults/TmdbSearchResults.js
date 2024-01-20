@@ -5,20 +5,20 @@ import TmdbCard from "./TmdbCard";
 import styles from "./TmdbSearchResults.module.css";
 
 export default function TmdbSearchResults() {
-  const [searchResults] = useSearchResults();
+  const [searchResults, setSearchResults] = useSearchResults();
   const [query] = useQuery();
 
   useEffect(() => {
-    if (!!searchResults) {
+    if (!!searchResults.value) {
       document
         .getElementById("search-pos")
         ?.scrollIntoView({ behavior: "smooth" });
     }
 
     return () => {};
-  }, [searchResults]);
+  }, [searchResults.value]);
 
-  if (!searchResults)
+  if (!searchResults.value)
     return (
       <div
         className={`${styles["search-result-wrapper"]} ${styles[""]} `}
@@ -26,18 +26,26 @@ export default function TmdbSearchResults() {
     );
   return (
     <div className={`${styles["search-result-wrapper"]} ${styles[""]} `}>
-      {query && (
+      {query && searchResults.type == "SEARCH" && (
         <>
-          {searchResults.length > 0 ? (
+          {searchResults.value.length > 0 ? (
             <h1>Search Results</h1>
           ) : (
             <h1>Found Nothing</h1>
           )}
         </>
       )}
+      {searchResults.type == "HISTORY" && searchResults.value?.length > 0 && (
+        <h1>Watch History</h1>
+      )}
       <div className={`${styles["cards"]} ${styles[""]} `}>
-        {searchResults.map((result) => (
-          <TmdbCard key={result?.id} details={result} />
+        {searchResults.value.map((result) => (
+          <TmdbCard
+            key={result?.id}
+            details={result}
+            cardType={searchResults.type}
+            setSearchResults={setSearchResults}
+          />
         ))}
       </div>
     </div>
