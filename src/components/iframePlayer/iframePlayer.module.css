@@ -33,9 +33,12 @@
   padding-block: 0.5rem;
   display: flex;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 .src-list > button {
   margin-top: 0px;
+  min-width: fit-content;
+  flex: 1 1 0px;
 }
 
 .buttons {

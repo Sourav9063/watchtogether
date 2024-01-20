@@ -79,3 +79,24 @@ export const setSeasonAndEpisode = ({ type, id, season, episode }) => {
   tvDataParsed[id] = { season, episode };
   localStorage.setItem("tvData", JSON.stringify(tvDataParsed));
 };
+
+// if (iframeUrl.baseUrl == config.iframe.url4) {
+//   return getUrl4({ iframeUrl, full });
+// }
+
+// const getUrl4 = ({ iframeUrl, full }) => {
+//   const { type, id, season, episode } = iframeUrl;
+//   if (type == "movie") {
+//     return (full ? iframeUrl.baseUrl : "") + "/embed/" + iframeUrl.id;
+//   } else {
+//     return (
+//       (full ? iframeUrl.baseUrl : "") +
+//       "/embedtv/" +
+//       iframeUrl.id +
+//       "&s=" +
+//       iframeUrl.season +
+//       "&e=" +
+//       iframeUrl.episode
+//     );
+//   }
+// };
