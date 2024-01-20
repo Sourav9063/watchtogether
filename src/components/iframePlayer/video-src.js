@@ -7,11 +7,6 @@ export default function VideoSrc() {
   const [iframeUrl, setIframeUrl] = useIframeUrl();
   return (
     <div className={styles["src"]}>
-      <p>
-        {
-          "*If current server doesn't work please try other servers. You can download from some server."
-        }
-      </p>
       <div className={`${styles["src-list"]} ${styles[""]} `}>
         {config.iframe.urls.map((url, index) => {
           return (
@@ -34,6 +29,11 @@ export default function VideoSrc() {
           );
         })}
       </div>
+      <p>
+        {
+          "*If current server doesn't work please try other servers. You can download from some server."
+        }
+      </p>
     </div>
   );
 }

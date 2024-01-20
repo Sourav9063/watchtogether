@@ -33,7 +33,7 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: stretch;
-  width: 250px;
+  width: min(250px, 100%);
   transition: all 0.3s ease-in-out;
   cursor: pointer;
   position: relative;
@@ -54,7 +54,7 @@
   overflow: hidden;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
   height: 370px;
-  width: 250px;
+  width: min(250px, 100%);
   border-radius: 5px;
 }
 .card:hover .title,

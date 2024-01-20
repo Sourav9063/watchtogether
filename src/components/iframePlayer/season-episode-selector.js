@@ -21,6 +21,11 @@ export default function SeasonEpisodeSelector({ id }) {
     };
   }, [change]);
 
+  useEffect(() => {
+    setSeason(iframeUrl.season);
+    setEpisode(iframeUrl.episode);
+  }, [iframeUrl]);
+
   return (
     <div className={`${styles["season-episode"]} ${styles[""]} `}>
       <div className={`${styles["season"]} ${styles["buttons"]} `}>
@@ -32,6 +37,7 @@ export default function SeasonEpisodeSelector({ id }) {
             value={season}
             onChange={(e) => {
               setSeason(e.target.value);
+              setEpisode(1);
               setChange({ value: 1 });
             }}
           />
@@ -40,6 +46,7 @@ export default function SeasonEpisodeSelector({ id }) {
           <button
             onClick={() => {
               setSeason((state) => Math.max(1, state - 1));
+              setEpisode(1);
               setChange({ value: 1 });
             }}
           >
@@ -48,6 +55,7 @@ export default function SeasonEpisodeSelector({ id }) {
           <button
             onClick={() => {
               setSeason((state) => Number(state) + 1);
+              setEpisode(1);
               setChange({ value: 1 });
             }}
           >

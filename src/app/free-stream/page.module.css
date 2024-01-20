@@ -3,7 +3,6 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  padding-inline: 3rem;
   padding-block: 1rem;
   min-height: 100vh;
   /* --left-color: rgba(204, 0, 187, 0.25);
@@ -22,10 +21,4 @@
   background-color: rgb(var(--background-end-rgb));
   /* max-height: 100vh;
   overflow-y: scroll; */
-}
-
-@media screen and (max-width: 768px) {
-  .main {
-    padding-inline: 0.5rem;
-  }
 }

@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useQuery, useSearchResults } from "../Provider/IframeDataProvider";
 import TmdbCard from "./TmdbCard";
 import styles from "./TmdbSearchResults.module.css";
@@ -7,6 +7,16 @@ import styles from "./TmdbSearchResults.module.css";
 export default function TmdbSearchResults() {
   const [searchResults] = useSearchResults();
   const [query] = useQuery();
+
+  useEffect(() => {
+    if (!!searchResults) {
+      document
+        .getElementById("scroll-pos")
+        ?.scrollIntoView({ behavior: "smooth" });
+    }
+
+    return () => {};
+  }, [searchResults]);
 
   if (!searchResults)
     return (

@@ -12,11 +12,9 @@ export default function IframePlayer() {
     <div id="wrapper">
       {iframeUrl && iframeUrl.type && (
         <>
-          {iframeUrl.type == "tv" && (
-            <SeasonEpisodeSelector id={iframeUrl.id} />
-          )}
           <div className={`${styles["iframe-wrapper"]} ${styles[""]} `}>
             <iframe
+              id="iframe-player"
               allowfullscreen="true"
               webkitallowfullscreen="true"
               mozallowfullscreen="true"
@@ -24,6 +22,9 @@ export default function IframePlayer() {
               src={getIframeUrl({ iframeUrl: iframeUrl })}
             />
           </div>
+          {iframeUrl.type == "tv" && (
+            <SeasonEpisodeSelector id={iframeUrl.id} />
+          )}
           <VideoSrc />
         </>
       )}

@@ -1,13 +1,16 @@
 .search-wrapper {
   margin-bottom: 2rem;
-  max-width: 1200px;
-  width: 100%;
+  margin-inline: 10vw;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  padding-inline: 0.5rem;
+  width: 80%;
 }
 .search {
   display: flex;
   align-items: center;
-  margin-top: 8rem;
   gap: 1rem;
+  width: 100%;
 }
 
 .search > input {
@@ -19,7 +22,20 @@
 }
 
 .status {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   text-align: center;
   min-height: 2rem;
+}
+
+@media (max-width: 800px) {
+  .search-wrapper {
+    margin-inline: 0.5rem;
+    width: 100%;
+    margin-bottom: 0;
+    padding-inline: 0;
+  }
+  .search {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }

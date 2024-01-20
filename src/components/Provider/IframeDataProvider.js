@@ -69,6 +69,9 @@ export const useIframeUrl = () => {
       localStorage.setItem("iframeUrl", JSON.stringify(rest));
       window.history.pushState(null, null, getIframeUrlForQuery({ iframeUrl }));
       setSeasonAndEpisode({ ...iframeUrl });
+      document
+        .getElementById("iframe-player")
+        ?.scrollIntoView({ behavior: "smooth" });
     }
 
     const main = document.querySelector("." + styleMain.main);
