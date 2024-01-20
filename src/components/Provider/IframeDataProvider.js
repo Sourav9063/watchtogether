@@ -1,7 +1,19 @@
 "use client";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from "react";
 import styleMain from "@/app/free-stream/page.module.css";
 import { randomRGBA } from "@/helper/customFunc";
+import { useRouter } from "next/navigation";
+import {
+  getIframeObjectFromUrl,
+  getIframeUrlForQuery,
+  isIframeObjectValid,
+} from "@/helper/iframeFunc";
 export const IframeDataContext = createContext({});
 export default function IframeDataProvider({ children }) {
   const [iframeUrl, setIframeUrl] = useState(null);
@@ -28,12 +40,25 @@ export const useIframeUrl = () => {
 
   useEffect(() => {
     if (!iframeUrl) {
-      const existing = localStorage.getItem("iframeUrl");
-      if (existing) {
-        setIframeUrl(JSON.parse(existing));
+      const iframeObj = getIframeObjectFromUrl({
+        url: window.location.search,
+      });
+      if (isIframeObjectValid({ iframeObj })) {
+        setIframeUrl(iframeObj);
+      } else {
+        const existing = localStorage.getItem("iframeUrl");
+        if (existing) {
+          setIframeUrl(JSON.parse(existing));
+        }
       }
-    } else {
+    }
+    return () => {};
+  }, []);
+
+  useEffect(() => {
+    if (isIframeObjectValid({ iframeObj: iframeUrl })) {
       localStorage.setItem("iframeUrl", JSON.stringify(iframeUrl));
+      window.history.pushState(null, null, getIframeUrlForQuery({ iframeUrl }));
     }
 
     const main = document.querySelector("." + styleMain.main);
