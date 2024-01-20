@@ -37,7 +37,7 @@
   transition: all 0.3s ease-in-out;
   cursor: pointer;
   position: relative;
-  border-radius: 10px;
+  border-radius: 5px;
 }
 .card:hover {
   all: unset();
@@ -52,10 +52,10 @@
 .img-title {
   position: relative;
   overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
   height: 370px;
   width: 250px;
-  border-radius: 10px;
+  border-radius: 5px;
 }
 .card:hover .title,
 .card:focus-within .title,
@@ -80,7 +80,7 @@
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(5px);
-  border-radius: 10px;
+  border-radius: 5px;
   padding: 1rem;
   display: grid;
   place-items: center;

@@ -3,14 +3,15 @@
   width: 90vw;
   height: 90vh;
   margin-top: 1rem;
+  border-radius: 5px;
 }
 
 .season-episode {
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
   align-items: center;
+  justify-content: space-between;
   margin-top: 1rem;
-  width: min(90vw, 800px);
 }
 .src {
   margin-block: 1rem;
@@ -22,11 +23,50 @@
   margin-top: 1rem;
 }
 
+.buttons {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  align-items: center;
+  border-radius: 5px;
+}
+.season {
+  border: 2px solid var(--left-color);
+  padding: 0.5rem;
+}
+.season * {
+  border-color: var(--left-color);
+  border-width: 2px;
+}
+.episode * {
+  border-color: var(--right-color);
+  border-width: 2px;
+}
+.episode {
+  border: 2px solid var(--right-color);
+  padding: 0.5rem;
+}
+.buttons > .name {
+  min-width: 70px;
+}
+.buttons > button {
+  margin-top: 0px;
+  background-color: transparent;
+  color: var(--text-color);
+}
+.season button:hover {
+  background-color: var(--left-color);
+}
+.episode button:hover {
+  background-color: var(--right-color);
+}
+
 @media (max-width: 800px) {
   .season-episode {
     flex-direction: column;
     align-items: flex-start;
     margin-inline: 0.5rem;
+    gap: 0.5rem;
   }
   .iframe {
     width: 100vw;
@@ -34,5 +74,13 @@
   }
   .src {
     margin: 1rem;
+  }
+}
+
+@media (max-width: 300px) {
+  .season-episode > .buttons {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 }

@@ -23,24 +23,70 @@ export default function SeasonEpisodeSelector({ id }) {
 
   return (
     <div className={`${styles["season-episode"]} ${styles[""]} `}>
-      <h3>Season:</h3>
-      <input
-        type="number"
-        value={season}
-        onChange={(e) => {
-          setSeason(e.target.value);
-          setChange({ value: 1 });
-        }}
-      />
-      <h3>Episode:</h3>
-      <input
-        type="number"
-        value={episode}
-        onChange={(e) => {
-          setEpisode(e.target.value);
-          setChange({ value: 1 });
-        }}
-      />
+      <div className={`${styles["season"]} ${styles["buttons"]} `}>
+        <div className={`${styles["buttons"]} ${styles[""]} `}>
+          <h3 className={styles["name"]}>Season</h3>
+          <h3>:</h3>
+          <input
+            type="number"
+            value={season}
+            onChange={(e) => {
+              setSeason(e.target.value);
+              setChange({ value: 1 });
+            }}
+          />
+        </div>
+        <div className={`${styles["buttons"]} ${styles[""]} `}>
+          <button
+            onClick={() => {
+              setSeason((state) => Math.max(1, state - 1));
+              setChange({ value: 1 });
+            }}
+          >
+            Prev
+          </button>
+          <button
+            onClick={() => {
+              setSeason((state) => Number(state) + 1);
+              setChange({ value: 1 });
+            }}
+          >
+            Next
+          </button>
+        </div>
+      </div>
+      <div className={`${styles["episode"]} ${styles["buttons"]} `}>
+        <div className={`${styles["buttons"]} ${styles[""]} `}>
+          <h3 className={styles["name"]}>Episode</h3>
+          <h3>:</h3>
+          <input
+            type="number"
+            value={episode}
+            onChange={(e) => {
+              setEpisode(e.target.value);
+              setChange({ value: 1 });
+            }}
+          />
+        </div>
+        <div className={styles["buttons"]}>
+          <button
+            onClick={() => {
+              setEpisode((state) => Math.max(1, state - 1));
+              setChange({ value: 1 });
+            }}
+          >
+            Prev
+          </button>
+          <button
+            onClick={() => {
+              setEpisode((state) => Number(state) + 1);
+              setChange({ value: 1 });
+            }}
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
