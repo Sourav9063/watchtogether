@@ -22,16 +22,26 @@
 }
 
 .card {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: stretch;
   width: 250px;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease-in-out;
   cursor: pointer;
   position: relative;
+  border-radius: 10px;
+}
+.card:hover {
+  all: unset();
+  background-color: transparent;
 }
 .card > h4 {
   text-align: center;
@@ -42,15 +52,22 @@
 .img-title {
   position: relative;
   overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+  height: 370px;
+  width: 250px;
+  border-radius: 10px;
 }
-.img-title:hover .title {
+.card:hover .title,
+.card:focus-within .title,
+.card:active .title {
   top: 50%;
   bottom: 0;
 }
 
 .img-title > img {
-  width: 250px;
-  height: 350px;
+  height: 100%;
+  width: 100%;
+  pointer-events: none;
   object-fit: cover;
   border-radius: 5px;
 }
@@ -58,29 +75,36 @@
 .title {
   position: absolute;
   min-height: 20%;
-  min-width: 100%;
+  width: 100%;
   top: 100%;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(5px);
-  border-radius: 5px;
+  border-radius: 10px;
   padding: 1rem;
   display: grid;
   place-items: center;
   transition: top 0.3s ease-in-out;
+  color: white;
 }
 .title > h2 {
   text-align: center;
   font-size: 1.2rem;
 }
 
-@media (max-width: 800px) {
+/* @media (max-width: 800px) {
   .title {
     top: auto;
     bottom: 0;
     gap: 0.5rem;
+    min-height: fit-content;
+    display: none;
+  }
+  .title > * {
+    display: none;
   }
   .title > h2 {
     font-size: 1rem;
+    display: inline;
   }
-}
+} */

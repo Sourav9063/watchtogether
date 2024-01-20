@@ -6,7 +6,7 @@ export default function TmdbCard({ details }) {
   const [, setIframeUrl] = useIframeUrl();
   return (
     <>
-      <div
+      <button
         className={`${styles["card"]} ${styles[""]} `}
         onClick={() => {
           if (details.type == "movie") {
@@ -36,7 +36,7 @@ export default function TmdbCard({ details }) {
           </div>
         </div>
         <h4>{details.type == "tv" ? "Series" : "Movie"}</h4>
-      </div>
+      </button>
     </>
   );
 }
