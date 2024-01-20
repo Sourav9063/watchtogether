@@ -63,11 +63,11 @@ export const useTmdbSearch = () => {
             );
             i++
           ) {
-            if (movieData.results[i]) {
-              combinedResults.push(movieData.results[i]);
-            }
             if (tvData.results[i]) {
               combinedResults.push(tvData.results[i]);
+            }
+            if (movieData.results[i]) {
+              combinedResults.push(movieData.results[i]);
             }
           }
           setSearchResults(combinedResults);
