@@ -1,4 +1,4 @@
-import styles from "../page.module.css";
+import styles from "./page.module.css";
 import Link from "next/link";
 import IframeWrapper from "@/components/IframeWrapper";
 export default function Personal() {
@@ -15,6 +15,7 @@ export default function Personal() {
         <p
           style={{
             margin: "1rem",
+            marginTop: "auto",
           }}
         >
           Highly suggested to use an Ad blocker like{" "}

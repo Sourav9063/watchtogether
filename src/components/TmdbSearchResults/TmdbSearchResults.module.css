@@ -6,7 +6,8 @@
   margin: 0 auto;
   width: 100%;
   max-width: 1200px;
-  gap: 1rem;
+  gap: 2rem;
+  margin-bottom: 8rem;
 }
 
 .cards {
@@ -71,4 +72,16 @@
 }
 .title > h2 {
   text-align: center;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 800px) {
+  .title {
+    top: auto;
+    bottom: 0;
+    gap: 0.5rem;
+  }
+  .title > h2 {
+    font-size: 1rem;
+  }
 }

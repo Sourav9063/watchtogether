@@ -1,6 +1,6 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import styleMain from "@/app/page.module.css";
+import styleMain from "@/app/free-stream/page.module.css";
 import { randomRGBA } from "@/helper/customFunc";
 export const IframeDataContext = createContext({});
 export default function IframeDataProvider({ children }) {
