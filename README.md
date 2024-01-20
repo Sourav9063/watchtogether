@@ -12,7 +12,7 @@ https://github.com/Sourav9063/watchtogether/assets/53114581/4827debc-3649-44fa-a
 
 
 ![image](https://github.com/Sourav9063/watchtogether/assets/53114581/6b5fdfd0-b8ad-4af5-b699-6dd2ef777f9d)
-
+![image](https://github.com/Sourav9063/watchtogether/assets/53114581/609cdec5-ed48-40bc-a13b-8618ffabaa50)
 ![Screenshot (28)](https://github.com/Sourav9063/watchtogether/assets/53114581/e001ce11-948d-40e0-9c54-9f3bca1bf32f)
 
 
