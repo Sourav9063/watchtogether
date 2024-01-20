@@ -222,9 +222,10 @@ export default function FirebaseVideoPlayer() {
           setPlay(false);
           break;
         case Constants.playerActions.CHAT:
-          toast(`${data.name} said "${data.message}"`, {
+          toast(`${name}: ${data.message}`, {
             autoClose: 10000,
             className: styles["toast-msg"],
+            position: "bottom-left",
             progressStyle: {
               background: "#9000ff",
               height: "2px",
