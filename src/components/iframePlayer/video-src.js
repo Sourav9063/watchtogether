@@ -39,7 +39,7 @@ export default function VideoSrc() {
         onClick={(e) => {
           e.preventDefault();
           document
-            .querySelector("#iframe-player iframe")
+            .querySelector("#iframe-player")
             ?.scrollIntoView({ behavior: "smooth" });
         }}
       >
