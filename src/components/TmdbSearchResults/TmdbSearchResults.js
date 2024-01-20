@@ -8,14 +8,23 @@ export default function TmdbSearchResults() {
   const [searchResults] = useSearchResults();
   const [query] = useQuery();
 
-  if (!searchResults) return null;
+  if (!searchResults)
+    return (
+      <div
+        className={`${styles["search-result-wrapper"]} ${styles[""]} `}
+      ></div>
+    );
   return (
     <div className={`${styles["search-result-wrapper"]} ${styles[""]} `}>
-      {searchResults.length > 0 ? (
-        <h1>Search Results</h1>
-      ) : query.length > 0 ? (
-        <h1>Found Nothing</h1>
-      ) : null}
+      {query && (
+        <>
+          {searchResults.length > 0 ? (
+            <h1>Search Results</h1>
+          ) : (
+            <h1>Found Nothing</h1>
+          )}
+        </>
+      )}
       <div className={`${styles["cards"]} ${styles[""]} `}>
         {searchResults.map((result) => (
           <TmdbCard key={result?.id} details={result} />
