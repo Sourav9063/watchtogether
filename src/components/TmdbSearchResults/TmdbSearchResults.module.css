@@ -1,0 +1,74 @@
+.search-result-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1200px;
+  gap: 1rem;
+}
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1200px;
+  gap: 1rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  width: 250px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+  position: relative;
+}
+.card > h4 {
+  text-align: center;
+  margin: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #fff;
+}
+.img-title {
+  position: relative;
+  overflow: hidden;
+}
+.img-title:hover .title {
+  top: 50%;
+  bottom: 0;
+}
+
+.img-title > img {
+  width: 250px;
+  height: 350px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.title {
+  position: absolute;
+  min-height: 20%;
+  min-width: 100%;
+  top: 100%;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  border-radius: 5px;
+  padding: 1rem;
+  display: grid;
+  place-items: center;
+  transition: top 0.3s ease-in-out;
+}
+.title > h2 {
+  text-align: center;
+}
