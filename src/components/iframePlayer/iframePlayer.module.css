@@ -86,21 +86,30 @@
   position: fixed;
   top: 0px;
   right: 0px;
-  min-height: 50px;
+  min-height: 69px;
   min-width: 150px;
-  margin-right: 0.2rem;
   margin-top: 0.2rem;
+  border-right: 0.2rem solid rgba(255, 0, 0, 0.3);
+  transition: all 0.5s ease;
+  z-index: 1;
+}
+.hover-se-ep:hover {
+  border-color: red;
 }
 .hover-se-ep > .wrapper {
-  display: none;
+  /* display: none; */
   border-radius: 5px;
   background: linear-gradient(
       218.73deg,
-      var(--left-color) 0%,
-      rgba(201, 32, 184, 0) 50%
+      rgba(255, 0, 0, 0.5) 0%,
+      var(--left-color) 40%,
+      rgba(201, 32, 184, 0) 60%
     ),
     linear-gradient(321.27deg, rgba(0, 70, 209, 0) 50%, var(--right-color) 100%);
   background-color: rgb(var(--background-end-rgb));
+  animation: vanish 1s ease forwards;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
 }
 .hover-se-ep > .wrapper > div {
   margin: 0;
@@ -110,6 +119,30 @@
   background-color: var(--background-transparent);
   display: block;
   backdrop-filter: blur(5px);
+  animation: hover-se-ep 0.2s ease forwards;
+}
+@keyframes hover-se-ep {
+  0% {
+    transform: translateX(100px);
+  }
+  100% {
+    transform: translateX(0px);
+  }
+}
+@keyframes vanish {
+  0% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100px);
+    display: none;
+  }
 }
 @media (max-width: 800px) {
   .season-episode {
@@ -119,10 +152,9 @@
     gap: 0.5rem;
   }
   .iframe-wrapper {
-    padding-block: 0rem;
+    padding-block: 0.2rem;
   }
   .iframe {
-    width: 100vw;
     aspect-ratio: 16/9;
     min-height: 40vh;
   }
