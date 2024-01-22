@@ -12,7 +12,7 @@ export const useTmdbSearch = () => {
   const [status, setStatus] = useState("idle"); // "idle" | "loading" | "success" | "error"
   const [, setSearchResults] = useSearchResults();
   const [query] = useQuery();
-  const debounce = useDebounce(query, 1500);
+  const debounce = useDebounce(query, 2000);
   useEffect(() => {
     setStatus("loading");
     if (!query) {

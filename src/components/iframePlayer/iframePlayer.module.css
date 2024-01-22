@@ -107,7 +107,7 @@
     ),
     linear-gradient(321.27deg, rgba(0, 70, 209, 0) 50%, var(--right-color) 100%);
 
-  animation: vanish 1s ease forwards;
+  animation: vanish 3s ease forwards;
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
   backdrop-filter: blur(5px);
@@ -118,14 +118,16 @@
   padding: 0.5rem;
 }
 .hover-se-ep:hover > .wrapper {
-  animation: hover-se-ep 0.2s ease forwards;
+  animation: hover-se-ep 0.4s ease forwards;
 }
 @keyframes hover-se-ep {
   0% {
+    opacity: 0;
     transform: translateX(100px);
   }
   100% {
     transform: translateX(0px);
+    opacity: 1;
   }
 }
 @keyframes vanish {
@@ -133,7 +135,7 @@
     opacity: 1;
     transform: translateX(0px);
   }
-  50% {
+  85% {
     opacity: 1;
     transform: translateX(0px);
   }
