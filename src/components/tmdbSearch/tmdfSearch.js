@@ -3,8 +3,10 @@ import React from "react";
 import { useQuery } from "../Provider/IframeDataProvider";
 import { useTmdbSearch } from "@/helper/hooks/useTmdbSearch";
 import styles from "./tmdbSearch.module.css";
+import { useStore } from "@/helper/hooks/useStore";
+import { Stores } from "@/helper/CONSTANTS";
 export default function TmdbSearch() {
-  const [query, setQuery] = useQuery();
+  const [query, setQuery] = useStore(Stores.query);
   const status = useTmdbSearch();
   return (
     <div id="search-pos" className={styles["search-wrapper"]}>

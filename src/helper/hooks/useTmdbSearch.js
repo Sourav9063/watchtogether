@@ -6,12 +6,13 @@ import config from "@/config";
 import { useEffect, useState } from "react";
 import { useDebounce } from "./useDebounce";
 import { getLocalStorage } from "../functions/localStorageFn";
-import { Constants } from "../CONSTANTS";
+import { Constants, Stores } from "../CONSTANTS";
+import { useStore } from "./useStore";
 
 export const useTmdbSearch = () => {
   const [status, setStatus] = useState("idle"); // "idle" | "loading" | "success" | "error"
-  const [, setSearchResults] = useSearchResults();
-  const [query] = useQuery();
+  const [, setSearchResults] = useStore(Stores.searchResults);
+  const [query] = useStore(Stores.query);
   const debounce = useDebounce(query, 2000);
   useEffect(() => {
     setStatus("loading");
@@ -88,7 +89,7 @@ export const useTmdbSearch = () => {
       };
       fn();
     }
-  }, [debounce, setSearchResults]);
+  }, [debounce]);
   return status;
 };
 

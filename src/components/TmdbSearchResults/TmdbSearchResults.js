@@ -3,10 +3,12 @@ import React, { useEffect, useRef } from "react";
 import { useQuery, useSearchResults } from "../Provider/IframeDataProvider";
 import TmdbCard from "./TmdbCard";
 import styles from "./TmdbSearchResults.module.css";
+import { useStore } from "@/helper/hooks/useStore";
+import { Stores } from "@/helper/CONSTANTS";
 
 export default function TmdbSearchResults() {
-  const [searchResults, setSearchResults] = useSearchResults();
-  const [query] = useQuery();
+  const [searchResults, setSearchResults] = useStore(Stores.searchResults);
+  // const [query] = useStore(Stores.query);
 
   useEffect(() => {
     if (!!searchResults.value) {
@@ -26,7 +28,7 @@ export default function TmdbSearchResults() {
     );
   return (
     <div className={`${styles["search-result-wrapper"]} ${styles[""]} `}>
-      {query && searchResults.type == "SEARCH" && (
+      {searchResults.type == "SEARCH" && (
         <>
           {searchResults.value.length > 0 ? (
             <h1>Search Results</h1>

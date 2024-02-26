@@ -11,3 +11,8 @@ export const Constants = {
     WATCH_HISTORY: "watchHistory",
   },
 };
+
+export const Stores = {
+  query: "QUERY",
+  searchResults: "SEARCH_RESULTS",
+};
