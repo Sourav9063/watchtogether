@@ -104,6 +104,7 @@ export const useStore = (scope, { initState, effect } = {}) => {
 };
 
 export const useInitStore = (scope, initState) => {
+  serverInitState[scope] = initState;
   const store = useStoreSetup(scope);
   if (!store) {
     throw new Error("no initStore found");
@@ -113,7 +114,6 @@ export const useInitStore = (scope, initState) => {
 };
 
 export default function InitStore({ scope, initState }) {
-  serverInitState[scope] = initState;
   useInitStore(scope, initState);
   return <></>;
 }
