@@ -9,7 +9,8 @@ export default function Personal() {
         <Link href={"/"} style={{ textDecoration: "none" }}>
           <h1>Sync Play</h1>
         </Link>
-        {false ? <ReactVideoPlayer /> : <FirebaseVideoPlayerPersonal />}
+        {/* {false ? <ReactVideoPlayer /> : <FirebaseVideoPlayerPersonal />} */}
+        <FirebaseVideoPlayerPersonal />
       </main>
     </>
   );

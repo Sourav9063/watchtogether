@@ -19,7 +19,8 @@ export default function Home() {
         >
           <p>Free Stream</p>
         </Link>
-        {false ? <ReactVideoPlayer /> : <FirebaseVideoPlayer />}
+        {/* {false ? <ReactVideoPlayer /> : <FirebaseVideoPlayer />} */}
+        <FirebaseVideoPlayer />
       </main>
     </>
   );

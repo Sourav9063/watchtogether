@@ -15,19 +15,16 @@ const useStoreSetup = (scope, initState) => {
   }, []);
 
   const set = useCallback((value, scope) => {
-    console.log(value);
     if (typeof value === "function") value = value(store[scope]);
     if (
       typeof value === "object" &&
       value !== null &&
       Array.isArray(value) === false
     ) {
-      console.log(value);
       store[scope] = { ...store[scope], ...value };
     } else {
       store[scope] = value;
     }
-    console.log(store);
 
     return subscribers[scope]?.forEach((callback) => callback());
   }, []);
@@ -116,6 +113,7 @@ export const useInitStore = (scope, initState) => {
 };
 
 export default function InitStore({ scope, initState }) {
+  serverInitState[scope] = initState;
   useInitStore(scope, initState);
   return <></>;
 }
