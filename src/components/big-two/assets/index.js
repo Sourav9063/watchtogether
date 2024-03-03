@@ -1,5 +1,6 @@
 const root = "/assets/card-svg/";
 export const cardsImage = {
+  blue_back: root + "blue_back.png",
   "2_of_clubs": root + "2_of_clubs.svg",
   "2_of_diamonds": root + "2_of_diamonds.svg",
   "2_of_hearts": root + "2_of_hearts.svg",
