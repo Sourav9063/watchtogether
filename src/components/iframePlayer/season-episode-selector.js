@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useIframeUrl } from "../Provider/IframeDataProvider";
 import styles from "./iframePlayer.module.css";
+import { Stores } from "@/helper/CONSTANTS";
+import { useStore } from "@/helper/hooks/useStore";
 
 export default function SeasonEpisodeSelector({ id }) {
-  const [iframeUrl, setIframeUrl] = useIframeUrl();
+  const [iframeUrl, setIframeUrl] = useStore(Stores.iframeUrl);
   const [season, setSeason] = useState(iframeUrl.season);
   const [episode, setEpisode] = useState(iframeUrl.episode);
   const [change, setChange] = useState({ value: 0 });

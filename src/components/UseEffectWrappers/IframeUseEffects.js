@@ -2,9 +2,11 @@
 import React, { useEffect } from "react";
 import { useIframeUrl } from "../Provider/IframeDataProvider";
 import { itrSeEp } from "@/helper/iframeFunc";
+import { useStore } from "@/helper/hooks/useStore";
+import { Stores } from "@/helper/CONSTANTS";
 
 export default function IframeUseEffects() {
-  const [iframeUrl, setIframeUrl] = useIframeUrl();
+  const [iframeUrl, setIframeUrl] = useStore(Stores.iframeUrl);
   useEffect(() => {
     const keyDown = (e) => {
       if (iframeUrl?.type == "movie") return;

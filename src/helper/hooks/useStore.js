@@ -95,9 +95,7 @@ export const useStore = (scope, { initState, effect } = {}) => {
 
   useLayoutEffect(() => {
     effect && effect(state);
-    return () => {
-      store.subscribers[scope]?.clear();
-    };
+    return () => {};
   }, [state]);
 
   return [state, (value) => store.set(value, scope), dispatch];

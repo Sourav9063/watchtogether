@@ -6,10 +6,11 @@ import {
   addValueLocalStorageArray,
   removeValueLocalStorageArray,
 } from "@/helper/functions/localStorageFn";
-import { Constants } from "@/helper/CONSTANTS";
+import { Constants, Stores } from "@/helper/CONSTANTS";
+import { useStore } from "@/helper/hooks/useStore";
 
 export default function TmdbCard({ details, cardType, setSearchResults }) {
-  const [, setIframeUrl] = useIframeUrl();
+  const [, setIframeUrl] = useStore(Stores.iframeUrl);
   const {
     type,
     id,

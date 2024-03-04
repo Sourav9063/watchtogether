@@ -5,9 +5,11 @@ import { useIframeUrl } from "../Provider/IframeDataProvider";
 import { getIframeUrl } from "@/helper/iframeFunc";
 import SeasonEpisodeSelector from "./season-episode-selector";
 import VideoSrc from "./video-src";
+import { useStore } from "@/helper/hooks/useStore";
+import { Stores } from "@/helper/CONSTANTS";
 
 export default function IframePlayer() {
-  const [iframeUrl] = useIframeUrl();
+  const [iframeUrl] = useStore(Stores.iframeUrl);
   return (
     <div id="wrapper">
       {iframeUrl && iframeUrl.type && (
@@ -17,9 +19,7 @@ export default function IframePlayer() {
             className={`${styles["iframe-wrapper"]} ${styles[""]} `}
           >
             <iframe
-              allowfullscreen="true"
-              webkitallowfullscreen="true"
-              mozallowfullscreen="true"
+              allowFullScreen={true}
               className={`${styles["iframe"]} ${styles[""]} `}
               src={getIframeUrl({ iframeUrl: iframeUrl })}
             />

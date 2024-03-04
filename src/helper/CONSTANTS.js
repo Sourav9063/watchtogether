@@ -15,4 +15,5 @@ export const Constants = {
 export const Stores = {
   query: "QUERY",
   searchResults: "SEARCH_RESULTS",
+  iframeUrl: "IFRAME_URL",
 };

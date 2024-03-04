@@ -2,9 +2,11 @@ import React from "react";
 import styles from "./iframePlayer.module.css";
 import { useIframeUrl } from "../Provider/IframeDataProvider";
 import config from "@/config";
+import { useStore } from "@/helper/hooks/useStore";
+import { Stores } from "@/helper/CONSTANTS";
 
 export default function VideoSrc() {
-  const [iframeUrl, setIframeUrl] = useIframeUrl();
+  const [iframeUrl, setIframeUrl] = useStore(Stores.iframeUrl);
   return (
     <div className={styles["src"]}>
       <div className={`${styles["src-list"]} ${styles[""]} `}>

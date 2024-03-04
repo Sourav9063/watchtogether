@@ -8,7 +8,9 @@ import { Stores } from "@/helper/CONSTANTS";
 
 export default function TmdbSearchResults() {
   const [searchResults, setSearchResults] = useStore(Stores.searchResults);
-  // const [query] = useStore(Stores.query);
+  console.log(searchResults);
+  const [query] = useStore(Stores.query);
+  console.log(query);
 
   useEffect(() => {
     if (!!searchResults.value) {
@@ -28,6 +30,7 @@ export default function TmdbSearchResults() {
     );
   return (
     <div className={`${styles["search-result-wrapper"]} ${styles[""]} `}>
+      <h1>{searchResults.value?.length}</h1>
       {searchResults.type == "SEARCH" && (
         <>
           {searchResults.value.length > 0 ? (

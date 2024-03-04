@@ -7,6 +7,7 @@ import { useStore } from "@/helper/hooks/useStore";
 import { Stores } from "@/helper/CONSTANTS";
 export default function TmdbSearch() {
   const [query, setQuery] = useStore(Stores.query);
+  console.log(query);
   const status = useTmdbSearch();
   return (
     <div id="search-pos" className={styles["search-wrapper"]}>
