@@ -101,17 +101,17 @@ export const useStore = (scope, { initState, effect } = {}) => {
   return [state, (value) => store.set(value, scope), dispatch];
 };
 
-export const useInitStore = (scope, initState) => {
-  serverInitState[scope] = initState;
-  const store = useStoreSetup(scope);
-  if (!store) {
-    throw new Error("no initStore found");
-  }
-  store.set(initState, scope);
-  return initState;
-};
+// export const useInitStore = (scope, initState) => {
+//   serverInitState[scope] = initState;
+//   const store = useStoreSetup(scope);
+//   if (!store) {
+//     throw new Error("no initStore found");
+//   }
+//   store.set(initState, scope);
+//   return initState;
+// };
 
-export default function InitStore({ scope, initState }) {
-  useInitStore(scope, initState);
-  return <></>;
-}
+// export default function InitStore({ scope, initState }) {
+//   useInitStore(scope, initState);
+//   return <></>;
+// }

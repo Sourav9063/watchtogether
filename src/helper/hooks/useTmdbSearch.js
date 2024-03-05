@@ -11,18 +11,13 @@ import { useStore } from "./useStore";
 
 export const useTmdbSearch = () => {
   const [status, setStatus] = useState("idle"); // "idle" | "loading" | "success" | "error"
-  const [searchResult, setSearchResults] = useStore(Stores.searchResults);
-  console.log(searchResult);
+  const [, setSearchResults] = useStore(Stores.searchResults);
   const [query] = useStore(Stores.query);
-  console.log(query);
   const debounce = useDebounce(query, 2000);
   useEffect(() => {
     setStatus("loading");
-    console.log(query);
     if (!query) {
-      console.log(query);
       setStatus("idle");
-      console.log("first");
       setSearchResults({
         type: "HISTORY",
         value: getLocalStorage({

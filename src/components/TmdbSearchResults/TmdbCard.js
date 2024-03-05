@@ -9,8 +9,7 @@ import {
 import { Constants, Stores } from "@/helper/CONSTANTS";
 import { useStore } from "@/helper/hooks/useStore";
 
-export default function TmdbCard({ details, cardType, setSearchResults }) {
-  const [, setIframeUrl] = useStore(Stores.iframeUrl);
+export default function TmdbCard({ details, cardType, setSearchResults,setIframeUrl }) {
   const {
     type,
     id,
