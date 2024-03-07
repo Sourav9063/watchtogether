@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import ProviderWrapper from "./Provider/ProviderWrapper";
 import IframePlayer from "./iframePlayer/iframePlayer";
@@ -17,6 +18,7 @@ export default function IframeWrapper() {
       <IframePlayer />
       <TmdbSearch />
       <TmdbSearchResults />
+      {/* <Button>name</Button> */}
       {/* </ProviderWrapper> */}
     </>
   );

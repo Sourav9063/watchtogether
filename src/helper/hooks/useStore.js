@@ -1,29 +1,25 @@
 "use client";
 import { useCallback, useLayoutEffect, useSyncExternalStore } from "react";
 
-const store = {};
+export const mainStore = {};
 const subscribers = {};
 const serverInitState = {};
 
-const useStoreSetup = (scope, initState) => {
-  if (!store[scope]) {
-    store[scope] = initState;
-  }
-
+const useStoreSetup = () => {
   const get = useCallback((scope) => {
-    return store[scope];
+    return mainStore[scope];
   }, []);
 
   const set = useCallback((value, scope) => {
-    if (typeof value === "function") value = value(store[scope]);
+    if (typeof value === "function") value = value(mainStore[scope]);
     if (
       typeof value === "object" &&
       value !== null &&
       Array.isArray(value) === false
     ) {
-      store[scope] = { ...store[scope], ...value };
+      mainStore[scope] = { ...mainStore[scope], ...value };
     } else {
-      store[scope] = value;
+      mainStore[scope] = value;
     }
 
     return subscribers[scope]?.forEach((callback) => callback());
@@ -40,7 +36,7 @@ const useStoreSetup = (scope, initState) => {
     };
   }, []);
 
-  return { get, set, subscribe, store, subscribers };
+  return { get, set, subscribe, mainStore, subscribers };
 };
 
 /**
@@ -60,6 +56,14 @@ const useStoreSetup = (scope, initState) => {
 export const useStore = (scope, { initState, effect } = {}) => {
   if (!scope) throw new Error("useStore must be used with a scope");
 
+  if (!mainStore[scope]) {
+    mainStore[scope] = initState;
+  }
+  useLayoutEffect(() => {
+    if (initState) {
+      mainStore[scope] = { ...store[scope], ...initState };
+    }
+  }, [scope]);
   const store = useStoreSetup(scope, initState);
 
   const state = useSyncExternalStore(
