@@ -14,7 +14,7 @@ export default function TmdbSearch() {
         <h1>Search</h1>
         <input
           type="text"
-          value={query}
+          value={query||""}
           onChange={(e) => setQuery(e.target.value)}
         />
       </div>
