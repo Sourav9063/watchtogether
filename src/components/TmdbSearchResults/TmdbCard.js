@@ -9,7 +9,12 @@ import {
 import { Constants, Stores } from "@/helper/CONSTANTS";
 import { useStore } from "@/helper/hooks/useStore";
 
-export default function TmdbCard({ details, cardType, setSearchResults,setIframeUrl }) {
+export default function TmdbCard({
+  details,
+  cardType,
+  setSearchResults,
+  setIframeUrl,
+}) {
   const {
     type,
     id,
@@ -55,7 +60,7 @@ export default function TmdbCard({ details, cardType, setSearchResults,setIframe
       >
         {/* cross svg */}
         {cardType == "HISTORY" && (
-          <button
+          <div
             className={`${styles["cross"]} ${styles[""]} `}
             onClick={(e) => {
               e.stopPropagation();
@@ -85,7 +90,7 @@ export default function TmdbCard({ details, cardType, setSearchResults,setIframe
                 d="M13.414 12l4.293-4.293a1 1 0 10-1.414-1.414L12 10.586 7.707 6.293a1 1 0 00-1.414 1.414L10.586 12l-4.293 4.293a1 1 0 001.414 1.414L12 13.414l4.293 4.293a1 1 0 001.414-1.414L13.414 12z"
               ></path>
             </svg>
-          </button>
+          </div>
         )}
         <div className={`${styles["img-title"]} ${styles[""]} `}>
           <img src={poster_image_url} />

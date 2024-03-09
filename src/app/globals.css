@@ -124,10 +124,12 @@ button {
   border-radius: 5px;
   width: 100%;
   cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
 
 button:hover {
   background-color: var(--hover-color);
+  transform: scale(1.03);
 }
 
 .input-wrapper > * {

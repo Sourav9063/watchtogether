@@ -42,6 +42,7 @@
 .card:hover {
   all: unset();
   background-color: transparent;
+  transform: scale(1.03);
 }
 .card > h4 {
   text-align: center;
@@ -86,6 +87,7 @@
   place-items: center;
   transition: top 0.3s ease-in-out;
   color: white;
+  text-shadow: 3px 3px 5px #020047dc;
 }
 .title > h2 {
   text-align: center;
@@ -124,9 +126,14 @@
   border-radius: 50%;
   display: none;
   place-items: center;
+  transition: all 0.3s ease-in-out;
 }
 .card:hover .cross {
   display: grid;
+}
+.cross:hover {
+  background-color: #645bff;
+  transform: scale(1.1);
 }
 .cross > svg {
   width: 20px;
