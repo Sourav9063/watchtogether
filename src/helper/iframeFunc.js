@@ -40,9 +40,9 @@ export const getIframeUrlForQuery = ({ iframeUrl }) => {
   const query = getIframeUrl({ iframeUrl, full: false }).replace("/", "");
   return (
     "?url=" +
-    query.replaceAll("/", spacer) +
+    getBaseUrlIndex(iframeUrl.baseUrl) +
     spacer +
-    getBaseUrlIndex(iframeUrl.baseUrl)
+    query.replaceAll("/", spacer)
   );
 };
 
@@ -50,14 +50,14 @@ export const getIframeObjectFromUrl = ({ url }) => {
   const queryString = new URLSearchParams(url).get("url");
   if (!queryString) return null;
   const queryStringSplit = queryString.split(spacer);
-  const [type, id, season, episode, baseUrlIndex] = queryStringSplit;
+  const [baseUrlIndex, type, id, season, episode] = queryStringSplit;
 
   if (type == "movie") {
     if (!isIframeObjectValid({ iframeObj: { type, id } })) return null;
     return {
       type: type,
       id: id || "",
-      baseUrl: getSrc(Number(season)),
+      baseUrl: getSrc(Number(baseUrlIndex)),
     };
   } else if (type == "tv") {
     if (!isIframeObjectValid({ iframeObj: { type, id, season, episode } }))

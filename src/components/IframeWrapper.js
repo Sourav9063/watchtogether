@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import ProviderWrapper from "./Provider/ProviderWrapper";
 import IframePlayer from "./iframePlayer/iframePlayer";
