@@ -1,6 +1,11 @@
+import config from "@/config";
+
 export const spacer = "-";
 
 export const getIframeUrl = ({ iframeUrl, full = true }) => {
+  if (iframeUrl.baseUrl == config.iframe.url5 && full) {
+    return getUrl5({ iframeUrl });
+  }
   if (iframeUrl.type == "movie") {
     return (full ? iframeUrl.baseUrl : "") + "/movie/" + iframeUrl.id;
   } else {
@@ -15,22 +20,44 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
     );
   }
 };
+
+const getUrl5 = ({ iframeUrl }) => {
+  if (iframeUrl.type == "movie")
+    return `${iframeUrl.baseUrl}?video_id=${iframeUrl.id}&tmdb=1`;
+  return `${iframeUrl.baseUrl}?video_id=${iframeUrl.id}&tmdb=1&s=${iframeUrl.season}&e=${iframeUrl.episode}`;
+};
+
+export const getBaseUrlIndex = (src) => {
+  if (!src) return 0;
+  return config.iframe.urls.indexOf(src) || 0;
+};
+export const getSrc = (index) => {
+  if (index < 0) return config.iframe.urls[0];
+  return config.iframe.urls[index] || config.iframe.urls[0];
+};
+
 export const getIframeUrlForQuery = ({ iframeUrl }) => {
   const query = getIframeUrl({ iframeUrl, full: false }).replace("/", "");
-  return "?url=" + query.replaceAll("/", spacer);
+  return (
+    "?url=" +
+    query.replaceAll("/", spacer) +
+    spacer +
+    getBaseUrlIndex(iframeUrl.baseUrl)
+  );
 };
 
 export const getIframeObjectFromUrl = ({ url }) => {
   const queryString = new URLSearchParams(url).get("url");
   if (!queryString) return null;
   const queryStringSplit = queryString.split(spacer);
-  const [type, id, season, episode] = queryStringSplit;
+  const [type, id, season, episode, baseUrlIndex] = queryStringSplit;
 
   if (type == "movie") {
     if (!isIframeObjectValid({ iframeObj: { type, id } })) return null;
     return {
       type: type,
       id: id || "",
+      baseUrl: getSrc(Number(season)),
     };
   } else if (type == "tv") {
     if (!isIframeObjectValid({ iframeObj: { type, id, season, episode } }))
@@ -40,6 +67,7 @@ export const getIframeObjectFromUrl = ({ url }) => {
       id: id || "",
       season: Number(season) || "",
       episode: Number(episode) || "",
+      baseUrl: getSrc(Number(baseUrlIndex)),
     };
   } else {
     return null;

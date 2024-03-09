@@ -9,7 +9,6 @@ export default function IframeUseEffects() {
   const [iframeUrl, setIframeUrl] = useStore(Stores.iframeUrl);
   useEffect(() => {
     const keyDown = (e) => {
-      console.log(e);
       if (iframeUrl?.type == "movie") return;
       if (e.key == "ArrowLeft") {
         if (e.shiftKey) {

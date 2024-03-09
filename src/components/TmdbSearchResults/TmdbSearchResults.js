@@ -11,7 +11,7 @@ export default function TmdbSearchResults() {
   const [, setIframeUrl] = useStore(Stores.iframeUrl);
 
   useEffect(() => {
-    if (!!searchResults.value) {
+    if (!!searchResults.value && searchResults.type == "SEARCH") {
       document
         .getElementById("search-pos")
         ?.scrollIntoView({ behavior: "smooth" });

@@ -2,7 +2,7 @@
 import config from "@/config";
 import { Constants, Stores } from "@/helper/CONSTANTS";
 import { getLocalStorage } from "@/helper/functions/localStorageFn";
-import { useInitStore, useStore } from "@/helper/hooks/useStore";
+import { useStore } from "@/helper/hooks/useStore";
 import React, { useEffect, useLayoutEffect } from "react";
 import styleMain from "@/app/free-stream/page.module.css";
 import { randomRGBA } from "@/helper/customFunc";
@@ -21,9 +21,9 @@ export default function InitIframeStore() {
 
   const iframeUrlEffect = () => {
     if (isIframeObjectValid({ iframeObj: iframeUrl })) {
-      const { baseUrl, ...rest } = iframeUrl;
-      localStorage.setItem("iframeUrl", JSON.stringify(rest));
-      window.history.pushState(null, null, getIframeUrlForQuery({ iframeUrl }));
+      const saveString = getIframeUrlForQuery({ iframeUrl });
+      localStorage.setItem("iframeUrl", saveString);
+      window.history.pushState(null, null, saveString);
       setSeasonAndEpisode({ ...iframeUrl });
       document
         .getElementById("iframe-player")
@@ -56,9 +56,10 @@ export default function InitIframeStore() {
         });
       } else {
         const existing = localStorage.getItem("iframeUrl");
+        const existingObj = getIframeObjectFromUrl({ url: existing });
         if (existing) {
           setIframeUrl((state) => {
-            return { ...state, ...JSON.parse(existing) };
+            return { ...state, ...existingObj };
           });
         }
       }
