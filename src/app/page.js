@@ -2,6 +2,7 @@ import FirebaseVideoPlayer from "@/components/firebasePlayer/FirebasePlayer";
 import styles from "./page.module.css";
 import ReactVideoPlayer from "@/components/reactPlayer/ReactPlayer";
 import Link from "next/link";
+import ServerComponentWrapper from "@/components/serverComponentWrapper/ServerComponentWrapper";
 export default function Home() {
   return (
     <>
@@ -20,7 +21,9 @@ export default function Home() {
           <p>Free Stream</p>
         </Link>
         {/* {false ? <ReactVideoPlayer /> : <FirebaseVideoPlayer />} */}
-        <FirebaseVideoPlayer />
+        <ServerComponentWrapper>
+          <FirebaseVideoPlayer />
+        </ServerComponentWrapper>
       </main>
     </>
   );
