@@ -5,20 +5,28 @@
   align-items: center;
   margin: 0 auto;
   width: 100%;
-  max-width: 1200px;
+  max-width: 100vw;
   gap: 2rem;
-  margin-bottom: 8rem;
+  margin-bottom: 2rem;
 }
 
 .cards {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: stretch;
   margin: 0 auto;
   width: 100%;
-  max-width: 1200px;
-  gap: 1rem;
+  max-width: 100vw;
+  padding-inline: 30px;
+  gap: 1.5rem;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  padding-inline: 2rem;
+  margin-bottom: 2rem;
+}
+
+.cards::-webkit-scrollbar {
+  display: none;
 }
 
 .card {
@@ -33,6 +41,7 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: stretch;
+  min-width: 250px;
   width: min(250px, 100%);
   transition: all 0.3s ease-in-out;
   cursor: pointer;

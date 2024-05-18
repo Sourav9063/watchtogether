@@ -6,19 +6,19 @@ import TmdbSearchResults from "./TmdbSearchResults/TmdbSearchResults";
 import IframeUseEffects from "./UseEffectWrappers/IframeUseEffects";
 import HoverSeEp from "./iframePlayer/hoverSeEp";
 import InitIframeStore from "./Provider/InitIframeStore";
+import LatestMedia, { LatestType } from "./latest/LatestMedia";
 
 export default function IframeWrapper() {
   return (
     <>
-      {/* <ProviderWrapper> */}
       <InitIframeStore />
       <IframeUseEffects />
       <HoverSeEp />
       <IframePlayer />
       <TmdbSearch />
       <TmdbSearchResults />
-      {/* <Button>name</Button> */}
-      {/* </ProviderWrapper> */}
+      <LatestMedia type={LatestType.MOVIE_NEW} />
+      <LatestMedia type={LatestType.TV_NEW} />
     </>
   );
 }

@@ -15,6 +15,8 @@ export default function Personal() {
         <p
           style={{
             marginTop: "auto",
+            marginTop: "6rem",
+            textAlign: "center",
           }}
         >
           Highly suggested to use an Ad blocker like{" "}

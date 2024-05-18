@@ -20,6 +20,10 @@ export default function InitIframeStore() {
   });
 
   const iframeUrlEffect = () => {
+    const main = document.querySelector("." + styleMain.main);
+    main.style.setProperty("--left-color", randomRGBA());
+    main.style.setProperty("--right-color", randomRGBA());
+
     if (isIframeObjectValid({ iframeObj: iframeUrl })) {
       const saveString = getIframeUrlForQuery({ iframeUrl });
       localStorage.setItem("iframeUrl", saveString);
@@ -29,10 +33,6 @@ export default function InitIframeStore() {
         .getElementById("iframe-player")
         ?.scrollIntoView({ behavior: "smooth" });
     }
-
-    const main = document.querySelector("." + styleMain.main);
-    main.style.setProperty("--left-color", randomRGBA());
-    main.style.setProperty("--right-color", randomRGBA());
   };
   const [iframeUrl, setIframeUrl] = useStore(Stores.iframeUrl, {
     initState: {

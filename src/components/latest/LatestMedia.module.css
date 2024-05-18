@@ -1,0 +1,41 @@
+.section {
+  background: linear-gradient(
+      218.73deg,
+      var(--right-color) 0%,
+      rgba(201, 32, 184, 0) 50%
+    ),
+    linear-gradient(321.27deg, rgba(0, 70, 209, 0) 50%, var(--left-color) 100%);
+  border-radius: 5px;
+  margin-bottom: 2rem;
+}
+
+.header {
+  text-align: center;
+  font-size: 2rem;
+  padding-block: 1rem;
+  background: linear-gradient(
+      218.73deg,
+      var(--right-color) 0%,
+      rgba(201, 32, 184, 0) 50%
+    ),
+    linear-gradient(321.27deg, rgba(0, 70, 209, 0) 50%, var(--left-color) 100%);
+}
+
+.cards {
+  display: flex;
+  justify-content: flex-start;
+  align-items: stretch;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 100vw;
+  padding-inline: 30px;
+  gap: 1.5rem;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  padding-inline: 2rem;
+  margin-bottom: 2rem;
+}
+
+.cards::-webkit-scrollbar {
+  display: none;
+}

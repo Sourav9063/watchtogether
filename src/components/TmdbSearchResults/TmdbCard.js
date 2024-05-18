@@ -1,6 +1,4 @@
-import React from "react";
 import styles from "./TmdbSearchResults.module.css";
-import { useIframeUrl } from "../Provider/IframeDataProvider";
 import { getSeasonAndEpisode } from "@/helper/iframeFunc";
 import {
   addValueLocalStorageArray,
@@ -12,8 +10,9 @@ import { useStore } from "@/helper/hooks/useStore";
 export default function TmdbCard({
   details,
   cardType,
-  setSearchResults,
-  setIframeUrl,
+  showType = true,
+  setSearchResults = () => {},
+  setIframeUrl = () => {},
 }) {
   const {
     type,
@@ -56,6 +55,13 @@ export default function TmdbCard({
               };
             });
           }
+
+          setSearchResults((state) => {
+            return {
+              ...state,
+              value: [details, ...state.value.filter((item) => item.id != id)],
+            };
+          });
         }}
       >
         {/* cross svg */}
@@ -110,7 +116,7 @@ export default function TmdbCard({
             )}
           </div>
         </div>
-        <h4>{type == "tv" ? "Series" : "Movie"}</h4>
+        {showType && <h4>{type == "tv" ? "Series" : "Movie"}</h4>}
       </button>
     </>
   );
