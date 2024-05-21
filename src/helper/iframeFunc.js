@@ -82,7 +82,6 @@ export const isIframeObjectValid = ({ iframeObj }) => {
     return true;
   } else if (type == "tv") {
     if (typeof id == "undefined" || id == null) return false;
-    if (typeof season == "undefined" || season == null) return false;
     return true;
   } else {
     return false;

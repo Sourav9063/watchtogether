@@ -20,6 +20,7 @@ export default function TmdbCard({
     vote_average,
     title,
     poster_image_url,
+    backdrop_image_url,
     release_date,
     first_air_date,
   } = details;
@@ -57,10 +58,16 @@ export default function TmdbCard({
           }
 
           setSearchResults((state) => {
-            return {
-              ...state,
-              value: [details, ...state.value.filter((item) => item.id != id)],
-            };
+            if (state.type == "HISTORY") {
+              return {
+                ...state,
+                value: [
+                  details,
+                  ...state.value.filter((item) => item.id != id),
+                ],
+              };
+            }
+            return state;
           });
         }}
       >
@@ -99,7 +106,7 @@ export default function TmdbCard({
           </div>
         )}
         <div className={`${styles["img-title"]} ${styles[""]} `}>
-          <img src={poster_image_url} />
+          <img src={poster_image_url || backdrop_image_url} alt={title} />
           <div className={`${styles["title"]} ${styles[""]} `}>
             <h2>{title}</h2>
             {

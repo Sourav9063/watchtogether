@@ -50,8 +50,12 @@ export const useTmdbSearch = () => {
               result.name ||
               result.original_title ||
               result.original_name;
-            result.poster_image_url = `https://image.tmdb.org/t/p/w500${result.poster_path}`;
-            result.backdrop_image_url = `https://image.tmdb.org/t/p/w500${result.backdrop_path}`;
+            result.poster_image_url = result.poster_path
+              ? `https://image.tmdb.org/t/p/w500${result.poster_path}`
+              : null;
+            result.backdrop_image_url = result.backdrop_path
+              ? `https://image.tmdb.org/t/p/w500${result.backdrop_path}`
+              : null;
           }
           for (const result of tvData.results) {
             result.type = "tv";

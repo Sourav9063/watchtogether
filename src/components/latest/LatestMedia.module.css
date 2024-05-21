@@ -1,24 +1,33 @@
 .section {
   background: linear-gradient(
       218.73deg,
-      var(--right-color) 0%,
+      var(--left-color) 0%,
       rgba(201, 32, 184, 0) 50%
     ),
-    linear-gradient(321.27deg, rgba(0, 70, 209, 0) 50%, var(--left-color) 100%);
-  border-radius: 5px;
-  margin-bottom: 2rem;
+    linear-gradient(321.27deg, rgba(0, 70, 209, 0) 50%, var(--right-color) 100%);
+  padding-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .header {
   text-align: center;
-  font-size: 2rem;
-  padding-block: 1rem;
+  font-size: 2.5rem;
+  /* font-weight: 800; */
+  margin-block: 1.5rem;
+  margin-inline: auto;
   background: linear-gradient(
       218.73deg,
-      var(--right-color) 0%,
+      var(--left-color) 0%,
       rgba(201, 32, 184, 0) 50%
     ),
-    linear-gradient(321.27deg, rgba(0, 70, 209, 0) 50%, var(--left-color) 100%);
+    linear-gradient(321.27deg, rgba(0, 70, 209, 0) 50%, var(--right-color) 100%);
+  background-size: contain;
+  display: inline;
+  background-clip: text;
+  color: var(--header-color);
 }
 
 .cards {
@@ -33,9 +42,16 @@
   overflow-x: scroll;
   overflow-y: hidden;
   padding-inline: 2rem;
-  margin-bottom: 2rem;
+  padding-bottom: 2rem;
 }
 
 .cards::-webkit-scrollbar {
   display: none;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding-block: 1.5rem;
+    font-size: 1.5rem;
+  }
 }

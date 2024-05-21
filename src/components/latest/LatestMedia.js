@@ -1,6 +1,7 @@
 import styles from "./LatestMedia.module.css";
 import config from "@/config";
 import LatestMediaClient from "./LatestMediaClient";
+import { randomRGBA } from "@/helper/customFunc";
 
 export const LatestType = {
   MOVIE_NEW: "/movie/new",
@@ -52,14 +53,19 @@ export async function getLatest({
 
   return {
     data: resultsArray.map((item, i) => {
-      const { tmdb_id: id, type, title } = item;
-      const details = tmdbDetailsMap[id];
+      const { tmdb_id, imdb_id, type, title } = item;
+      const details = tmdbDetailsMap[tmdb_id];
       return {
         ...item,
         ...details,
+        id: tmdb_id || imdb_id,
         title: title || details?.title,
-        poster_image_url: `https://image.tmdb.org/t/p/w500${details?.poster_path}`,
-        backdrop_image_url: `https://image.tmdb.org/t/p/w500${details?.backdrop_path}`,
+        poster_image_url: details?.poster_path
+          ? `https://image.tmdb.org/t/p/w500${details?.poster_path}`
+          : null,
+        backdrop_image_url: details?.backdrop_path
+          ? `https://image.tmdb.org/t/p/w500${details?.backdrop_path}`
+          : null,
       };
     }),
   };
@@ -70,14 +76,22 @@ export default async function LatestMedia({
   numberOfPage = 5,
 }) {
   const { data, error } = await getLatest({ type, numberOfPage });
+  const header = {
+    [LatestType.MOVIE_NEW]: "Latest Released Movies",
+    [LatestType.MOVIE_ADD]: "Latest Added Movies",
+    [LatestType.TV_NEW]: "Latest Released Series",
+    [LatestType.TV_ADD]: "Latest Added Series",
+  };
   return (
-    <section className={styles["section"]}>
-      <h1 className={styles["header"]}>
-        {type === LatestType.MOVIE_NEW || type === LatestType.MOVIE_ADD
-          ? "Latest Movies"
-          : "Latest Series"}
-      </h1>
-      <LatestMediaClient data={data} />
+    <section
+      style={{
+        "--left-color": randomRGBA(0.4),
+        "--right-color": randomRGBA(0.4),
+      }}
+      className={styles["section"]}
+    >
+      <h1 className={styles["header"]}>{header[type]}</h1>
+      <LatestMediaClient data={data} type={type} />
     </section>
   );
 }

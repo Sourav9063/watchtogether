@@ -10,7 +10,6 @@ export default function TmdbSearchResults() {
   const [searchResults, setSearchResults] = useStore(Stores.searchResults);
   const [, setIframeUrl] = useStore(Stores.iframeUrl);
 
-  console.log(searchResults);
   useEffect(() => {
     if (!!searchResults.value && searchResults.type == "SEARCH") {
       document
