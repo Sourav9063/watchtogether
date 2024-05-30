@@ -15,6 +15,9 @@ const fetchFn = async (url, option = {}) => {
     next: { revalidate: 24 * 60 * 60 },
     ...option,
   });
+  if (!res.ok) {
+    return {};
+  }
   const data = await res.json();
   return data;
 };
