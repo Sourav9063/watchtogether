@@ -3,8 +3,15 @@ import config from "@/config";
 export const spacer = "-";
 
 export const getIframeUrl = ({ iframeUrl, full = true }) => {
-  if (iframeUrl.baseUrl == config.iframe.url5 && full) {
-    return getUrl5({ iframeUrl });
+  if (full) {
+    switch (iframeUrl.baseUrl) {
+      case config.iframe.url4:
+        return getUrl4({ iframeUrl });
+      case config.iframe.url5:
+        return getUrl5({ iframeUrl });
+      case config.iframe.url6:
+        return getUrl6({ iframeUrl });
+    }
   }
   if (iframeUrl.type == "movie") {
     return (full ? iframeUrl.baseUrl : "") + "/movie/" + iframeUrl.id;
@@ -21,10 +28,23 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
   }
 };
 
+const getUrl4 = ({ iframeUrl }) => {
+  if (iframeUrl.type == "movie") {
+    return `${iframeUrl.baseUrl}/embed/{iframeUrl.id}`;
+  }
+  return `${iframeUrl.baseUrl}/embedtv/${iframeUrl.id}?s=${iframeUrl.season}&s=1`;
+};
+
 const getUrl5 = ({ iframeUrl }) => {
   if (iframeUrl.type == "movie")
     return `${iframeUrl.baseUrl}?video_id=${iframeUrl.id}&tmdb=1`;
   return `${iframeUrl.baseUrl}?video_id=${iframeUrl.id}&tmdb=1&s=${iframeUrl.season}&e=${iframeUrl.episode}`;
+};
+
+const getUrl6 = ({ iframeUrl }) => {
+  if (iframeUrl.type == "movie")
+    return `${iframeUrl.baseUrl}/movie/${iframeUrl.id}`;
+  return `${iframeUrl.baseUrl}/tv/${iframeUrl.id}-${iframeUrl.season}-${iframeUrl.episode}`;
 };
 
 export const getBaseUrlIndex = (src) => {
