@@ -6,6 +6,7 @@ export const metadata = {
   description:
     "Simple website to play videos. Highly suggested to use an Ad blocker like uBlock, or Adblock.",
 };
+export const revalidate = 21600;
 
 export default function RootLayout({ children }) {
   return (

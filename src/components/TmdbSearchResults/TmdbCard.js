@@ -74,6 +74,8 @@ export default function TmdbCard({
         {/* cross svg */}
         {cardType == "HISTORY" && (
           <div
+            role="button"
+            tabIndex={0}
             className={`${styles["cross"]} ${styles[""]} `}
             onClick={(e) => {
               e.stopPropagation();
