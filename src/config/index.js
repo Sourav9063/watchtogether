@@ -16,6 +16,7 @@ const config = {
     ],
   },
   tmdbApiKey: process.env.NEXT_PUBLIC_PERSONAL_tmdb_api_key,
+  latestMediaUrl: process.env.NEXT_PUBLIC_LATEST_MEDIA_url,
 };
 
 export default config;

@@ -12,7 +12,7 @@ export const LatestType = {
 
 const fetchFn = async (url, option = {}) => {
   const res = await fetch(url, {
-    next: { revalidate: 24 * 60 * 60 },
+    next: { revalidate: 21600 },
     ...option,
   });
   if (!res.ok) {
