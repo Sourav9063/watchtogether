@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery, useSearchResults } from "../Provider/IframeDataProvider";
 import TmdbCard from "./TmdbCard";
 import styles from "./TmdbSearchResults.module.css";
@@ -10,7 +10,7 @@ import { getLocalStorage } from "@/helper/functions/localStorageFn";
 export default function TmdbSearchResults() {
   const [searchResults, setSearchResults] = useStore(Stores.searchResults);
   const [, setIframeUrl] = useStore(Stores.iframeUrl);
-
+  const [btnTxt, setBtnTxt] = useState("Copy History");
   useEffect(() => {
     if (!!searchResults.value && searchResults.type == "SEARCH") {
       document
@@ -49,16 +49,19 @@ export default function TmdbSearchResults() {
                   key: Constants.LocalStorageKey.WATCH_HISTORY,
                   emptyReturn: [],
                 }),
-
                 [Constants.LocalStorageKey.TV_DATA]: getLocalStorage({
                   key: Constants.LocalStorageKey.TV_DATA,
                   emptyReturn: {},
                 }),
               };
               navigator.clipboard.writeText(JSON.stringify(exportJSON));
+              setBtnTxt("Copied");
+              setTimeout(() => {
+                setBtnTxt("Copy History");
+              }, 5000);
             }}
           >
-            Copy History
+            {btnTxt}
           </button>
         </div>
       )}

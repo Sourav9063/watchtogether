@@ -29,14 +29,27 @@
 .paste {
   margin-bottom: 1rem;
 }
-.paste > * {
-  flex: 1;
+
+.paste > button {
+  margin-top: 0px;
+}
+
+.paste-form {
+  display: flex;
+  gap: 0.5rem;
   width: 100%;
 }
+
+.paste-form > button {
+  flex: 1;
+  margin-top: 0px;
+}
 .paste-input {
-  flex: 2;
   width: 100%;
   max-width: 100%;
+  font-size: 0.82rem;
+  padding: 0.5rem;
+  flex: 2;
 }
 
 @media (max-width: 800px) {

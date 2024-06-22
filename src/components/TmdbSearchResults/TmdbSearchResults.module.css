@@ -179,4 +179,9 @@
     flex-direction: column;
     gap: 0.5rem;
   }
+  .history > h1 {
+    white-space: unset;
+    text-align: center;
+    text-decoration: underline;
+  }
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import styles from "./tmdbSearch.module.css";
 import { useIframeUrl } from "../Provider/IframeDataProvider";
 import config from "@/config";
@@ -13,6 +13,10 @@ export function PasteHistory() {
   const [historyJson, setHistoryJson] = useState("");
   const [isValidJson, setIsValidJson] = useState(false);
   const [showInput, setShowInput] = useState(false);
+  const autoFocusFn = useCallback(
+    (element) => (element ? element.focus() : null),
+    []
+  );
 
   const [, setSearchResults] = useStore(Stores.searchResults);
   return (
@@ -23,8 +27,14 @@ export function PasteHistory() {
         </button>
       )}
       {showInput && (
-        <form action="" onSubmit={(e) => e.preventDefault()}>
+        <form
+          className={styles["paste-form"]}
+          action=""
+          onSubmit={(e) => e.preventDefault()}
+        >
           <input
+            ref={autoFocusFn}
+            autofocus={true}
             placeholder="Paste JSON"
             className={styles["paste-input"]}
             type="text"
