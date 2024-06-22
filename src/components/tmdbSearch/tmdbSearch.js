@@ -5,16 +5,18 @@ import { useTmdbSearch } from "@/helper/hooks/useTmdbSearch";
 import styles from "./tmdbSearch.module.css";
 import { useStore } from "@/helper/hooks/useStore";
 import { Stores } from "@/helper/CONSTANTS";
+import { PasteHistory } from "@/components/tmdbSearch/ParseHistory";
 export default function TmdbSearch() {
   const [query, setQuery] = useStore(Stores.query);
   const status = useTmdbSearch();
   return (
     <div id="search-pos" className={styles["search-wrapper"]}>
+      <PasteHistory />
       <div className={`${styles["search"]} ${styles[""]} `}>
         <h1>Search</h1>
         <input
           type="text"
-          value={query||""}
+          value={query || ""}
           onChange={(e) => setQuery(e.target.value)}
         />
       </div>

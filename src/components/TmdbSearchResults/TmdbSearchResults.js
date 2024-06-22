@@ -4,7 +4,8 @@ import { useQuery, useSearchResults } from "../Provider/IframeDataProvider";
 import TmdbCard from "./TmdbCard";
 import styles from "./TmdbSearchResults.module.css";
 import { useStore } from "@/helper/hooks/useStore";
-import { Stores } from "@/helper/CONSTANTS";
+import { Constants, Stores } from "@/helper/CONSTANTS";
+import { getLocalStorage } from "@/helper/functions/localStorageFn";
 
 export default function TmdbSearchResults() {
   const [searchResults, setSearchResults] = useStore(Stores.searchResults);
@@ -38,7 +39,28 @@ export default function TmdbSearchResults() {
         </>
       )}
       {searchResults.type == "HISTORY" && searchResults.value?.length > 0 && (
-        <h1>Watch History</h1>
+        <div className={styles["history"]}>
+          <h1>Watch History</h1>
+          <button
+            className={`${styles["copy-history"]} ${styles[""]} `}
+            onClick={() => {
+              const exportJSON = {
+                [Constants.LocalStorageKey.WATCH_HISTORY]: getLocalStorage({
+                  key: Constants.LocalStorageKey.WATCH_HISTORY,
+                  emptyReturn: [],
+                }),
+
+                [Constants.LocalStorageKey.TV_DATA]: getLocalStorage({
+                  key: Constants.LocalStorageKey.TV_DATA,
+                  emptyReturn: {},
+                }),
+              };
+              navigator.clipboard.writeText(JSON.stringify(exportJSON));
+            }}
+          >
+            Copy History
+          </button>
+        </div>
       )}
       <div className={`${styles["cards"]} ${styles[""]} `}>
         {searchResults.value.map((result) => (

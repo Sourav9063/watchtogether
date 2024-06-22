@@ -1,7 +1,6 @@
 .search-wrapper {
   margin-bottom: 2rem;
   margin-inline: 10vw;
-  margin-top: 2rem;
   padding-top: 2rem;
   padding-inline: 0.2rem;
   width: 80%;
@@ -27,6 +26,19 @@
   min-height: 2rem;
 }
 
+.paste {
+  margin-bottom: 1rem;
+}
+.paste > * {
+  flex: 1;
+  width: 100%;
+}
+.paste-input {
+  flex: 2;
+  width: 100%;
+  max-width: 100%;
+}
+
 @media (max-width: 800px) {
   .search-wrapper {
     margin-inline: 0.5rem;
@@ -37,5 +49,8 @@
   .search {
     flex-direction: column;
     gap: 0.5rem;
+  }
+  .paste {
+    padding-inline: 0.5rem;
   }
 }

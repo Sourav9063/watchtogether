@@ -150,7 +150,21 @@
   height: 20px;
   fill: white;
 }
-
+.history {
+  display: flex;
+  justify-content: stretch;
+  align-items: center;
+  gap: 1rem;
+}
+.history > h1 {
+  white-space: nowrap;
+}
+.copy-history {
+  display: none;
+}
+.history:hover .copy-history {
+  display: block;
+}
 @media (max-width: 800px) {
   .cross {
     display: grid;
@@ -160,5 +174,9 @@
   .cross > svg {
     width: 30px;
     height: 30px;
+  }
+  .history {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 }
