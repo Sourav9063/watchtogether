@@ -6,11 +6,13 @@ import styles from "./TmdbSearchResults.module.css";
 import { useStore } from "@/helper/hooks/useStore";
 import { Constants, Stores } from "@/helper/CONSTANTS";
 import { getLocalStorage } from "@/helper/functions/localStorageFn";
+import { useHorizontalScroll } from "@/helper/hooks/useHorizontalScroll";
 
 export default function TmdbSearchResults() {
   const [searchResults, setSearchResults] = useStore(Stores.searchResults);
   const [, setIframeUrl] = useStore(Stores.iframeUrl);
   const [btnTxt, setBtnTxt] = useState("Copy History");
+  const ref = useHorizontalScroll();
   useEffect(() => {
     if (!!searchResults.value && searchResults.type == "SEARCH") {
       document
@@ -65,7 +67,7 @@ export default function TmdbSearchResults() {
           </button>
         </div>
       )}
-      <div className={`${styles["cards"]} ${styles[""]} `}>
+      <div ref={ref} className={`${styles["cards"]} ${styles[""]} `}>
         {searchResults.value.map((result) => (
           <TmdbCard
             key={result?.id}
