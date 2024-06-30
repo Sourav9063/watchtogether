@@ -27,7 +27,7 @@ export async function getLatest({
   numberOfPage = 7,
 }) {
   const requests = Array.from({ length: numberOfPage }, (_, i) => {
-    return fetchFn(`https://vidsrc.to/vapi${type}/${i + 1}`);
+    return fetchFn(config.latestMediaUrl + `${type}/${i + 1}`);
   });
 
   const results = await Promise.all(requests);
