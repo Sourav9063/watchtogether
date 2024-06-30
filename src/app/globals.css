@@ -40,6 +40,7 @@
   --card-rgb: 180, 185, 188;
   --card-border-rgb: 131, 134, 135;
   --header-color: rgba(0, 0, 0, 0.15);
+  --text-color: black;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -75,6 +76,7 @@
     --card-rgb: 100, 100, 100;
     --card-border-rgb: 200, 200, 200;
     --header-color: rgba(255, 255, 255, 0.15);
+    --text-color: white;
   }
 }
 

@@ -1,7 +1,7 @@
 .search-wrapper {
   margin-bottom: 2rem;
   margin-inline: 10vw;
-  padding-top: 2rem;
+  padding-top: 1.5rem;
   padding-inline: 0.2rem;
   width: 80%;
 }
@@ -27,7 +27,7 @@
 }
 
 .paste {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .paste > button {
@@ -40,6 +40,38 @@
   width: 100%;
 }
 
+.copy-history-section {
+  margin-bottom: 0.5rem;
+}
+.copy-history {
+  margin-bottom: 0.5rem;
+}
+
+.drop-down {
+  white-space: no-wrap;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.arrow {
+  white-space: no-wrap;
+  height: 0px;
+  width: 0px;
+  display: inline-block;
+  border-top: 0.5rem solid transparent;
+  border-bottom: 0.5rem solid transparent;
+  border-right: 0.5rem solid var(--text-color);
+  position: relative;
+  margin-right: 0.5rem;
+  transition: transform 0.2s ease-in-out;
+}
+
+.open {
+  transform: rotate(-90deg);
+}
 .paste-form > button {
   flex: 1;
   margin-top: 0px;
