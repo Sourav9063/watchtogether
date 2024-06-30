@@ -23,7 +23,10 @@ export default function TmdbCard({
     backdrop_image_url,
     release_date,
     first_air_date,
+    genres,
   } = details;
+  const genresStr = genres?.map((item) => item.name).join(", ");
+  console.log(genresStr);
   return (
     <>
       <button
@@ -40,6 +43,7 @@ export default function TmdbCard({
               poster_image_url,
               release_date,
               first_air_date,
+              genres,
             },
           });
           if (type == "movie") {
@@ -111,12 +115,7 @@ export default function TmdbCard({
           <img src={poster_image_url || backdrop_image_url} alt={title} />
           <div className={`${styles["title"]} ${styles[""]} `}>
             <h2>{title}</h2>
-            {
-              <p>
-                {release_date?.substring(0, 4) ||
-                  first_air_date?.substring(0, 4)}
-              </p>
-            }
+            {genresStr && <p>{genresStr}</p>}
             {!!vote_average && vote_average > 0 && (
               <p>
                 <span>Rating: </span>
