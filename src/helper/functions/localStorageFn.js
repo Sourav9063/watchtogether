@@ -3,14 +3,17 @@ export const addValueLocalStorageArray = ({
   value,
   values = [],
   compare = "id",
-  maxLength = 20,
+  maxLength = 100,
 }) => {
   if (!check()) return;
   const existingParsed = getLocalStorage({ key, emptyReturn: [] });
   let newValue = [...values, ...existingParsed];
   if (!!value) newValue = [value, ...newValue];
-  let setObj = new Set(newValue.map(JSON.stringify));
-  newValue = Array.from(setObj).map(JSON.parse);
+  let setObj = {};
+  newValue.forEach((item) => {
+    setObj[item[compare] ?? item.title ?? JSON.stringify(item)] = item;
+  });
+  newValue = Object.values(setObj);
   localStorage.setItem(key, JSON.stringify(newValue.slice(0, maxLength)));
 };
 
