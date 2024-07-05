@@ -17,6 +17,7 @@
   font-size: 2.5rem;
   margin-block: 1.5rem;
   margin-inline: 1rem;
+  margin-bottom: 0px;
   background: linear-gradient(
       218.73deg,
       var(--left-color) 0%,
@@ -38,8 +39,9 @@
   max-width: 100vw;
   padding-inline: 30px;
   gap: 1.5rem;
+  padding-top: 2.5rem;
   overflow-x: scroll;
-  overflow-y: hidden;
+  overflow-y: visible;
   padding-inline: 2rem;
   padding-bottom: 2rem;
 }

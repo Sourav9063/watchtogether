@@ -6,10 +6,14 @@
   margin: 0 auto;
   width: 100%;
   max-width: 100vw;
-  gap: 2rem;
+  /* gap: 2rem; */
   margin-bottom: 4rem;
+  overflow-y: scroll;
 }
-
+.search-result-wrapper .card {
+  --x: 100%;
+  --y: 1rem;
+}
 .cards {
   display: flex;
   justify-content: flex-start;
@@ -19,8 +23,9 @@
   max-width: 100vw;
   padding-inline: 30px;
   gap: 1.5rem;
+  padding-top: 2.5rem;
   overflow-x: scroll;
-  overflow-y: hidden;
+  overflow-y: visible;
   padding-inline: 2rem;
   margin-bottom: 2rem;
 }
@@ -30,6 +35,9 @@
 }
 
 .card {
+  --x: 1rem;
+  --y: calc(100% - 1rem);
+  transform-origin: var(--x) var(--y);
   background: none;
   color: inherit;
   border: none;
@@ -47,12 +55,22 @@
   cursor: pointer;
   position: relative;
   border-radius: 5px;
+  z-index: 100;
+  transform-style: preserve-3d;
+  perspective: 1000;
+  animation: rotate-slightly-reverse 1.3s ease-out forwards;
 }
+/* .card:nth-child(even) {
+
+} */
 .card:hover {
   all: unset();
   background-color: transparent;
-  transform: scale(1.02);
+  transform: scale(1.3);
+  z-index: 100;
+  animation: rotate-slightly 1.3s ease-out forwards;
 }
+
 @keyframes jello {
   0% {
     transform: scale3d(1, 1, 1);
@@ -74,6 +92,90 @@
   }
   100% {
     transform: scale3d(1, 1, 1);
+  }
+}
+@keyframes rotate-slightly {
+  /* 0% {
+    transform: rotate(0deg) translateY(0px);
+  }
+  20% {
+    transform: rotate(-7.5deg) translateY(-15px);
+  }
+  40% {
+    transform: rotate(-2.5deg) translateY(-5px);
+  }
+  55% {
+    transform: rotate(-6.5deg) translateY(-013px);
+  }
+  65% {
+    transform: rotate(-3.5deg) translateY(-007px);
+  }
+  75% {
+    transform: rotate(-6deg) translateY(-12px);
+  }
+  85% {
+    transform: rotate(-4deg) translateY(-8px);
+  }
+  100% {
+    transform: rotate(-5deg) translateY(-10px);
+  } */
+
+  0% {
+    transform: rotate(0deg) translateY(0px);
+  }
+  12.5% {
+    transform: rotate(-7.5deg) translateY(-15px);
+  }
+  25% {
+    transform: rotate(-2.5deg) translateY(-5px);
+  }
+  37.5% {
+    transform: rotate(-6.5deg) translateY(-013px);
+  }
+  50% {
+    transform: rotate(-3.5deg) translateY(-007px);
+  }
+  62.5% {
+    transform: rotate(-6deg) translateY(-12px);
+  }
+  75% {
+    transform: rotate(-4deg) translateY(-8px);
+  }
+  87.5% {
+    transform: rotate(-5.5deg) translateY(-10px);
+  }
+  100% {
+    transform: rotate(-5deg) translateY(-10px);
+  }
+}
+
+@keyframes rotate-slightly-reverse {
+  0% {
+    transform: rotate(-5deg) translateY(-10px);
+  }
+  12.5% {
+    transform: rotate(2.5deg) translateY(5px);
+  }
+  25% {
+    transform: rotate(-2.5deg) translateY(-5px);
+  }
+  37.5% {
+    transform: rotate(1.5deg) translateY(3px);
+  }
+  50% {
+    transform: rotate(-1.5deg) translateY(-3px);
+  }
+  62.5% {
+    transform: rotate(1deg) translateY(2px);
+  }
+  75% {
+    transform: rotate(-1deg) translateY(-2px);
+  }
+  87.5% {
+    transform: rotate(0.5deg) translateY(1px);
+  }
+  100% {
+    transform: rotate(0deg) translateY(0px);
   }
 }
 .card > h4 {
