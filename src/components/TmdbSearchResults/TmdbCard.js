@@ -26,7 +26,6 @@ export default function TmdbCard({
     genres,
   } = details;
   const genresStr = genres?.map((item) => item.name).join(", ");
-  console.log(genresStr);
   return (
     <>
       <button
