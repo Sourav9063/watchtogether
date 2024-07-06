@@ -1,14 +1,9 @@
 .search-result-wrapper {
+  padding-bottom: 2rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  margin: 0 auto;
-  width: 100%;
-  max-width: 100vw;
-  /* gap: 2rem; */
-  margin-bottom: 4rem;
-  overflow-y: visible;
+  justify-content: center;
 }
 .search-result-wrapper .card {
   --x: 100%;
@@ -27,7 +22,7 @@
   overflow-x: scroll;
   overflow-y: visible;
   padding-inline: 2rem;
-  margin-bottom: 2rem;
+  padding-bottom: 2rem;
 }
 
 .cards::-webkit-scrollbar {
