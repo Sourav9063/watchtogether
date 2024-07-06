@@ -8,7 +8,7 @@
   max-width: 100vw;
   /* gap: 2rem; */
   margin-bottom: 4rem;
-  overflow-y: scroll;
+  overflow-y: visible;
 }
 .search-result-wrapper .card {
   --x: 100%;
