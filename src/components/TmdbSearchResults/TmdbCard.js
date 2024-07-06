@@ -26,54 +26,49 @@ export default function TmdbCard({
     genres,
   } = details;
   const genresStr = genres?.map((item) => item.name).join(", ");
-  return (
-    <>
-      <button
-        className={`${styles["card"]} ${styles[""]} `}
-        onClick={(e) => {
-          e.stopPropagation();
-          addValueLocalStorageArray({
-            key: Constants.LocalStorageKey.WATCH_HISTORY,
-            value: {
-              type,
-              id,
-              vote_average,
-              title,
-              poster_image_url,
-              release_date,
-              first_air_date,
-              genres,
-            },
-          });
-          if (type == "movie") {
-            setIframeUrl((state) => {
-              return { ...state, type: "movie", id: id };
-            });
-          } else {
-            setIframeUrl((state) => {
-              return {
-                ...state,
-                type: "tv",
-                id: id,
-                ...getSeasonAndEpisode({ id: id }),
-              };
-            });
-          }
+  const onClick = (e) => {
+    e.stopPropagation();
+    addValueLocalStorageArray({
+      key: Constants.LocalStorageKey.WATCH_HISTORY,
+      value: {
+        type,
+        id,
+        vote_average,
+        title,
+        poster_image_url,
+        release_date,
+        first_air_date,
+        genres,
+      },
+    });
+    if (type == "movie") {
+      setIframeUrl((state) => {
+        return { ...state, type: "movie", id: id };
+      });
+    } else {
+      setIframeUrl((state) => {
+        return {
+          ...state,
+          type: "tv",
+          id: id,
+          ...getSeasonAndEpisode({ id: id }),
+        };
+      });
+    }
 
-          setSearchResults((state) => {
-            if (state.type == "HISTORY") {
-              return {
-                ...state,
-                value: [
-                  details,
-                  ...state.value.filter((item) => item.id != id),
-                ],
-              };
-            }
-            return state;
-          });
-        }}
-      >
+    setSearchResults((state) => {
+      if (state.type == "HISTORY") {
+        return {
+          ...state,
+          value: [details, ...state.value.filter((item) => item.id != id)],
+        };
+      }
+      return state;
+    });
+  };
+  return (
+    <div className={styles["card-wrapper"]} onClick={onClick}>
+      <button className={`${styles["card"]} `} onClick={onClick}>
         {/* cross svg */}
         {cardType == "HISTORY" && (
           <div
@@ -125,6 +120,6 @@ export default function TmdbCard({
         </div>
         {showType && <h4>{type == "tv" ? "Series" : "Movie"}</h4>}
       </button>
-    </>
+    </div>
   );
 }
