@@ -10,7 +10,7 @@ export default function Personal() {
           <h1>Sync Play</h1>
         </Link>
         {/* {false ? <ReactVideoPlayer /> : <FirebaseVideoPlayerPersonal />} */}
-        {/* <FirebaseVideoPlayerPersonal /> */}
+        <FirebaseVideoPlayerPersonal />
       </main>
     </>
   );

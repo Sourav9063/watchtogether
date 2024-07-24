@@ -32,3 +32,8 @@
     linear-gradient(321.27deg, rgba(0, 70, 209, 0) 50%, var(--right-color) 100%);
   background-color: var(--background-transparent);
 } */
+.cards {
+  display: flex;
+  overflow-x: scroll;
+  max-width: 100vw;
+}
