@@ -30,18 +30,22 @@ export async function getLatest({
     return fetchFn(config.latestMediaUrl + `${type}/${i + 1}`);
   });
 
-  const results = await Promise.all(requests);
+  try {
+    const results = await Promise.all(requests);
 
-  const resultsArray = results?.reduce((acc, cur) => {
-    if (!cur) return acc;
-    return [...acc, ...cur.result?.items];
-  }, []);
+    const resultsArray = results?.reduce((acc, cur) => {
+      if (!cur) return acc;
+      return [...acc, ...cur.result?.items];
+    }, []);
 
-  const tmdbDetailsUrls = resultsArray.map((item) => {
-    const { tmdb_id: id, type } = item;
-    if (!id) return null;
-    return `https://api.themoviedb.org/3/${type}/${id}?api_key=${config.tmdbApiKey}`;
-  });
+    const tmdbDetailsUrls = resultsArray.map((item) => {
+      const { tmdb_id: id, type } = item;
+      if (!id) return null;
+      return `https://api.themoviedb.org/3/${type}/${id}?api_key=${config.tmdbApiKey}`;
+    });
+  } catch (e) {
+    console.log(e);
+  }
 
   const tmdbDetails = await Promise.all(
     tmdbDetailsUrls.map((url) => {
