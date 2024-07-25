@@ -32,7 +32,7 @@ export async function getLatest({
 
   const results = await Promise.all(requests);
 
-  const resultsArray = results.reduce((acc, cur) => {
+  const resultsArray = results?.reduce((acc, cur) => {
     if (!cur) return acc;
     return [...acc, ...cur.result?.items];
   }, []);
