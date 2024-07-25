@@ -34,6 +34,7 @@ export async function getLatest({
     if (cur?.result?.items) {
       return [...acc, ...cur.result.items];
     }
+    return acc;
   }, []);
   const tmdbDetailsUrls = resultsArray.map((item) => {
     const { tmdb_id: id, type } = item;

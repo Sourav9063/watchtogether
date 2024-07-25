@@ -12,7 +12,7 @@ export default function LatestMediaClient({ data, type }) {
   const ref = useHorizontalScroll();
   return (
     <div className={styles["cards"]} ref={ref}>
-      {data.map((item) => {
+      {data?.map((item) => {
         if (!item.id) return;
         return (
           <TmdbCard
