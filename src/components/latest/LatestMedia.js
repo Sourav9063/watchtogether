@@ -32,10 +32,10 @@ export async function getLatest({
 
   const results = await Promise.all(requests);
 
-  const resultsArray = results.reduce(
-    (acc, cur) => [...acc, ...cur.result.items],
-    []
-  );
+  const resultsArray = results.reduce((acc, cur) => {
+    if (!cur) return acc;
+    return [...acc, ...cur.result?.items];
+  }, []);
 
   const tmdbDetailsUrls = resultsArray.map((item) => {
     const { tmdb_id: id, type } = item;
