@@ -49,7 +49,7 @@ export async function getLatest({
       return fetchFn(url);
     })
   );
-  const tmdbDetailsMap = tmdbDetails.reduce((acc, cur) => {
+  const tmdbDetailsMap = tmdbDetails?.reduce((acc, cur) => {
     if (!cur) return acc;
     return { ...acc, [cur.id]: cur };
   }, {});
