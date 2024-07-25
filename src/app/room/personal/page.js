@@ -1,7 +1,7 @@
 import styles from "../../page.module.css";
 import ReactVideoPlayer from "@/components/reactPlayer/ReactPlayer";
 import Link from "next/link";
-import FirebaseVideoPlayerPersonal from "@/components/firebasePlayer/FirebasePlayerPersonal";
+// import FirebaseVideoPlayerPersonal from "@/components/firebasePlayer/FirebasePlayerPersonal";
 export default function Personal() {
   return (
     <>
@@ -10,7 +10,7 @@ export default function Personal() {
           <h1>Sync Play</h1>
         </Link>
         {/* {false ? <ReactVideoPlayer /> : <FirebaseVideoPlayerPersonal />} */}
-        <FirebaseVideoPlayerPersonal />
+        {/* <FirebaseVideoPlayerPersonal /> */}
       </main>
     </>
   );
