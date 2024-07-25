@@ -43,39 +43,39 @@ export async function getLatest({
       if (!id) return null;
       return `https://api.themoviedb.org/3/${type}/${id}?api_key=${config.tmdbApiKey}`;
     });
+
+    const tmdbDetails = await Promise.all(
+      tmdbDetailsUrls.map((url) => {
+        if (!url) return null;
+        return fetchFn(url);
+      })
+    );
+    const tmdbDetailsMap = tmdbDetails?.reduce((acc, cur) => {
+      if (!cur) return acc;
+      return { ...acc, [cur.id]: cur };
+    }, {});
+
+    return {
+      data: resultsArray.map((item, i) => {
+        const { tmdb_id, imdb_id, type, title } = item;
+        const details = tmdbDetailsMap[tmdb_id];
+        return {
+          ...item,
+          ...details,
+          id: tmdb_id || imdb_id,
+          title: title || details?.title,
+          poster_image_url: details?.poster_path
+            ? `https://image.tmdb.org/t/p/w500${details?.poster_path}`
+            : null,
+          backdrop_image_url: details?.backdrop_path
+            ? `https://image.tmdb.org/t/p/w500${details?.backdrop_path}`
+            : null,
+        };
+      }),
+    };
   } catch (e) {
     console.log(e);
   }
-
-  const tmdbDetails = await Promise.all(
-    tmdbDetailsUrls.map((url) => {
-      if (!url) return null;
-      return fetchFn(url);
-    })
-  );
-  const tmdbDetailsMap = tmdbDetails?.reduce((acc, cur) => {
-    if (!cur) return acc;
-    return { ...acc, [cur.id]: cur };
-  }, {});
-
-  return {
-    data: resultsArray.map((item, i) => {
-      const { tmdb_id, imdb_id, type, title } = item;
-      const details = tmdbDetailsMap[tmdb_id];
-      return {
-        ...item,
-        ...details,
-        id: tmdb_id || imdb_id,
-        title: title || details?.title,
-        poster_image_url: details?.poster_path
-          ? `https://image.tmdb.org/t/p/w500${details?.poster_path}`
-          : null,
-        backdrop_image_url: details?.backdrop_path
-          ? `https://image.tmdb.org/t/p/w500${details?.backdrop_path}`
-          : null,
-      };
-    }),
-  };
 }
 
 export default async function LatestMedia({
