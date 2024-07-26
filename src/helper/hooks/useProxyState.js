@@ -7,9 +7,11 @@ export const useProxyState = (initialState = {}) => {
   state.setState = setState;
   const handler = {
     set(_, prop, value) {
-      setState((state) => {
-        return { ...state, [prop]: value };
-      });
+      if (value !== state[prop]) {
+        setState((state) => {
+          return { ...state, [prop]: value };
+        });
+      }
       return Reflect.set(...arguments);
     },
   };
