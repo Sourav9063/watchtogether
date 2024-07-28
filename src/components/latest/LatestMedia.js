@@ -29,20 +29,18 @@ export async function getLatest({
   const requests = Array.from({ length: numberOfPage }, (_, i) => {
     return fetchFn(config.latestMediaUrl + `${type}/${i + 1}`);
   });
-
   const results = await Promise.all(requests);
-
-  const resultsArray = results.reduce(
-    (acc, cur) => [...acc, ...cur.result.items],
-    []
-  );
-
+  const resultsArray = results.reduce((acc, cur) => {
+    if (cur?.result?.items) {
+      return [...acc, ...cur.result.items];
+    }
+    return acc;
+  }, []);
   const tmdbDetailsUrls = resultsArray.map((item) => {
     const { tmdb_id: id, type } = item;
     if (!id) return null;
     return `https://api.themoviedb.org/3/${type}/${id}?api_key=${config.tmdbApiKey}`;
   });
-
   const tmdbDetails = await Promise.all(
     tmdbDetailsUrls.map((url) => {
       if (!url) return null;
@@ -53,7 +51,6 @@ export async function getLatest({
     if (!cur) return acc;
     return { ...acc, [cur.id]: cur };
   }, {});
-
   return {
     data: resultsArray.map((item, i) => {
       const { tmdb_id, imdb_id, type, title } = item;
@@ -73,7 +70,6 @@ export async function getLatest({
     }),
   };
 }
-
 export default async function LatestMedia({
   type = LatestType.MOVIE_NEW,
   numberOfPage = 5,
