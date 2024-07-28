@@ -34,7 +34,8 @@
 .card-wrapper > .card {
   animation: rotate-slightly-reverse 1.3s ease-out forwards;
 }
-.card-wrapper:hover > .card {
+.card-wrapper:hover > .card,
+.card:focus-within {
   animation: rotate-slightly 1.3s ease-out forwards;
 }
 
