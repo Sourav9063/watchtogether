@@ -13,11 +13,11 @@ export default function GlobalStore({ storeKey, value, children }) {
     <Context.Provider value={{ state, setState }}>
       <div>{children}</div>
       {/*  div is necessary */}
+      {/* {children} */}
     </Context.Provider>
   );
 }
 export const useGlobalStore = (key) => {
-  console.log(contexts);
   const { state, setState } = useContext(contexts[key]);
   return [state, setState];
 };
