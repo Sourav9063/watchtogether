@@ -5,6 +5,18 @@ import { Stores } from "@/helper/CONSTANTS";
 
 export default function VideoSrc() {
   const [iframeUrl, setIframeUrl] = useStore(Stores.iframeUrl);
+  const getSuffix = (url) => {
+    switch (url) {
+      case config.iframe.url1:
+        return "(Anime)";
+      case config.iframe.url2:
+        return "(Fast)";
+      case config.iframe.url3:
+        return "(Variety)";
+      default:
+        return "";
+    }
+  };
   return (
     <div className={styles["src"]}>
       <div className={`${styles["src-list"]} ${styles[""]} `}>
@@ -24,7 +36,7 @@ export default function VideoSrc() {
                 });
               }}
             >
-              Source {index + 1} {config.iframe.url2 === url ? "(Anime)" : ""}
+              Source {index + 1} {getSuffix(url)}
             </button>
           );
         })}

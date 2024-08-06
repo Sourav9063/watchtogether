@@ -5,10 +5,10 @@ export const spacer = "-";
 export const getIframeUrl = ({ iframeUrl, full = true }) => {
   if (full) {
     switch (iframeUrl.baseUrl) {
+      case config.iframe.url3:
+        return getUrl3({ iframeUrl });
       case config.iframe.url4:
         return getUrl4({ iframeUrl });
-      case config.iframe.url5:
-        return getUrl5({ iframeUrl });
       case config.iframe.url6:
         return getUrl6({ iframeUrl });
     }
@@ -35,7 +35,7 @@ const getUrl4 = ({ iframeUrl }) => {
   return `${iframeUrl.baseUrl}/embedtv/${iframeUrl.id}?s=${iframeUrl.season}&s=1`;
 };
 
-const getUrl5 = ({ iframeUrl }) => {
+const getUrl3 = ({ iframeUrl }) => {
   if (iframeUrl.type == "movie")
     return `${iframeUrl.baseUrl}?video_id=${iframeUrl.id}&tmdb=1`;
   return `${iframeUrl.baseUrl}?video_id=${iframeUrl.id}&tmdb=1&s=${iframeUrl.season}&e=${iframeUrl.episode}`;

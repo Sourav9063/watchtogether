@@ -3,15 +3,11 @@ import config from "@/config";
 import LatestMediaClient from "./LatestMediaClient";
 import { randomRGBA } from "@/helper/customFunc";
 
-// export const LatestType = {
-//   MOVIE_NEW: "/movie/new",
-//   MOVIE_ADD: "/movie/add",
-//   TV_NEW: "/tv/new",
-//   TV_ADD: "/tv/add",
-// };
 export const LatestType = {
-  MOVIE_ADD: "/movies/latest/page-",
-  TV_ADD: "/tvshows/latest/page-",
+  MOVIE_NEW: "/movie/new",
+  MOVIE_ADD: "/movie/add",
+  TV_NEW: "/tv/new",
+  TV_ADD: "/tv/add",
 };
 
 const fetchFn = async (url, option = {}) => {
@@ -27,26 +23,23 @@ const fetchFn = async (url, option = {}) => {
 };
 
 export async function getLatest({
-  type = LatestType.MOVIE_ADD,
-  numberOfPage = 2,
+  type = LatestType.MOVIE_NEW,
+  numberOfPage = 7,
 }) {
   const requests = Array.from({ length: numberOfPage }, (_, i) => {
-    const url = config.latestMediaUrl1 + `${type}${i + 1}.json`;
-    return fetchFn(url);
+    return fetchFn(config.latestMediaUrl + `${type}/${i + 1}`);
   });
   const results = await Promise.all(requests);
   const resultsArray = results.reduce((acc, cur) => {
-    if (cur?.result) {
-      return [...acc, ...cur.result];
+    if (cur?.result?.items) {
+      return [...acc, ...cur.result.items];
     }
     return acc;
   }, []);
-  const dataType = type === LatestType.MOVIE_ADD ? "movie" : "tv";
   const tmdbDetailsUrls = resultsArray.map((item) => {
-    const { tmdb_id, imdb_id } = item;
-    const id = tmdb_id || imdb_id;
+    const { tmdb_id: id, type } = item;
     if (!id) return null;
-    return `https://api.themoviedb.org/3/${dataType}/${id}?api_key=${config.tmdbApiKey}`;
+    return `https://api.themoviedb.org/3/${type}/${id}?api_key=${config.tmdbApiKey}`;
   });
   const tmdbDetails = await Promise.all(
     tmdbDetailsUrls.map((url) => {
@@ -65,7 +58,6 @@ export async function getLatest({
       return {
         ...item,
         ...details,
-        type: dataType,
         id: tmdb_id || imdb_id,
         title: title || details?.title,
         poster_image_url: details?.poster_path
@@ -78,15 +70,15 @@ export async function getLatest({
     }),
   };
 }
-export default async function LatestMedia({
-  type = LatestType.MOVIE_ADD,
-  numberOfPage = 2,
+export default async function LatestMediaOld({
+  type = LatestType.MOVIE_NEW,
+  numberOfPage = 5,
 }) {
   const { data, error } = await getLatest({ type, numberOfPage });
   const header = {
-    [LatestType.MOVIE_ADD]: "Latest Released Movies",
+    [LatestType.MOVIE_NEW]: "Latest Released Movies",
     [LatestType.MOVIE_ADD]: "Latest Added Movies",
-    [LatestType.TV_ADD]: "Latest Released Series",
+    [LatestType.TV_NEW]: "Latest Released Series",
     [LatestType.TV_ADD]: "Latest Added Series",
   };
   return (
