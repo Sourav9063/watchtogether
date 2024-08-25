@@ -1,0 +1,17 @@
+.header {
+  text-align: center;
+  transition: height 0.5s ease-in-out;
+  overflow: hidden;
+}
+
+.header-init {
+  height: 0px;
+}
+
+.header-show {
+  height: 40px;
+}
+
+.header-hide {
+  height: 0px;
+}

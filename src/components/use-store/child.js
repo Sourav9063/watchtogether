@@ -1,6 +1,8 @@
 "use client";
 import { useGlobalStore } from "@/components/Provider/Store";
-import React from "react";
+import { useDelayUnmount } from "@/helper/hooks/useDelayUnmount";
+import styles from "./child.module.css";
+import React, { useState } from "react";
 
 export default function Child() {
   const [state] = useGlobalStore("GLOBAL");
@@ -35,15 +37,21 @@ export function Button() {
   );
 }
 export function Button2() {
-  const [state, setState] = useGlobalStore("ANOTHER");
+  const [show, setShow] = useState(true);
+  const [shouldMount, getAnimation] = useDelayUnmount(show, 500);
   return (
-    <button
-      onClick={() => {
-        setState((state) => ({ ...state, another: state.another + 1 }));
-      }}
-    >
-      {state.another}
-    </button>
+    <div>
+      {shouldMount && (
+        <h1 className={getAnimation("header", styles)}>Header</h1>
+      )}
+      <button
+        onClick={() => {
+          setShow((state) => !state);
+        }}
+      >
+        {show ? "Show" : "Hide"}
+      </button>
+    </div>
   );
 }
 
