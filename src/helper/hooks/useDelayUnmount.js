@@ -5,7 +5,9 @@ export const useDelayUnmount = (show, delay) => {
   useEffect(() => {
     let timeoutId;
     if (show && !shouldMount) {
-      setShouldMount(true);
+      setTimeout(() => {
+        setShouldMount(true);
+      });
     } else if (!show && shouldMount) {
       timeoutId = setTimeout(() => {
         setShouldMount(false);
@@ -17,15 +19,15 @@ export const useDelayUnmount = (show, delay) => {
   }, [show, delay, shouldMount]);
 
   const getClassNames = (className, styles) => {
-    return `${styles[className]} ${
-      styles[
-        show
-          ? shouldMount
-            ? className + "-show"
-            : className + "-init"
-          : className + "-hide"
-      ]
-    } `;
+    const newClass = show
+      ? shouldMount
+        ? className + "-show"
+        : className + "-init"
+      : className + "-hide";
+
+    return !styles
+      ? `${className} ${newClass}`
+      : `${styles[className]} ${styles[newClass]} `;
   };
 
   return [show || shouldMount, getClassNames];
