@@ -45,6 +45,8 @@ export default function InitIframeStore() {
     effect: iframeUrlEffect,
   });
 
+  const [isAnime] = useStore(Stores.isAnime, false);
+
   useEffect(() => {
     if (!iframeUrl.type) {
       const iframeObj = getIframeObjectFromUrl({

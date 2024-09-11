@@ -5,17 +5,27 @@ import { Stores } from "@/helper/CONSTANTS";
 
 export default function VideoSrc() {
   const [iframeUrl, setIframeUrl] = useStore(Stores.iframeUrl);
-  const getSuffix = (url) => {
+  const getSourceText = (url, index) => {
+    let prefix = `Source ${index + 1}`;
+    let suffix = "";
     switch (url) {
       case config.iframe.url1:
-        return "(Anime)";
+        suffix = " (All)";
+        break;
       case config.iframe.url2:
-        return "(Fast)";
+        suffix = " (Fast)";
+        break;
       case config.iframe.url3:
-        return "(Variety)";
+        suffix = " (Variety)";
+        break;
+      case config.iframe.url7:
+        prefix = "Anime";
+        suffix = "";
+        break;
       default:
-        return "";
+        break;
     }
+    return prefix + suffix;
   };
   return (
     <div className={styles["src"]}>
@@ -36,7 +46,7 @@ export default function VideoSrc() {
                 });
               }}
             >
-              Source {index + 1} {getSuffix(url)}
+              {getSourceText(url, index)}
             </button>
           );
         })}

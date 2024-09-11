@@ -8,6 +8,7 @@ import { Stores } from "@/helper/CONSTANTS";
 import { PasteHistory } from "@/components/tmdbSearch/ParseHistory";
 export default function TmdbSearch() {
   const [query, setQuery] = useStore(Stores.query);
+  const [isAnime, setIsAnime] = useStore(Stores.isAnime);
   const status = useTmdbSearch();
   return (
     <div id="search-pos" className={styles["search-wrapper"]}>
@@ -19,6 +20,17 @@ export default function TmdbSearch() {
           value={query || ""}
           onChange={(e) => setQuery(e.target.value)}
         />
+        <div>
+          <label className={styles["anime"]} htmlFor="isAnime">
+            <h1>Anime</h1>
+            <input
+              id="isAnime"
+              type="checkbox"
+              value={isAnime}
+              onChange={(e) => setIsAnime(e.target.checked)}
+            />
+          </label>
+        </div>
       </div>
 
       <div className={styles["status"]}>

@@ -24,7 +24,7 @@ export default function IframePlayer() {
               src={getIframeUrl({ iframeUrl: iframeUrl })}
             />
           </div>
-          {iframeUrl.type == "tv" && (
+          {(iframeUrl.type == "tv" || iframeUrl.type == "anime") && (
             <SeasonEpisodeSelector id={iframeUrl.id} />
           )}
           <VideoSrc />

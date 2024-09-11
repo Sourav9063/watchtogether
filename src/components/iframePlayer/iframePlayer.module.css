@@ -48,6 +48,13 @@
   align-items: center;
   border-radius: 5px;
 }
+.select-wrapper {
+  width: 200px;
+}
+.select {
+  width: 100%;
+  min-height: 35px;
+}
 .buttons > input {
   font-weight: bold;
   font-size: 0.82rem;
@@ -55,6 +62,7 @@
 .season {
   border: 2px solid var(--left-color);
   padding: 0.5rem;
+  border-radius: 5px;
 }
 .season * {
   border-color: var(--left-color);
