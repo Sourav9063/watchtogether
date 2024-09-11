@@ -8,7 +8,8 @@ import { Stores } from "@/helper/CONSTANTS";
 
 export default function HoverSeEp() {
   const [iframeUrl] = useStore(Stores.iframeUrl);
-  if (!iframeUrl || iframeUrl.type != "tv") return null;
+  if (!iframeUrl || (iframeUrl.type != "tv" && iframeUrl.type !== "anime"))
+    return null;
   return (
     <div className={`${styles["hover-se-ep"]} ${styles[""]} `}>
       <div className={`${styles["wrapper"]} ${styles[""]} `}>

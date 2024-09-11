@@ -45,6 +45,15 @@ export default function TmdbCard({
       setIframeUrl((state) => {
         return { ...state, type: "movie", id: id };
       });
+    } else if (type == "anime") {
+      setIframeUrl((state) => {
+        return {
+          ...state,
+          type: "anime",
+          id: id,
+          ...getSeasonAndEpisode({ id: id }),
+        };
+      });
     } else {
       setIframeUrl((state) => {
         return {
@@ -118,7 +127,11 @@ export default function TmdbCard({
             )}
           </div>
         </div>
-        {showType && <h4>{type == "tv" ? "Series" : "Movie"}</h4>}
+        {showType && (
+          <h4>
+            {{ movie: "Movie", tv: "Series", anime: "Anime" }[type] || "Movie"}
+          </h4>
+        )}
       </button>
     </div>
   );

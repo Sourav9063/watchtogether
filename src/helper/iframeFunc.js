@@ -3,6 +3,9 @@ import config from "@/config";
 export const spacer = "-";
 
 export const getIframeUrl = ({ iframeUrl, full = true }) => {
+  if (iframeUrl.type == "anime") {
+    iframeUrl.baseUrl = config.iframe.url7;
+  }
   if (full) {
     switch (iframeUrl.baseUrl) {
       case config.iframe.url3:
@@ -11,10 +14,22 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
         return getUrl4({ iframeUrl });
       case config.iframe.url6:
         return getUrl6({ iframeUrl });
+      case config.iframe.url7:
+        return getUrl7({ iframeUrl });
     }
   }
   if (iframeUrl.type == "movie") {
     return (full ? iframeUrl.baseUrl : "") + "/movie/" + iframeUrl.id;
+  } else if (iframeUrl.type == "anime") {
+    return (
+      (full ? iframeUrl.baseUrl : "") +
+        "/anime/" +
+        iframeUrl.id +
+        "/" +
+        iframeUrl.episode +
+        "/" +
+        iframeUrl.dub || 0
+    );
   } else {
     return (
       (full ? iframeUrl.baseUrl : "") +
@@ -45,6 +60,18 @@ const getUrl6 = ({ iframeUrl }) => {
   if (iframeUrl.type == "movie")
     return `${iframeUrl.baseUrl}/movie/${iframeUrl.id}`;
   return `${iframeUrl.baseUrl}/tv/${iframeUrl.id}-${iframeUrl.season}-${iframeUrl.episode}`;
+};
+
+const getUrl7 = ({ iframeUrl }) => {
+  if (iframeUrl.type == "movie") {
+    return `${iframeUrl.baseUrl}/movie/${iframeUrl.id}`;
+  }
+  if (iframeUrl.type == "anime") {
+    return `${iframeUrl.baseUrl}/anime/${iframeUrl.id}/${iframeUrl.episode}/${
+      iframeUrl.dub || 0
+    }`;
+  }
+  return `${iframeUrl.baseUrl}/tv/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
 };
 
 export const getBaseUrlIndex = (src) => {
@@ -85,8 +112,18 @@ export const getIframeObjectFromUrl = ({ url }) => {
     return {
       type: type,
       id: id || "",
-      season: Number(season) || "",
-      episode: Number(episode) || "",
+      season: Number(season) ?? "",
+      episode: Number(episode) ?? "",
+      baseUrl: getSrc(Number(baseUrlIndex)),
+    };
+  } else if (type == "anime") {
+    if (!isIframeObjectValid({ iframeObj: { type, id, season, episode } }))
+      return null;
+    return {
+      type: type,
+      id: id || "",
+      episode: Number(season) || "",
+      dub: Number(episode) ?? "0",
       baseUrl: getSrc(Number(baseUrlIndex)),
     };
   } else {
@@ -101,6 +138,9 @@ export const isIframeObjectValid = ({ iframeObj }) => {
     if (typeof id == "undefined" || id == null) return false;
     return true;
   } else if (type == "tv") {
+    if (typeof id == "undefined" || id == null) return false;
+    return true;
+  } else if (type == "anime") {
     if (typeof id == "undefined" || id == null) return false;
     return true;
   } else {

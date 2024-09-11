@@ -8,11 +8,13 @@ import { useDebounce } from "./useDebounce";
 import { getLocalStorage } from "../functions/localStorageFn";
 import { Constants, Stores } from "../CONSTANTS";
 import { useStore } from "./useStore";
+import { searchAnime } from "@/components/tmdbSearch/WatchAnime";
 
 export const useTmdbSearch = () => {
   const [status, setStatus] = useState("idle"); // "idle" | "loading" | "success" | "error"
   const [, setSearchResults] = useStore(Stores.searchResults);
   const [query] = useStore(Stores.query);
+  const [isAnime] = useStore(Stores.isAnime);
   const debounce = useDebounce(query, 2000);
   useEffect(() => {
     setStatus("loading");
@@ -28,7 +30,28 @@ export const useTmdbSearch = () => {
     }
   }, [query]);
   useEffect(() => {
-    if (debounce) {
+    if (isAnime && debounce) {
+      async function fetchData() {
+        if (!debounce || debounce === "") {
+          return;
+        }
+
+        const { data, error } = await searchAnime(debounce);
+        if (error) {
+          console.log(error);
+          setStatus("error");
+        }
+
+        setSearchResults({
+          type: "SEARCH",
+          value: data || [],
+        });
+        setStatus("success");
+      }
+
+      fetchData();
+    }
+    if (debounce && !isAnime) {
       const fn = async () => {
         try {
           const [movieRes, tvRes] = await Promise.all([
@@ -93,7 +116,7 @@ export const useTmdbSearch = () => {
       };
       fn();
     }
-  }, [debounce]);
+  }, [debounce, isAnime]);
   return status;
 };
 
