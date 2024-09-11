@@ -51,6 +51,7 @@ export default function TmdbCard({
           ...state,
           type: "anime",
           id: id,
+          dub: 0,
           ...getSeasonAndEpisode({ id: id }),
         };
       });
