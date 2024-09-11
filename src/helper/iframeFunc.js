@@ -28,7 +28,7 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
         "/" +
         iframeUrl.episode +
         "/" +
-        iframeUrl.dub || 0
+        iframeUrl.dub || "0"
     );
   } else {
     return (
@@ -68,7 +68,7 @@ const getUrl7 = ({ iframeUrl }) => {
   }
   if (iframeUrl.type == "anime") {
     return `${iframeUrl.baseUrl}/anime/${iframeUrl.id}/${iframeUrl.episode}/${
-      iframeUrl.dub || 0
+      iframeUrl.dub || "0"
     }`;
   }
   return `${iframeUrl.baseUrl}/tv/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
@@ -112,8 +112,8 @@ export const getIframeObjectFromUrl = ({ url }) => {
     return {
       type: type,
       id: id || "",
-      season: Number(season) ?? "",
-      episode: Number(episode) ?? "",
+      season: !season ? 1 : Number(season),
+      episode: !episode ? 1 : Number(episode),
       baseUrl: getSrc(Number(baseUrlIndex)),
     };
   } else if (type == "anime") {
@@ -122,8 +122,8 @@ export const getIframeObjectFromUrl = ({ url }) => {
     return {
       type: type,
       id: id || "",
-      episode: Number(season) || "",
-      dub: Number(episode) ?? "0",
+      episode: !season ? 1 : Number(season),
+      dub: !episode ? 0 : Number(episode),
       baseUrl: getSrc(Number(baseUrlIndex)),
     };
   } else {
@@ -149,21 +149,31 @@ export const isIframeObjectValid = ({ iframeObj }) => {
 };
 
 export const getSeasonAndEpisode = ({ id }) => {
-  const defaultResponse = { season: 1, episode: 1 };
+  const defaultResponse = { season: 1, episode: 1, dub: 0 };
   const tvData = localStorage.getItem("tvData");
   if (!tvData) return defaultResponse;
   const tvDataParsed = JSON.parse(tvData);
   const tvShow = tvDataParsed[id];
   return tvShow
-    ? { season: Number(tvShow.season), episode: Number(tvShow.episode) }
+    ? {
+        season: Number(tvShow.season),
+        episode: Number(tvShow.episode),
+        dub: Number(tvShow.dub || 0),
+      }
     : defaultResponse;
 };
 
-export const setSeasonAndEpisode = ({ type, id, season, episode }) => {
-  if (type != "tv") return;
+export const setSeasonAndEpisode = ({
+  type,
+  id,
+  season = 1,
+  episode = 1,
+  dub = 0,
+}) => {
+  if (type != "tv" && type != "anime") return;
   const tvData = localStorage.getItem("tvData");
   const tvDataParsed = tvData ? JSON.parse(tvData) : {};
-  tvDataParsed[id] = { season, episode };
+  tvDataParsed[id] = { season, episode, dub };
   localStorage.setItem("tvData", JSON.stringify(tvDataParsed));
 };
 

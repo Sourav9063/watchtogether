@@ -54,6 +54,7 @@
 .select {
   width: 100%;
   min-height: 35px;
+  padding: 0.5rem;
 }
 .buttons > input {
   font-weight: bold;
