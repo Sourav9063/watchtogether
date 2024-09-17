@@ -55,6 +55,14 @@
   width: 100%;
   min-height: 35px;
   padding: 0.5rem;
+  background-color: transparent;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 0.82rem;
+}
+.select > option {
+  background-color: black;
+  font-weight: bold;
 }
 .buttons > input {
   font-weight: bold;
@@ -160,6 +168,9 @@
     align-items: flex-start;
     margin-inline: 0.5rem;
     gap: 0.5rem;
+  }
+  .select-wrapper {
+    width: 100%;
   }
   /* .iframe-wrapper {
     padding-block: 0px;
