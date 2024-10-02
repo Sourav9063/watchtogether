@@ -1,5 +1,4 @@
 .search-result-wrapper {
-  padding-bottom: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -9,20 +8,27 @@
   --x: 100%;
   --y: 1rem;
 }
+.search-result-wrapper h1 {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 2.5rem;
+  font-weight: bold;
+  background-clip: text;
+}
 .cards {
   display: flex;
   justify-content: flex-start;
   align-items: stretch;
   margin: 0 auto;
-  width: fit-content;
+  width: 100%;
   max-width: 100vw;
   padding-inline: 30px;
-  gap: 1.5rem;
+  gap: 3rem;
   padding-top: 2.5rem;
   overflow-x: scroll;
   overflow-y: visible;
-  padding-inline: 2rem;
-  padding-bottom: 2rem;
+  padding: 6rem 2rem 2rem;
+  position: relative;
+  bottom: 2.5rem;
 }
 
 .cards::-webkit-scrollbar {
@@ -289,6 +295,7 @@
   justify-content: stretch;
   align-items: center;
   gap: 1rem;
+  z-index: 10;
 }
 .history > h1 {
   white-space: nowrap;
