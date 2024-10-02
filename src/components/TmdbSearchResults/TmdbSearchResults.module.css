@@ -14,7 +14,7 @@
   justify-content: flex-start;
   align-items: stretch;
   margin: 0 auto;
-  width: 100%;
+  width: fit-content;
   max-width: 100vw;
   padding-inline: 30px;
   gap: 1.5rem;
