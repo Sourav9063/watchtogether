@@ -3,7 +3,6 @@
   margin-inline: calc(10vw + 20px);
   padding-top: 1.5rem;
   padding-inline: 0.2rem;
-  width: 80%;
 }
 .search {
   display: flex;

@@ -28,7 +28,7 @@
   overflow-y: visible;
   padding: 6rem 2rem 2rem;
   position: relative;
-  bottom: 2.5rem;
+  bottom: 3rem;
 }
 
 .cards::-webkit-scrollbar {
@@ -307,6 +307,9 @@
   display: block;
 }
 @media (max-width: 800px) {
+  .search-result-wrapper h1 {
+    font-size: 2rem;
+  }
   .cross {
     display: grid;
     width: 40px;
