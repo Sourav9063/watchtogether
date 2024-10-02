@@ -15,7 +15,7 @@ export default function IframeWrapper() {
       <IframeUseEffects />
       <HoverSeEp />
       <IframePlayer />
-      <section
+      <div
         style={{
           "--left-color": randomRGBA(0.4),
           "--right-color": randomRGBA(0.4),
@@ -24,7 +24,7 @@ export default function IframeWrapper() {
       >
         <TmdbSearch />
         <TmdbSearchResults />
-      </section>
+      </div>
       <LatestMedia type={LatestType.MOVIE_ADD} />
       <LatestMedia type={LatestType.TV_ADD} />
     </>

@@ -1,5 +1,6 @@
 .wrapper-history {
   margin-top: 2rem;
+  padding-inline: 20px;
   width: 100vw;
   --left-color: rgba(204, 0, 187, 0);
   --right-color: rgba(0, 70, 209, 0);
