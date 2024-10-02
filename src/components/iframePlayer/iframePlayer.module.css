@@ -3,16 +3,16 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-block: 3px;
+  padding-block: 20px;
 }
 .iframe {
   border: none;
-  width: calc(100vw - 6px);
-  max-height: calc(100vh - 6px);
+  width: calc(100vw - 40px);
+  max-height: calc(100vh - 40px);
   aspect-ratio: 16/9;
   margin-bottom: 1rem;
   /* padding-block: 0.5rem; */
-  border-radius: 5px;
+  border-radius: 10px;
 }
 
 .season-episode {
@@ -163,6 +163,10 @@
   }
 }
 @media (max-width: 800px) {
+  .iframe {
+    width: calc(100vw - 6px);
+    max-height: calc(100vh - 6px);
+  }
   .season-episode {
     flex-direction: column;
     align-items: flex-start;
@@ -201,4 +205,8 @@
     align-items: flex-start;
     gap: 0.5rem;
   }
+}
+
+.filter-blur {
+  filter: url(#blur-and-scale);
 }
