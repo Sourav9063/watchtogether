@@ -77,7 +77,7 @@ export default function TmdbCard({
     });
   };
   return (
-    <div className={styles["card-wrapper"]} onClick={onClick}>
+    <div className={`${styles["card-wrapper"]} back-light `} onClick={onClick}>
       <button className={`${styles["card"]} `} onClick={onClick}>
         {/* cross svg */}
         {cardType == "HISTORY" && (

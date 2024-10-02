@@ -17,26 +17,9 @@ export default function IframePlayer() {
           <div id="iframe-player" className={`${styles["iframe-wrapper"]} `}>
             <iframe
               allowFullScreen={true}
-              className={`${styles["iframe"]} ${styles["filter-blur"]} `}
+              className={`${styles["iframe"]} back-light `}
               src={getIframeUrl({ iframeUrl: iframeUrl })}
             />
-            <svg width="0" height="0">
-              <filter
-                id="blur-and-scale"
-                y="-50%"
-                x="-50%"
-                width="200%"
-                height="200%"
-              >
-                <feGaussianBlur
-                  in="SourceGraphic"
-                  stdDeviation="50"
-                  result="blurred"
-                />
-                <feColorMatrix type="saturate" in="blurred" values="3" />
-                <feComposite in="SourceGraphic" operator="over" />
-              </filter>
-            </svg>
           </div>
           {(iframeUrl.type == "tv" || iframeUrl.type == "anime") && (
             <SeasonEpisodeSelector id={iframeUrl.id} />
