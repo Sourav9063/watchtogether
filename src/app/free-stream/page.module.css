@@ -9,7 +9,8 @@
   --right-color: rgba(0, 70, 209, 0.25); */
   /* background: linear-gradient(218.73deg, rgba(204, 0, 187, 0.25) 0%, rgba(201, 32, 184, 0) 50%),
     linear-gradient(321.27deg, rgba(0, 70, 209, 0) 50%, rgba(0, 70, 209, 0.25) 100%); */
-  --left-color: rgba(204, 0, 187, 0);
+
+  /* --left-color: rgba(204, 0, 187, 0);
   --right-color: rgba(0, 70, 209, 0);
   position: relative;
   background: linear-gradient(
@@ -17,7 +18,8 @@
       var(--left-color) 0%,
       rgba(201, 32, 184, 0) 50%
     ),
-    linear-gradient(321.27deg, rgba(0, 70, 209, 0) 50%, var(--right-color) 100%);
+    linear-gradient(321.27deg, rgba(0, 70, 209, 0) 50%, var(--right-color) 100%); */
+
   background-color: rgb(var(--background-end-rgb));
   /* max-height: 100vh;
   overflow-y: scroll; */
