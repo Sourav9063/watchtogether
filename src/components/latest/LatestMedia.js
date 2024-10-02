@@ -90,13 +90,7 @@ export default async function LatestMedia({
     [LatestType.TV_ADD]: "Latest Added Series",
   };
   return (
-    <section
-      style={{
-        "--left-color": randomRGBA(0.4),
-        "--right-color": randomRGBA(0.4),
-      }}
-      className={styles["section"]}
-    >
+    <section className={styles["section"]}>
       <h1 className={styles["header"]}>{header[type]}</h1>
       <LatestMediaClient data={data} type={type} />
     </section>

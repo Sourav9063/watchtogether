@@ -156,3 +156,7 @@ button:hover {
 body::-webkit-scrollbar {
   width: 0;
 }
+
+.back-light {
+  filter: url(#back-light);
+}

@@ -1,10 +1,12 @@
 import styles from "./page.module.css";
 import Link from "next/link";
 import IframeWrapper from "@/components/IframeWrapper";
+import BackLight from "@/components/backLigth/BackLight";
 export default function Personal() {
   return (
     <>
       <main className={styles.main}>
+        <BackLight />
         <Link
           href={"/free-stream"}
           style={{ textDecoration: "none", marginBottom: "1.5rem" }}
