@@ -30,7 +30,7 @@
   color: var(--header-color);
   position: absolute;
   top: 0rem;
-  width: 100%;
+  width: 90%;
 }
 
 .cards {
