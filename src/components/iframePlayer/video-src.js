@@ -22,6 +22,9 @@ export default function VideoSrc() {
         prefix = "Anime";
         suffix = "";
         break;
+      case config.iframe.url8:
+        suffix = " (Best)";
+        break;
       default:
         break;
     }
