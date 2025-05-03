@@ -4,7 +4,13 @@ export const spacer = "-";
 
 export const getIframeUrl = ({ iframeUrl, full = true }) => {
   if (iframeUrl.type == "anime") {
-    iframeUrl.baseUrl = config.iframe.url7;
+    if (
+      ![config.iframe.url7, config.iframe.url9, config.iframe.url8].includes(
+        iframeUrl.baseUrl,
+      )
+    ) {
+      iframeUrl.baseUrl = config.iframe.url9;
+    }
   }
   if (full) {
     switch (iframeUrl.baseUrl) {
@@ -16,33 +22,40 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
         return getUrl6({ iframeUrl });
       case config.iframe.url7:
         return getUrl7({ iframeUrl });
+      case config.iframe.url8:
+      case config.iframe.url9:
+        return getUrl89({ iframeUrl });
+      default:
+        return getDefaultUrl({ iframeUrl });
     }
   }
-  if (iframeUrl.type == "movie") {
-    return (full ? iframeUrl.baseUrl : "") + "/movie/" + iframeUrl.id;
-  } else if (iframeUrl.type == "anime") {
-    return (
-      (full ? iframeUrl.baseUrl : "") +
-        "/anime/" +
-        iframeUrl.id +
-        "/" +
-        iframeUrl.episode +
-        "/" +
-        iframeUrl.dub || "0"
-    );
-  } else {
-    return (
-      (full ? iframeUrl.baseUrl : "") +
-      "/tv/" +
-      iframeUrl.id +
-      "/" +
-      iframeUrl.season +
-      "/" +
-      iframeUrl.episode
-    );
-  }
+  return getDefaultUrl({ iframeUrl }).replace(iframeUrl.baseUrl, "");
 };
 
+const getDefaultUrl = ({ iframeUrl }) => {
+  switch (iframeUrl.type) {
+    case "movie":
+      return `${iframeUrl.baseUrl}/movie/${iframeUrl.id}`;
+    case "anime":
+      return `${iframeUrl.baseUrl}/anime/${iframeUrl.id}/${iframeUrl.episode}/${
+        iframeUrl.dub || "0"
+      }`;
+    default:
+      return `${iframeUrl.baseUrl}/tv/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
+  }
+};
+const getUrl89 = ({ iframeUrl }) => {
+  switch (iframeUrl.type) {
+    case "movie":
+      return `${iframeUrl.baseUrl}/movie/${iframeUrl.id}`;
+    case "anime":
+      return `${iframeUrl.baseUrl}/anime/${iframeUrl.id}/${iframeUrl.episode}${
+        iframeUrl.dub ? "?dub=true" : "?dub=false"
+      }`;
+    default:
+      return `${iframeUrl.baseUrl}/tv/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
+  }
+};
 const getUrl4 = ({ iframeUrl }) => {
   if (iframeUrl.type == "movie") {
     return `${iframeUrl.baseUrl}/embed/{iframeUrl.id}`;
