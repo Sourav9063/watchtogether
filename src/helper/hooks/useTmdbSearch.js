@@ -56,10 +56,10 @@ export const useTmdbSearch = () => {
         try {
           const [movieRes, tvRes] = await Promise.all([
             fetch(
-              `https://api.themoviedb.org/3/search/movie?api_key=${config.tmdbApiKey}&query=${debounce}`
+              `https://api.themoviedb.org/3/search/movie?api_key=${config.tmdbApiKey}&query=${debounce}&include_adult=true`,
             ),
             fetch(
-              `https://api.themoviedb.org/3/search/tv?api_key=${config.tmdbApiKey}&query=${debounce}`
+              `https://api.themoviedb.org/3/search/tv?api_key=${config.tmdbApiKey}&query=${debounce}&include_adult=true`,
             ),
           ]);
           const [movieData, tvData] = await Promise.all([
@@ -96,7 +96,7 @@ export const useTmdbSearch = () => {
             i <
             Math.max(
               movieData.results?.length || 0,
-              tvData.results?.length || 0
+              tvData.results?.length || 0,
             );
             i++
           ) {
