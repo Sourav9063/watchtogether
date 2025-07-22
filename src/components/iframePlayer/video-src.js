@@ -28,6 +28,9 @@ export default function VideoSrc() {
       case config.iframe.url8:
         suffix = " (Alt)";
         break;
+      case config.iframe.url13:
+        suffix = " (Torrent)";
+        break;
       default:
         break;
     }

@@ -24,7 +24,10 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
         return getUrl7({ iframeUrl });
       case config.iframe.url8:
       case config.iframe.url9:
-        return getUrl89({ iframeUrl });
+        return getUrl8_9({ iframeUrl });
+      case config.iframe.url13:
+      case config.iframe.url14:
+        return getUrl13_14({ iframeUrl });
       default:
         return getDefaultUrl({ iframeUrl });
     }
@@ -44,7 +47,7 @@ const getDefaultUrl = ({ iframeUrl }) => {
       return `${iframeUrl.baseUrl}/tv/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
   }
 };
-const getUrl89 = ({ iframeUrl }) => {
+const getUrl8_9 = ({ iframeUrl }) => {
   switch (iframeUrl.type) {
     case "movie":
       return `${iframeUrl.baseUrl}/movie/${iframeUrl.id}`;
@@ -86,6 +89,12 @@ const getUrl7 = ({ iframeUrl }) => {
   }
   return `${iframeUrl.baseUrl}/tv/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
 };
+
+const getUrl13_14 = ({ iframeUrl }) => {
+  if (iframeUrl.type == "movie")
+    return `${iframeUrl.baseUrl}?type=movie&id=${iframeUrl.id}`;
+  return `${iframeUrl.baseUrl}?type=tv&id=${iframeUrl.id}&season=${iframeUrl.season}&episode=${iframeUrl.episode}`
+}
 
 export const getBaseUrlIndex = (src) => {
   if (!src) return 0;
