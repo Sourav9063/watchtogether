@@ -4,7 +4,7 @@ import { Constants, Stores } from "@/helper/CONSTANTS";
 import { getLocalStorage } from "@/helper/functions/localStorageFn";
 import { useStore } from "@/helper/hooks/useStore";
 import React, { useEffect, useLayoutEffect } from "react";
-import styleMain from "@/app/free-stream/page.module.css";
+import styleMain from "@/app/stream/page.module.css";
 import { randomRGBA } from "@/helper/customFunc";
 import {
   getIframeObjectFromUrl,
