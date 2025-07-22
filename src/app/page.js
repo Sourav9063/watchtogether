@@ -11,7 +11,7 @@ export default function Home() {
           <h1>Sync Play</h1>
         </Link>
         <Link
-          href={"/free-stream"}
+          href={"/stream"}
           style={{
             position: "absolute",
             left: "1rem",

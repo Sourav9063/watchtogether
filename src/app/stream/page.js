@@ -8,7 +8,7 @@ export default function Personal() {
       <main className={styles.main}>
         <BackLight />
         <Link
-          href={"/free-stream"}
+          href={"/stream"}
           style={{ textDecoration: "none", marginBottom: "1.5rem" }}
         >
           <h1>Free Stream</h1>

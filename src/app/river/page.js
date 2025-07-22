@@ -7,7 +7,7 @@ export default function River() {
       allowFullScreen={true}
       className={`${styles["iframe"]} back-light `}
       style={{ width: "100%", minHeight: "100vh", margin:"0px" }}
-      src={config.iframe.url15.split("/watch")[0]}
+      src={config.iframe.url15.split("/embed")[0]}
     />
   );
 }
