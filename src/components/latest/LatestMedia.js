@@ -15,15 +15,19 @@ export const LatestType = {
 };
 
 const fetchFn = async (url, option = {}) => {
-  const res = await fetch(url, {
-    next: { revalidate: 21600 },
-    ...option,
-  });
-  if (!res.ok) {
+  try {
+    const res = await fetch(url, {
+      next: { revalidate: 21600 },
+      ...option,
+    });
+    if (!res.ok) {
+      return {};
+    }
+    const data = await res.json();
+    return data;
+  } catch (error) {
     return {};
   }
-  const data = await res.json();
-  return data;
 };
 
 export async function getLatest({

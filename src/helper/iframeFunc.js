@@ -27,6 +27,7 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
         return getUrl8_9({ iframeUrl });
       case config.iframe.url13:
       case config.iframe.url14:
+      case config.iframe.url15:
         return getUrl13_14({ iframeUrl });
       default:
         return getDefaultUrl({ iframeUrl });

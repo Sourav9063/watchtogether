@@ -31,6 +31,9 @@ export default function VideoSrc() {
       case config.iframe.url13:
         suffix = " (Torrent)";
         break;
+      case config.iframe.url15:
+        suffix = " (Multi)";
+        break;
       default:
         break;
     }

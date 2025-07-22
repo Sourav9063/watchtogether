@@ -24,7 +24,7 @@ export default function Personal() {
           Highly suggested to use an Ad blocker like{" "}
           <Link
             href={
-              "https://chromewebstore.google.com/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm"
+              "https://chromewebstore.google.com/detail/ublock-origin-lite/ddkjiahejlhfcafbddmgiahcphecmpfh"
             }
             target="_blank"
           >
