@@ -2,6 +2,8 @@ import styles from "./page.module.css";
 import Link from "next/link";
 import IframeWrapper from "@/components/IframeWrapper";
 import BackLight from "@/components/backLigth/BackLight";
+import StreamNavigation from "@/components/stream/StreamNavigation";
+
 export default function Personal() {
   return (
     <>
@@ -9,10 +11,11 @@ export default function Personal() {
         <BackLight />
         <Link
           href={"/stream"}
-          style={{ textDecoration: "none", marginBottom: "1.5rem" }}
+          style={{ textDecoration: "none"}}
         >
           <h1>Free Stream</h1>
         </Link>
+        <StreamNavigation />
         <IframeWrapper />
         <p
           style={{

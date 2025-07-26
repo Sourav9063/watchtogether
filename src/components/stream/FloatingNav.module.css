@@ -1,0 +1,37 @@
+.floatingNavContainer {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.navWrapper {
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  transform: translateY(-150%);
+  opacity: 0;
+}
+
+.indicator {
+  width: 30px;
+  height: 30px;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.floatingNavContainer.open .navWrapper {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.floatingNavContainer.open .indicator {
+  transform: rotate(180deg);
+}
