@@ -1,0 +1,25 @@
+.container {
+  padding: 20px;
+}
+
+.form {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.input {
+  flex: 3;
+  min-width: min(300px, 100%);
+}
+
+.button {
+  min-width: 100px;
+  flex: 1;
+  margin-top:0px !important;
+  padding: 8px;
+  cursor: pointer;
+}
