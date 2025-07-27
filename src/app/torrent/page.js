@@ -2,17 +2,12 @@
 
 import styles from './page.module.css';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import FloatingNav from '@/components/stream/FloatingNav';
 
-const DynamicWebtorPlayer = dynamic(() => import('../../components/WebtorPlayer'), {
-  ssr: false,
-  loading: () => <p>Loading Webtor player...</p>,
-});
-
-export default function TorrentPage() {
+function TorrentPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [magnetURI, setMagnetURI] = useState('');
@@ -63,5 +58,18 @@ export default function TorrentPage() {
         </div>
       )}
     </div>
+  );
+}
+
+const DynamicWebtorPlayer = dynamic(() => import('../../components/WebtorPlayer'), {
+  ssr: false,
+  loading: () => <p>Loading Webtor player...</p>,
+});
+
+export default function TorrentPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TorrentPageContent />
+    </Suspense>
   );
 }
