@@ -34,6 +34,9 @@ export default function VideoSrc() {
       case config.iframe.url15:
         suffix = " (Multi)";
         break;
+      case config.iframe.url16:
+        suffix = " (New)";
+        break;
       default:
         break;
     }

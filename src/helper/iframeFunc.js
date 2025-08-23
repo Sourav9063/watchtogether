@@ -5,9 +5,12 @@ export const spacer = "-";
 export const getIframeUrl = ({ iframeUrl, full = true }) => {
   if (iframeUrl.type == "anime") {
     if (
-      ![config.iframe.url7, config.iframe.url9, config.iframe.url8].includes(
-        iframeUrl.baseUrl,
-      )
+      ![
+        config.iframe.url7,
+        config.iframe.url9,
+        config.iframe.url8,
+        config.iframe.url16,
+      ].includes(iframeUrl.baseUrl)
     ) {
       iframeUrl.baseUrl = config.iframe.url9;
     }
@@ -29,6 +32,8 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
       case config.iframe.url14:
       case config.iframe.url15:
         return getUrl13_14({ iframeUrl });
+      case config.iframe.url16:
+        return getUrl16({ iframeUrl });
       default:
         return getDefaultUrl({ iframeUrl });
     }
@@ -94,8 +99,17 @@ const getUrl7 = ({ iframeUrl }) => {
 const getUrl13_14 = ({ iframeUrl }) => {
   if (iframeUrl.type == "movie")
     return `${iframeUrl.baseUrl}?type=movie&id=${iframeUrl.id}`;
-  return `${iframeUrl.baseUrl}?type=tv&id=${iframeUrl.id}&season=${iframeUrl.season}&episode=${iframeUrl.episode}`
-}
+  return `${iframeUrl.baseUrl}?type=tv&id=${iframeUrl.id}&season=${iframeUrl.season}&episode=${iframeUrl.episode}`;
+};
+
+const getUrl16 = ({ iframeUrl }) => {
+  if (iframeUrl.type === "anime")
+    return `${iframeUrl.baseUrl}/anime/${iframeUrl.id}/${iframeUrl.episode}/${
+      iframeUrl.dub ? "dub" : "sub"
+    }?fallback=true`;
+
+  return getDefaultUrl({ iframeUrl });
+};
 
 export const getBaseUrlIndex = (src) => {
   if (!src) return 0;

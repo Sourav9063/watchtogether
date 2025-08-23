@@ -15,8 +15,10 @@ const config = {
     url13: process.env.NEXT_PUBLIC_PERSONAL_url13,
     url14: process.env.NEXT_PUBLIC_PERSONAL_url14,
     url15: process.env.NEXT_PUBLIC_PERSONAL_url15,
+    url16: process.env.NEXT_PUBLIC_PERSONAL_url16,
     urls: [
       process.env.NEXT_PUBLIC_PERSONAL_url7,
+      process.env.NEXT_PUBLIC_PERSONAL_url16,
       process.env.NEXT_PUBLIC_PERSONAL_url15,
       process.env.NEXT_PUBLIC_PERSONAL_url1,
       process.env.NEXT_PUBLIC_PERSONAL_url2,
