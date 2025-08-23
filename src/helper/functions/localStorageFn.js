@@ -10,11 +10,15 @@ export const addValueLocalStorageArray = ({
   let newValue = [...values, ...existingParsed];
   if (!!value) newValue = [value, ...newValue];
   let setObj = {};
+  const cleanNewValue = []
   newValue.forEach((item) => {
-    setObj[item[compare] ?? item.title ?? JSON.stringify(item)] = item;
+    const compareKey = item[compare] ?? item.title ?? JSON.stringify(item);
+    if (!setObj[compareKey]) {
+      setObj[compareKey] = true;
+      cleanNewValue.push(item);
+    }
   });
-  newValue = Object.values(setObj);
-  localStorage.setItem(key, JSON.stringify(newValue.slice(0, maxLength)));
+  localStorage.setItem(key, JSON.stringify(cleanNewValue.slice(0, maxLength)));
 };
 
 export const removeValueLocalStorageArray = ({
