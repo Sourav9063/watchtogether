@@ -4,6 +4,7 @@
 
 .content {
   padding: 20px;
+  background-color: rgb(var(--background-end-rgb));
 }
 
 .inputContainer {
@@ -34,7 +35,7 @@
   position: relative;
   aspect-ratio: 16/9;
   max-height: 100vh;
-  background-color: black; /* Black background for player */
+  background-color: rgb(var(--background-end-rgb));
   margin: 0px 20px;
 }
 
