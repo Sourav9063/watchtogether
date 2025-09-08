@@ -15,6 +15,7 @@ const LiveClientComponent = ({ serverInitialChannels }) => {
   const [error, setError] = useState(null);
   const [m3uUrl, setM3uUrl] = useState("");
   const [currentChannel, setCurrentChannel] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const searchParams = useSearchParams();
 
@@ -84,17 +85,30 @@ const LiveClientComponent = ({ serverInitialChannels }) => {
         {currentChannel && (
           <h2 className={styles.currentChannelName}>{currentChannel.name}</h2>
         )}
-        <h1>Live Channels</h1>
+        <div className={styles.headerWrapper}>
+          <h1>Live Channels</h1>
+          <input
+            type="text"
+            placeholder="Search channels..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className={styles.searchInput}
+          />
+        </div>
 
         {!loading && !error && channels.length > 0 && (
           <ul className={styles.channelList}>
-            {channels.map((channel, index) => (
-              <Channel
-                key={index}
-                channel={channel}
-                onClick={handleChannelClick}
-              />
-            ))}
+            {channels
+              .filter((channel) =>
+                channel.name.toLowerCase().includes(searchTerm.toLowerCase()),
+              )
+              .map((channel, index) => (
+                <Channel
+                  key={index}
+                  channel={channel}
+                  onClick={handleChannelClick}
+                />
+              ))}
           </ul>
         )}
         <form className={styles.inputContainer}>

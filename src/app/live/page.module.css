@@ -84,6 +84,16 @@
   color: #666;
 }
 
+.headerWrapper {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.headerWrapper > input {
+  width: 50%;
+}
+
 @media (max-width: 768px) {
   .inputContainer {
     flex-direction: column;
@@ -98,4 +108,12 @@
     width: 100%;
     margin: 0;
   }
+
+  .headerWrapper {
+    flex-direction: column;
+  }
+
+.headerWrapper > input {
+  width: 100%;
+}
 }
