@@ -35,3 +35,10 @@
 .floatingNavContainer.open .indicator {
   transform: rotate(180deg);
 }
+
+@media (prefers-color-scheme: light) {  
+  .navWrapper {
+    background-color: rgba(255, 255, 255, 0.7);
+    color: black;
+  }
+}

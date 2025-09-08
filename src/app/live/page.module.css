@@ -7,7 +7,7 @@
 }
 
 .inputContainer {
-  margin-bottom: 20px;
+  margin-top: 20px;
   display: flex;
   gap: 10px;
 }
@@ -16,8 +16,8 @@
   flex: 3;
   min-width: 60%;
 }
-.inputContainer>button{
-  margin-top:0px;
+.inputContainer > button {
+  margin-top: 0px;
 }
 
 .channelList {
@@ -30,13 +30,13 @@
 }
 
 .playerWrapper {
+  width: calc(100% - 40px);
   position: relative;
-  margin-bottom: 20px;
   aspect-ratio: 16/9;
+  max-height: 100vh;
   background-color: black; /* Black background for player */
-  padding: 20px;
+  margin: 0px 20px;
 }
-
 
 .reactPlayer {
   position: absolute;
@@ -93,9 +93,9 @@
   .urlInput {
     min-width: 100%;
   }
-  
+
   .playerWrapper {
-    padding: 0;
+    width: 100%;
+    margin: 0;
   }
-  
 }
