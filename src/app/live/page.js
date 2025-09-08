@@ -1,4 +1,5 @@
 import LiveClientComponent from "./LiveClientComponent";
+import { Suspense } from "react";
 
 import { fetchM3U } from "../../helper/m3uFetcher";
 import BackLight from "@/components/backLigth/BackLight";
@@ -13,7 +14,9 @@ const LivePage = async () => {
     <>
       <BackLight />
       <StreamNavigation />
-      <LiveClientComponent serverInitialChannels={initialChannels} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <LiveClientComponent serverInitialChannels={initialChannels} />
+      </Suspense>
     </>
   );
 };
