@@ -4,7 +4,6 @@ import React, { useEffect, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import styles from "./page.module.css";
 import Channel from "../../components/Channel/Channel";
-import BackLight from "@/components/backLigth/BackLight";
 import { fetchM3U } from "../../helper/m3uFetcher";
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
@@ -55,7 +54,6 @@ const LiveClientComponent = ({ serverInitialChannels }) => {
 
   return (
     <>
-      <BackLight />
       {currentChannel && (
         <div className={`${styles.playerWrapper} back-light `}>
           <ReactPlayer

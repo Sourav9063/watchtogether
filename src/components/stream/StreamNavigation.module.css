@@ -34,3 +34,23 @@
 .nav a:hover::before {
   width: 100%;
 }
+
+/* light mode */
+@media (prefers-color-scheme: light) {
+  .nav a {
+    color: #333;
+  }
+
+  .nav a::before {
+    background-color: #333;
+  }
+
+  .nav a:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .nav a.active {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+}
+
