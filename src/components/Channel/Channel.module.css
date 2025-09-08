@@ -49,3 +49,41 @@
   font-size: 0.9em;
   color: #919191;
 }
+
+@media (max-width: 768px) {
+  .channelItem {
+    width: 180px;
+    padding: 12px;
+  }
+
+  .channelLogo {
+    margin-bottom: 15px;
+  }
+
+  .channelName {
+    font-size: 1em;
+  }
+
+  .channelGroup {
+    font-size: 0.8em;
+  }
+}
+
+@media (max-width: 480px) {
+  .channelItem {
+    width: 120px;
+    padding: 10px;
+  }
+
+  .channelLogo {
+    margin-bottom: 10px;
+  }
+
+  .channelName {
+    font-size: 0.9em;
+  }
+
+  .channelGroup {
+    font-size: 0.75em;
+  }
+}
