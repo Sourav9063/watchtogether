@@ -8,7 +8,7 @@ export default function BackLight({
   height = "200%",
 }) {
   return (
-    <svg width="0" height="0">
+    <svg width="0" height="0" style={{ position: "absolute" }}>
       <filter id={id} y="-50%" x="-50%" width={width} height={height}>
         <feGaussianBlur
           in="SourceGraphic"

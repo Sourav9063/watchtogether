@@ -1,0 +1,101 @@
+.container {
+  padding: 20px;
+}
+
+.content {
+  padding: 20px;
+}
+
+.inputContainer {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.urlInput {
+  flex: 3;
+  min-width: 60%;
+}
+.inputContainer>button{
+  margin-top:0px;
+}
+
+.channelList {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* Space between channel items */
+  justify-content: center; /* Center items for better visual */
+}
+
+.playerWrapper {
+  position: relative;
+  margin-bottom: 20px;
+  aspect-ratio: 16/9;
+  background-color: black; /* Black background for player */
+  padding: 20px;
+}
+
+
+.reactPlayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.channelItem {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 15px;
+  width: 200px; /* Adjust as needed */
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.currentChannelName {
+  font-size: 2em; /* Make it larger */
+  font-weight: bold; /* Make it bold */
+  color: #333; /* Darker color */
+  margin-bottom: 15px; /* Add some space below */
+  text-align: center; /* Center the text */
+}
+
+.channelItem:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.channelLogo {
+  max-width: 100px;
+  max-height: 100px;
+  margin-bottom: 10px;
+}
+
+.channelName {
+  font-size: 1.1em;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.channelGroup {
+  font-size: 0.9em;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .inputContainer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .urlInput {
+    min-width: 100%;
+  }
+  
+  .playerWrapper {
+    padding: 0;
+  }
+  
+}
