@@ -1,40 +1,44 @@
 "use client";
-import { useProxyState } from "@/helper/hooks/useProxyState";
+import { useReactive } from "@/helper/hooks/useReactive";
 import styles from "../page.module.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Personal() {
-  const state1 = useProxyState({ count: 1 });
-  const state2 = useProxyState(state1.count * 2);
-  state2.value = state1.count * 2;
+  const renderCount = useRef(0)
+
+  const state1 = useReactive({ count: 1 });
+  const state2 = useReactive(state1.count * 2);
 
   const [state3, setState3] = useState({
     count: 1,
   });
   const [state4, setState4] = useState(state3.count * 2);
+
   useEffect(() => {
     setState4(state3.count * 2);
     return () => {};
   }, [state3.count]);
 
-  console.count("rerender");
+  renderCount.current++;
   return (
     <>
       <main className={styles.main}>
         <div className={styles["cards"]}>
+          <div>Render count {renderCount.current}</div>
+
           <button
             onClick={() => {
               state1.count++;
             }}
           >
-            useProxyState {state1.count}
+            useReactive {state1.count}
           </button>
           <button
             onClick={() => {
               state2.value++;
             }}
           >
-            useProxyState {state2.value}
+            useReactive {state2.value}
           </button>
           <button
             onClick={() => {

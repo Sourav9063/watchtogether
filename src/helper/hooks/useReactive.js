@@ -1,5 +1,5 @@
 import { useState } from "react";
-export const useProxyState = (initialState = {}) => {
+export const useReactive = (initialState = {}) => {
   if (typeof initialState != "object") {
     initialState = { value: initialState };
   }

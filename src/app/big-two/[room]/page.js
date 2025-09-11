@@ -1,13 +1,13 @@
 "use client";
-import { useProxyState } from "@/helper/hooks/useProxyState";
+import { useReactive } from "@/helper/hooks/useReactive";
 import styles from "../page.module.css";
 import { CardData } from "@/components/big-two/data/data";
 import { useState } from "react";
 import { useHorizontalScroll } from "@/helper/hooks/useHorizontalScroll";
 
 export default function Personal() {
-  const state = useProxyState({ count: 1, card: "", cards: { count: 2 } });
-  const state1 = useProxyState(1);
+  const state = useReactive({ count: 1, card: "", cards: { count: 2 } });
+  const state1 = useReactive(1);
 
   const [state2, setState] = useState({
     count: 1,
@@ -30,11 +30,11 @@ export default function Personal() {
               <button
                 key={card.image}
                 onClick={() => {
-                  //useProxyState state object
+                  //useReactive state object
                   state.count = state.count + 1;
                   state.card = card.name;
                   state.cards.index = index;
-                  // useProxyState primary
+                  // useReactive primary
                   state1.value = state1.value + 1;
                   //useState
                   setState((state) => {
