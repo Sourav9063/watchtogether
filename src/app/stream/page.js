@@ -13,7 +13,7 @@ export default function Personal() {
           href={"/stream"}
           style={{ textDecoration: "none"}}
         >
-          <h1>Free Stream</h1>
+          <h1>Stream</h1>
         </Link>
         <StreamNavigation />
         <IframeWrapper />

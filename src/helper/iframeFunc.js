@@ -34,6 +34,8 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
         return getUrl13_14({ iframeUrl });
       case config.iframe.url16:
         return getUrl16({ iframeUrl });
+      case config.iframe.url17:
+        return getUrl17({ iframeUrl });
       default:
         return getDefaultUrl({ iframeUrl });
     }
@@ -109,6 +111,10 @@ const getUrl16 = ({ iframeUrl }) => {
     }?fallback=true`;
 
   return getDefaultUrl({ iframeUrl });
+};
+
+const getUrl17 = ({ iframeUrl }) => {
+  return `${iframeUrl.baseUrl}/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
 };
 
 export const getBaseUrlIndex = (src) => {

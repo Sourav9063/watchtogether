@@ -1,10 +1,13 @@
+"use client";
 import styles from "./iframePlayer.module.css";
 import config from "@/config";
 import { useStore } from "@/helper/hooks/useStore";
 import { Stores } from "@/helper/CONSTANTS";
+import { useState } from "react";
 
 export default function VideoSrc() {
   const [iframeUrl, setIframeUrl] = useStore(Stores.iframeUrl);
+  const [showAll, setShowAll] = useState(false);
   const getSourceText = (url, index) => {
     let prefix = `Source ${index + 1}`;
     let suffix = "";
@@ -37,6 +40,9 @@ export default function VideoSrc() {
       case config.iframe.url16:
         suffix = " (New)";
         break;
+      case config.iframe.url17:
+        suffix = " (X)";
+        break;
       default:
         break;
     }
@@ -45,26 +51,33 @@ export default function VideoSrc() {
   return (
     <div className={styles["src"]}>
       <div className={`${styles["src-list"]} ${styles[""]} `}>
-        {config.iframe.urls.map((url, index) => {
-          return (
-            <button
-              key={index}
-              style={{
-                backgroundColor:
-                  iframeUrl.baseUrl === url
-                    ? " var(--hover-color)"
-                    : "var(--primary-color)",
-              }}
-              onClick={() => {
-                setIframeUrl((state) => {
-                  return { ...state, baseUrl: url };
-                });
-              }}
-            >
-              {getSourceText(url, index)}
-            </button>
-          );
-        })}
+        {(showAll ? config.iframe.urls : config.iframe.urls.slice(0, 8)).map(
+          (url, index) => {
+            return (
+              <button
+                key={index}
+                style={{
+                  backgroundColor:
+                    iframeUrl.baseUrl === url
+                      ? " var(--hover-color)"
+                      : "var(--primary-color)",
+                }}
+                onClick={() => {
+                  setIframeUrl((state) => {
+                    return { ...state, baseUrl: url };
+                  });
+                }}
+              >
+                {getSourceText(url, index)}
+              </button>
+            );
+          }
+        )}
+        {config.iframe.urls.length > 5 && (
+          <button onClick={() => setShowAll(!showAll)}>
+            {showAll ? "Show Less" : "Show More"}
+          </button>
+        )}
       </div>
       <p>
         {

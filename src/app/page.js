@@ -18,7 +18,7 @@ export default function Home() {
             top: "1rem",
           }}
         >
-          <p>Free Stream</p>
+          <p>Stream</p>
         </Link>
         <Link
           href={"/live"}
