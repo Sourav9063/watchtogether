@@ -9,6 +9,7 @@ export const Constants = {
   LocalStorageKey: {
     TV_DATA: "tvData",
     WATCH_HISTORY: "watchHistory",
+    CHANNEL_HISTORY: "channelHistory"
   },
 };
 

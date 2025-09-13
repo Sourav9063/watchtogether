@@ -6,6 +6,12 @@ import styles from "./page.module.css";
 import Channel from "../../components/Channel/Channel";
 import { fetchM3U } from "../../helper/m3uFetcher";
 import VideoOverlayPlayer from "../../components/reactPlayer/VideoOverlayPlayer";
+import ChannelHistory from "../../components/ChannelHistory/ChannelHistory";
+import {
+  getLocalStorage,
+  removeLocalStorage,
+} from "@/helper/functions/localStorageFn";
+import { Constants } from "@/helper/CONSTANTS";
 
 const LiveClientComponent = ({ serverInitialChannels }) => {
   const DEFAULT_M3U_URL = process.env.NEXT_PUBLIC_DEFAULT_M3U_URL;
@@ -19,7 +25,14 @@ const LiveClientComponent = ({ serverInitialChannels }) => {
 
   const searchParams = useSearchParams();
 
+  const [history, setHistory] = useState([]);
+
   useEffect(() => {
+    const channelHistory = getLocalStorage({
+      key: Constants.LocalStorageKey.CHANNEL_HISTORY,
+      emptyReturn: [],
+    });
+    setHistory(channelHistory);
     const channelUrl = searchParams.get("url");
     const channelName = searchParams.get("name");
     if (channelUrl && channelName) {
@@ -28,7 +41,12 @@ const LiveClientComponent = ({ serverInitialChannels }) => {
         name: decodeURIComponent(channelName),
       });
     }
-  }, [searchParams]);
+  }, []);
+
+  const handleClearHistory = useCallback(() => {
+    removeLocalStorage({ key: Constants.LocalStorageKey.CHANNEL_HISTORY });
+    setHistory([]);
+  }, []);
 
   const clientFetchM3U = useCallback(async (url) => {
     setLoading(true);
@@ -45,9 +63,16 @@ const LiveClientComponent = ({ serverInitialChannels }) => {
 
   const handleChannelClick = (channel) => {
     setCurrentChannel(channel);
-    document
-      .querySelector("#live-player")
-      ?.scrollIntoView({ behavior: "smooth" });
+    const element = document.querySelector("#live-player");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    } else {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+
     if (channel) {
       const params = new URLSearchParams();
       params.set("url", encodeURIComponent(channel.url));
@@ -77,14 +102,19 @@ const LiveClientComponent = ({ serverInitialChannels }) => {
   return (
     <>
       {currentChannel && (
-        <div className={`${styles.playerWrapper} back-light `}>
-          <VideoOverlayPlayer url={currentChannel.url} />
-        </div>
-      )}
-      <div className={styles.content}>
-        {currentChannel && (
+        <>
+          <div className={`${styles.playerWrapper} back-light `}>
+            <VideoOverlayPlayer currentChannel={currentChannel} setHistory={setHistory} />
+          </div>
           <h2 className={styles.currentChannelName}>{currentChannel.name}</h2>
-        )}
+        </>
+      )}
+      <ChannelHistory
+        onChannelClick={handleChannelClick}
+        history={history}
+        handleClearHistory={handleClearHistory}
+      />
+      <div className={styles.content}>
         <div className={styles.headerWrapper}>
           <h1>Live Channels</h1>
           <input

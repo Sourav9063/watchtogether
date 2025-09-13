@@ -10,7 +10,7 @@ export const addValueLocalStorageArray = ({
   let newValue = [...values, ...existingParsed];
   if (!!value) newValue = [value, ...newValue];
   let setObj = {};
-  const cleanNewValue = []
+  const cleanNewValue = [];
   newValue.forEach((item) => {
     const compareKey = item[compare] ?? item.title ?? JSON.stringify(item);
     if (!setObj[compareKey]) {
@@ -19,6 +19,7 @@ export const addValueLocalStorageArray = ({
     }
   });
   localStorage.setItem(key, JSON.stringify(cleanNewValue.slice(0, maxLength)));
+  return cleanNewValue.slice(0, maxLength);
 };
 
 export const removeValueLocalStorageArray = ({
@@ -29,7 +30,7 @@ export const removeValueLocalStorageArray = ({
   if (!check()) return;
   const existingParsed = getLocalStorage({ key, emptyReturn: [] });
   const newValue = existingParsed.filter(
-    (item) => item[compare] != value[compare]
+    (item) => item[compare] != value[compare],
   );
   localStorage.setItem(key, JSON.stringify(newValue));
 };
@@ -39,6 +40,11 @@ export const getLocalStorage = ({ key, emptyReturn = null }) => {
   const existing = localStorage.getItem(key);
   const existingParsed = existing ? JSON.parse(existing) : emptyReturn;
   return existingParsed;
+};
+
+export const removeLocalStorage = ({ key }) => {
+  if (!check()) return;
+  localStorage.removeItem(key);
 };
 
 const check = () => {

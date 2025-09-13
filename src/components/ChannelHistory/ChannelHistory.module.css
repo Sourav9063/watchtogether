@@ -1,0 +1,37 @@
+.historyContainer {
+  padding: 1rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.clearButton {
+  width: fit-content;
+}
+
+.historyList {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  justify-content: flex-start;
+  align-items: stretch;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 100vw;
+  padding-inline: 30px;
+  gap: 1rem;
+  padding-top: 2.5rem;
+  overflow-x: scroll;
+  overflow-y: visible;
+}
+
+.historyList::-webkit-scrollbar {
+  display: none;
+}
+.historyList > li {
+  min-width: 200px;
+}

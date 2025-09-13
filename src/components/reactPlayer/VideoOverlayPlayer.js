@@ -1,4 +1,6 @@
 import React, { useState, useRef } from "react";
+import { addValueLocalStorageArray } from "../../helper/functions/localStorageFn";
+import { Constants } from "../../helper/CONSTANTS";
 import ReactPlayer from "react-player";
 import styles from "./VideoOverlayPlayer.module.css";
 
@@ -14,7 +16,7 @@ const PlayButton = () => (
   </svg>
 );
 
-const VideoOverlayPlayer = ({ url,...rest }) => {
+const VideoOverlayPlayer = ({ currentChannel, setHistory, ...rest }) => {
   const [isPaused, setIsPaused] = useState(true);
   const playerRef = useRef(null);
 
@@ -28,6 +30,11 @@ const VideoOverlayPlayer = ({ url,...rest }) => {
 
   const handlePlay = () => {
     setIsPaused(false);
+    const history = addValueLocalStorageArray({
+      key: Constants.LocalStorageKey.CHANNEL_HISTORY,
+      value: currentChannel,
+    });
+    setHistory(history);
   };
 
   return (
@@ -36,7 +43,7 @@ const VideoOverlayPlayer = ({ url,...rest }) => {
         className={styles.reactPlayer}
         id="live-player"
         ref={playerRef}
-        url={url}
+        url={currentChannel.url}
         playing={!isPaused}
         onPause={handlePause}
         onPlay={handlePlay}
