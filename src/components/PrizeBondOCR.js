@@ -1,28 +1,35 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import Tesseract from 'tesseract.js';
-import styles from './PrizeBondOCR.module.css';
+import { useState, useEffect, useRef, useCallback } from "react";
+import Tesseract from "tesseract.js";
+import styles from "./PrizeBondOCR.module.css";
 
 const PrizeBondOCR = ({ onNumberDetected }) => {
   const videoRef = useRef(null);
   const workerRef = useRef(null);
-  const scanIntervalRef = useRef(null);
+  const scanTimeoutRef = useRef(null);
+  const roiRef = useRef(null);
 
   const [isScanning, setIsScanning] = useState(false);
-  const [lastDetected, setLastDetected] = useState('');
-  const [cameraError, setCameraError] = useState('');
+  const [lastDetected, setLastDetected] = useState("");
+  const [cameraError, setCameraError] = useState("");
   const [workerReady, setWorkerReady] = useState(false);
   const [confidence, setConfidence] = useState(0);
-  const [manualInput, setManualInput] = useState('');
+  const [manualInput, setManualInput] = useState("");
+  const [detectedNumbers, setDetectedNumbers] = useState({});
+  const [editingNumber, setEditingNumber] = useState(null); // { id: string, value: string }
+  const [canvasPreview, setCanvasPreview] = useState("");
+  const [roi, setRoi] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const [autoAdd, setAutoAdd] = useState(false);
 
-  // Initialize Tesseract worker for Bengali
+  // Initialize Tesseract worker
   useEffect(() => {
     const initializeWorker = async () => {
-      // Tesseract.js v6+
-      const worker = await Tesseract.createWorker('ben');
+      const worker = await Tesseract.createWorker("ben", 1 );
       await worker.setParameters({
-        tessedit_char_whitelist: '০১২৩৪৫৬৭৮৯', // Whitelist only Bengali digits
+        tessedit_char_whitelist: "০১২৩৪৫৬৭৮৯",
+        tessjs_create_hocr: "0",
+        tessjs_create_tsv: "0",
       });
       workerRef.current = worker;
       setWorkerReady(true);
@@ -36,30 +43,65 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
     };
   }, []);
 
+  // Update ROI on window resize and video metadata load
+  const updateRoi = useCallback(() => {
+    if (videoRef.current) {
+      const video = videoRef.current;
+      const videoWidth = video.videoWidth;
+      const videoHeight = video.videoHeight;
+
+      // Define ROI as a percentage of the video dimensions
+      const roiWidth = videoWidth * 0.8; // 80% of video width
+      const roiHeight = videoHeight * 0.2; // 20% of video height
+      const roiX = (videoWidth - roiWidth) / 2;
+      const roiY = (videoHeight - roiHeight) / 2;
+
+      setRoi({ x: roiX, y: roiY, width: roiWidth, height: roiHeight });
+    }
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.addEventListener("loadedmetadata", updateRoi);
+      window.addEventListener("resize", updateRoi);
+
+      return () => {
+        video.removeEventListener("loadedmetadata", updateRoi);
+        window.removeEventListener("resize", updateRoi);
+      };
+    }
+  }, [updateRoi]);
+
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: 'environment', // Use back camera
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
+          facingMode: "environment",
+          width: { ideal: 720 },
+          height: { ideal: 480 },
+          frameRate: { ideal: 30 },
         },
       });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.onloadedmetadata = () => {
+          updateRoi();
+        };
       }
-      setCameraError('');
+      setCameraError("");
     } catch (err) {
       console.error("Camera Error:", err);
-      setCameraError('Could not access camera. Please check permissions.');
+      setCameraError("Could not access camera. Please check permissions.");
     }
   };
 
   const stopCamera = () => {
     if (videoRef.current && videoRef.current.srcObject) {
-      videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+      videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
       videoRef.current.srcObject = null;
     }
+    clearTimeout(scanTimeoutRef.current);
   };
 
   const toggleScanning = () => {
@@ -73,102 +115,271 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
   };
 
   const translateBengaliToEnglish = (bengaliNumber) => {
-    const bengaliNumerals = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-    const englishNumerals = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    return bengaliNumber.split('').map(char => {
-      const index = bengaliNumerals.indexOf(char);
-      return index !== -1 ? englishNumerals[index] : '';
-    }).join('');
+    const bengaliNumerals = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+    const englishNumerals = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+    return bengaliNumber
+      .split("")
+      .map((char) => {
+        const index = bengaliNumerals.indexOf(char);
+        return index !== -1 ? englishNumerals[index] : "";
+      })
+      .join("");
   };
 
   const scanFrame = useCallback(async () => {
-    if (!videoRef.current || !workerRef.current || videoRef.current.readyState !== videoRef.current.HAVE_ENOUGH_DATA) {
+    if (
+      !isScanning ||
+      !workerReady ||
+      !videoRef.current ||
+      videoRef.current.readyState !== videoRef.current.HAVE_ENOUGH_DATA
+    ) {
+      if (isScanning) {
+        scanTimeoutRef.current = setTimeout(scanFrame, 100);
+      }
       return;
     }
 
-    const canvas = document.createElement('canvas');
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    const context = canvas.getContext('2d');
-    context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-    
-    // For better accuracy, you might need image preprocessing (grayscale, contrast, etc.)
-    // Example:
-    context.filter = 'grayscale(1) contrast(1.5)';
-    context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d", { willReadFrequently: true });
+
+    canvas.width = roi.width;
+    canvas.height = roi.height;
+
+    // Draw the ROI from the video onto the canvas
+    context.drawImage(
+      videoRef.current,
+      roi.x,
+      roi.y,
+      roi.width,
+      roi.height,
+      0,
+      0,
+      roi.width,
+      roi.height,
+    );
+
+    // Image preprocessing
+    context.filter = "grayscale(1) contrast(2) brightness(1.2)";
+    context.drawImage(canvas, 0, 0, canvas.width, canvas.height);
+
+    setCanvasPreview(canvas.toDataURL("image/jpeg"));
 
     const { data } = await workerRef.current.recognize(canvas);
-    
-    // The whitelist should make this cleaner, but we can still process it.
-    const texts = data.text.split('\n')?.map(text => text.replace(/\s/g, ''))?.filter(text => text.length===7 );
-    if(texts.length<1) return;
-    console.log(texts)
-    const cleanedText = texts[0];
-    const bengali7DigitRegex = /[০১২৩৪৫৬৭৮৯]{7}/;
-    const match = cleanedText.match(bengali7DigitRegex);
-    console.log({cleanedText, match})
+    setConfidence(data.confidence);
 
-    if (match) {
-      const detectedBengali = match[0];
-      const detectedEnglish = translateBengaliToEnglish(detectedBengali);
-      
-      if (detectedEnglish.length === 7 && detectedEnglish !== lastDetected) {
-        console.log('Detected:', detectedEnglish, 'Confidence:', data.confidence);
-        setLastDetected(detectedEnglish);
-        setConfidence(data.confidence);
-        onNumberDetected(detectedEnglish);
+    const texts = data.text
+      .split("\n")
+      .map((text) => text.replace(/\s/g, ""))
+      .filter((text) => text.length > 5 && text.length < 10); // More flexible length
+
+    if (texts.length > 0) {
+      const newNumbers = [];
+      const bengali7DigitRegex = /[০১২৩৪৫৬৭৮৯]{7}/g; // Global flag to find all matches
+
+      texts.forEach((cleanedText) => {
+        const matches = cleanedText.match(bengali7DigitRegex);
+        if (matches) {
+          matches.forEach((match) => {
+            const detectedEnglish = translateBengaliToEnglish(match);
+            if (detectedEnglish.length === 7) {
+              newNumbers.push(detectedEnglish);
+            }
+          });
+        }
+      });
+
+      if (newNumbers.length > 0) {
+        setDetectedNumbers((prevFrequencies) => {
+          const newFrequencies = { ...prevFrequencies };
+          newNumbers.forEach((num) => {
+            newFrequencies[num] = (newFrequencies[num] || 0) + 1;
+          });
+          return newFrequencies;
+        });
       }
     }
-  }, [lastDetected, onNumberDetected]);
 
-  // Scanning loop
+    // Loop the scan
+    if (isScanning) {
+      scanTimeoutRef.current = setTimeout(scanFrame, 100); // Scan more frequently
+    }
+  }, [isScanning, workerReady, roi, onNumberDetected, detectedNumbers]);
+
+  // Start and stop scanning loop
   useEffect(() => {
     if (isScanning && workerReady) {
-      scanIntervalRef.current = setInterval(scanFrame, 200);
+      scanFrame();
     } else {
-      clearInterval(scanIntervalRef.current);
+      clearTimeout(scanTimeoutRef.current);
     }
-    return () => clearInterval(scanIntervalRef.current);
+    return () => clearTimeout(scanTimeoutRef.current);
   }, [isScanning, workerReady, scanFrame]);
+
+  const handleAccept = useCallback(
+    (number) => {
+      onNumberDetected(number);
+      setDetectedNumbers({});
+      setLastDetected(number);
+    },
+    [onNumberDetected],
+  );
+
+  const handleEdit = (number) => {
+    setEditingNumber({ id: number, value: number });
+  };
+
+  const handleSave = () => {
+    if (
+      editingNumber &&
+      editingNumber.value.length === 7 &&
+      /^\d{7}$/.test(editingNumber.value)
+    ) {
+      onNumberDetected(editingNumber.value);
+      setDetectedNumbers({});
+      setLastDetected(editingNumber.value);
+      setEditingNumber(null);
+    }
+  };
+
+  useEffect(() => {
+    if (autoAdd) {
+      const sortedNumbers = Object.keys(detectedNumbers).sort(
+        (a, b) => detectedNumbers[b] - detectedNumbers[a],
+      );
+      if (sortedNumbers.length > 0) {
+        const topNumber = sortedNumbers[0];
+        const topNumberCount = detectedNumbers[topNumber];
+        if (topNumberCount > 5) {
+          handleAccept(topNumber);
+        }
+      }
+    }
+  }, [detectedNumbers, autoAdd, handleAccept]);
 
   return (
     <div className={styles.ocrContainer}>
-      <div className={styles.videoContainer}>
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          className={styles.video}
-          style={{ display: isScanning ? 'block' : 'none' }}
-        />
+      <div className={styles.scannerBody}>
+        <div className={styles.videoContainer}>
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            className={styles.video}
+            style={{ display: isScanning ? "block" : "none" }}
+          />
+          {isScanning && roi.width > 0 && (
+            <div
+              ref={roiRef}
+              className={styles.roi}
+              style={{
+                left: `${(roi.x / videoRef.current.videoWidth) * 100}%`,
+                top: `${(roi.y / videoRef.current.videoHeight) * 100}%`,
+                width: `${(roi.width / videoRef.current.videoWidth) * 100}%`,
+                height: `${
+                  (roi.height / videoRef.current.videoHeight) * 100
+                }%`,
+                borderColor:
+                  confidence > 70
+                    ? "#00ff00"
+                    : confidence > 40
+                    ? "#ffd700"
+                    : "#ff0000",
+              }}
+            />
+          )}
+          {canvasPreview && isScanning && (
+            <img
+              src={canvasPreview}
+              className={styles.canvasPreview}
+              alt="OCR Processing Preview"
+            />
+          )}
+          {isScanning && workerReady && (
+            <div className={styles.confidenceIndicator}>
+              Confidence: <strong>{confidence.toFixed(2)}%</strong>
+            </div>
+          )}
+        </div>
+
+        {Object.keys(detectedNumbers).length > 0 && (
+          <div className={styles.detectedNumbersContainer}>
+            <h4>Detected Numbers:</h4>
+            <ul>
+              {Object.keys(detectedNumbers)
+                .sort((a, b) => detectedNumbers[b] - detectedNumbers[a])
+                .map((number) => (
+                  <li key={number}>
+                    {editingNumber && editingNumber.id === number ? (
+                      <div className={styles.editContainer}>
+                        <input
+                          type="text"
+                          value={editingNumber.value}
+                          onChange={(e) =>
+                            setEditingNumber({
+                              ...editingNumber,
+                              value: e.target.value,
+                            })
+                          }
+                          maxLength="7"
+                          pattern="[0-9]{7}"
+                        />
+                        <button onClick={handleSave}>Save</button>
+                        <button onClick={() => setEditingNumber(null)}>
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <div className={styles.detectedItem}>
+                        <span>{`${number} (${detectedNumbers[number]})`}</span>
+                        <div className={styles.itemActions}>
+                          <button onClick={() => handleAccept(number)}>
+                            Accept
+                          </button>
+                          <button onClick={() => handleEdit(number)}>
+                            Edit
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </li>
+                ))}
+            </ul>
+          </div>
+        )}
       </div>
 
-      {cameraError && (
-        <div className={styles.error}>
-          {cameraError}
-        </div>
-      )}
+      {cameraError && <div className={styles.error}>{cameraError}</div>}
 
       <div className={styles.controls}>
         <button
           onClick={toggleScanning}
-          className={`${styles.scanButton} ${isScanning ? styles.stop : styles.start}`}
+          className={`${styles.scanButton} ${
+            isScanning ? styles.stop : styles.start
+          }`}
           disabled={!workerReady}
         >
-          {!workerReady ? 'Initializing OCR...' : (isScanning ? 'Stop Scanning' : 'Start Scanning')}
+          {!workerReady
+            ? "Initializing OCR..."
+            : isScanning
+            ? "Stop Scanning"
+            : "Start Scanning"}
         </button>
+        <div className={styles.autoAdd}>
+          <input
+            type="checkbox"
+            id="autoAdd"
+            checked={autoAdd}
+            onChange={(e) => setAutoAdd(e.target.checked)}
+          />
+          <label htmlFor="autoAdd">Auto Add</label>
+        </div>
       </div>
 
       {lastDetected && (
         <div className={styles.lastDetected}>
-          <span>Last detected:</span>
+          <span>Last accepted:</span>
           <strong>{lastDetected}</strong>
-          {confidence > 0 && (
-            <span className={styles.confidenceBadge}>
-              {confidence.toFixed(0)}% sure
-            </span>
-          )}
         </div>
       )}
 
@@ -186,7 +397,7 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
             if (manualInput.length === 7 && /^\d{7}$/.test(manualInput)) {
               setLastDetected(manualInput);
               onNumberDetected(manualInput);
-              setManualInput('');
+              setManualInput("");
             }
           }}
           disabled={manualInput.length !== 7 || !/^\d{7}$/.test(manualInput)}
