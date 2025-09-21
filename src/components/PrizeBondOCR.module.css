@@ -270,6 +270,60 @@
   top: 8px;
 }
 
+.manualEntry {
+  background: linear-gradient(135deg, #e0e6ed 0%, #d1d9e6 100%);
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.manualEntry input {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px 16px;
+  font-size: 1.1rem;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+  border: 2px solid #b8c5d3;
+  border-radius: 8px;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.manualEntry input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.manualEntry button {
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.manualEntry button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.manualEntry button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
 @media (max-width: 640px) {
   .ocrContainer {
     padding: 0;
