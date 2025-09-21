@@ -13,6 +13,42 @@ import {
 } from "@/helper/functions/localStorageFn";
 import { Constants } from "@/helper/CONSTANTS";
 
+const SingleM3u8Form = ({ setCurrentChannel }) => {
+  const [m3u8Url, setM3u8Url] = useState("");
+
+  const handleUrlChange = (e) => {
+    setM3u8Url(e.target.value);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (m3u8Url) {
+      setCurrentChannel({ url: m3u8Url, name: "Direct URL" });
+      const element = document.querySelector("#live-player");
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      } else {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className={styles.inputContainer}>
+      <input
+        type="text"
+        value={m3u8Url}
+        onChange={handleUrlChange}
+        placeholder="Enter M3U8 URL"
+        className={styles.urlInput}
+      />
+      <button type="submit">Load URL</button>
+    </form>
+  );
+};
 const LiveClientComponent = ({ serverInitialChannels }) => {
   const DEFAULT_M3U_URL = process.env.NEXT_PUBLIC_DEFAULT_M3U_URL;
 
@@ -87,7 +123,8 @@ const LiveClientComponent = ({ serverInitialChannels }) => {
     setM3uUrl(e.target.value);
   };
 
-  const handleSaveUrl = () => {
+  const handleSaveUrl = (e) => {
+    e.preventDefault();
     clientFetchM3U(m3uUrl || DEFAULT_M3U_URL);
   };
 
@@ -104,7 +141,10 @@ const LiveClientComponent = ({ serverInitialChannels }) => {
       {currentChannel && (
         <>
           <div className={`${styles.playerWrapper} back-light `}>
-            <VideoOverlayPlayer currentChannel={currentChannel} setHistory={setHistory} />
+            <VideoOverlayPlayer
+              currentChannel={currentChannel}
+              setHistory={setHistory}
+            />
           </div>
           <h2 className={styles.currentChannelName}>{currentChannel.name}</h2>
         </>
@@ -130,11 +170,11 @@ const LiveClientComponent = ({ serverInitialChannels }) => {
           <ul className={styles.channelList}>
             {channels
               .filter((channel) =>
-                channel.name.toLowerCase().includes(searchTerm.toLowerCase()),
+                channel.name?.toLowerCase().includes(searchTerm.toLowerCase()),
               )
               .map((channel, index) => (
                 <Channel
-                  key={index}
+                  key={index + channel.url}
                   channel={channel}
                   onClick={handleChannelClick}
                 />
@@ -149,8 +189,11 @@ const LiveClientComponent = ({ serverInitialChannels }) => {
             placeholder="Enter M3U URL"
             className={styles.urlInput}
           />
-          <button onClick={handleSaveUrl}>Load & Save URL</button>
+          <button type="button" onClick={(e) => handleSaveUrl(e)}>
+            Load URL
+          </button>
         </form>
+        <SingleM3u8Form setCurrentChannel={setCurrentChannel} />
       </div>
     </>
   );

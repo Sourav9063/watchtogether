@@ -21,7 +21,7 @@ const ChannelHistory = ({ onChannelClick, history, handleClearHistory }) => {
       <ul className={styles.historyList} ref={ref}>
         {history.map((channel, index) => (
           <Channel
-            key={channel.url + Constants.LocalStorageKey.CHANNEL_HISTORY}
+            key={channel.url + Constants.LocalStorageKey.CHANNEL_HISTORY + index}
             channel={channel}
             onClick={onChannelClick}
           />

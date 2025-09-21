@@ -49,6 +49,9 @@ const VideoOverlayPlayer = ({ currentChannel, setHistory, ...rest }) => {
         onPlay={handlePlay}
         width="100%"
         height="100%"
+        onError={(e, data) => {
+          console.log("onError", e, data);
+        }}
         controls={true}
         config={{
           file: {
