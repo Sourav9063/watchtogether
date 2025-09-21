@@ -30,6 +30,16 @@ export default function Home() {
         >
           <p>Live</p>
         </Link>
+        <Link
+          href={"/prizebond"}
+          style={{
+            position: "absolute",
+            left: "1rem",
+            top: "3.4rem",
+          }}
+        >
+          <p>Prize Bond</p>
+        </Link>
         {/* {false ? <ReactVideoPlayer /> : <FirebaseVideoPlayer />} */}
         <ServerComponentWrapper>
           <FirebaseVideoPlayer />

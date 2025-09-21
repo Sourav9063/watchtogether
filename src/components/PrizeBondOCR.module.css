@@ -199,6 +199,14 @@
 
 @keyframes slideIn {
   from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
 
 .confidenceBadge {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -219,14 +227,6 @@
   to {
     opacity: 1;
     transform: scale(1);
-  }
-}
-    transform: translateX(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
   }
 }
 
