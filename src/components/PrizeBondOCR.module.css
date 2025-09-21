@@ -1,0 +1,288 @@
+.ocrContainer {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.videoContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.cameraIcon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.placeholder p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.processingOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.processingBar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.processingProgress {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff88, #00ff44);
+  transition: width 0.3s ease;
+  border-radius: 3px;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.8;
+  }
+}
+.confidenceIndicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.confidenceIndicator strong {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+
+.processingOverlay p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.error {
+  background: #ff4444;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.scanButton {
+  padding: 15px 40px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.scanButton.start {
+  background: linear-gradient(135deg, #00ff88, #00cc66);
+  color: white;
+}
+
+.scanButton.start:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
+}
+
+.scanButton.stop {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a50);
+  color: white;
+}
+
+.scanButton.stop:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+.scanButton:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.lastDetected {
+  background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+  padding: 15px 20px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+  from {
+
+.confidenceBadge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  margin-left: 10px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.lastDetected span {
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.lastDetected strong {
+  font-size: 1.3rem;
+  color: #2d3436;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+}
+
+.instructions {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.instructions h4 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.instructions ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.instructions li {
+  padding: 8px 0;
+  color: #666;
+  position: relative;
+  padding-left: 25px;
+}
+
+.instructions li:before {
+  content: '✅';
+  position: absolute;
+  left: 0;
+  top: 8px;
+}
+
+@media (max-width: 640px) {
+  .ocrContainer {
+    padding: 0;
+  }
+
+  .scanButton {
+    padding: 12px 30px;
+    font-size: 1rem;
+  }
+
+  .lastDetected {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+}
