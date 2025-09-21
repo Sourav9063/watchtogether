@@ -17,7 +17,6 @@
   background: #000;
   border-radius: 10px;
   overflow: hidden;
-  margin-bottom: 20px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
 }
 
@@ -298,6 +297,7 @@
   border-radius: 8px;
   background: white;
   transition: all 0.3s ease;
+  color: #000;
 }
 
 .manualEntry input:focus {
@@ -457,7 +457,17 @@
 .autoAdd {
   display: flex;
   align-items: center;
-  margin-top: 1rem;
   gap: 0.5rem;
   color: #000;
+}
+.autoAdd input {
+  width: 30px;
+  transform: scale(1.2);
+}
+
+.autoAdd label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  max-lines: 1;
+  white-space: nowrap;
 }

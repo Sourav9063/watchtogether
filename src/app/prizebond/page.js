@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
+import * as XLSX from 'xlsx';
 import styles from './prizebond.module.css';
 
 const PrizeBondOCR = dynamic(() => import('@/components/PrizeBondOCR'), {
@@ -11,6 +12,7 @@ const PrizeBondOCR = dynamic(() => import('@/components/PrizeBondOCR'), {
 
 export default function PrizeBondPage() {
   const [savedNumbers, setSavedNumbers] = useState([]);
+  const [showCheckButtons, setShowCheckButtons] = useState(false);
   const [winningNumbers, setWinningNumbers] = useState({
     first: '0544222',
     second: ['0241768'],
@@ -31,31 +33,34 @@ export default function PrizeBondPage() {
     const newEntry = { number, timestamp };
 
     setSavedNumbers(prev => {
-      const updated = [...prev, newEntry];
-      // Keep only last 100 entries
-      const trimmed = updated.slice(-100);
-      localStorage.setItem('prizeBondNumbers', JSON.stringify(trimmed));
-      return trimmed;
-    });
-  };
+      const exist = prev.find(entry => entry.number === number);
+      if (exist) {
+        return prev;
+      }
 
-  const handleDelete = (timestamp) => {
-    setSavedNumbers(prev => {
-      const updated = prev.filter(entry => entry.timestamp !== timestamp);
+      let updated = [...prev, newEntry].sort((a, b) => a.number - b.number);
       localStorage.setItem('prizeBondNumbers', JSON.stringify(updated));
       return updated;
     });
   };
 
-  const handleEdit = (timestamp) => {
-    const entryToEdit = savedNumbers.find(entry => entry.timestamp === timestamp);
+  const handleDelete = (number) => {
+    setSavedNumbers(prev => {
+      const updated = prev.filter(entry => entry.number !== number);
+      localStorage.setItem('prizeBondNumbers', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const handleEdit = (number) => {
+    const entryToEdit = savedNumbers.find(entry => entry.number === number);
     if (!entryToEdit) return;
 
     const newNumber = prompt('Enter new number', entryToEdit.number);
     if (newNumber && newNumber.trim()) {
       setSavedNumbers(prev => {
         const updated = prev.map(entry =>
-          entry.timestamp === timestamp ? { ...entry, number: newNumber.trim() } : entry
+          entry.number === number ? { ...entry, number: newNumber.trim() } : entry
         );
         localStorage.setItem('prizeBondNumbers', JSON.stringify(updated));
         return updated;
@@ -64,8 +69,10 @@ export default function PrizeBondPage() {
   };
 
   const clearNumbers = () => {
-    setSavedNumbers([]);
-    localStorage.removeItem('prizeBondNumbers');
+    if (window.confirm('Are you sure you want to delete all saved numbers?')) {
+      setSavedNumbers([]);
+      localStorage.removeItem('prizeBondNumbers');
+    }
   };
 
   const copyNumbers = () => {
@@ -78,6 +85,62 @@ export default function PrizeBondPage() {
         console.error('Failed to copy numbers: ', err);
         alert('Failed to copy numbers. Please try again.');
       });
+  };
+
+  const exportToExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(savedNumbers.map(entry => ({ Number: entry.number })), { skipHeader: true });
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Prize Bonds');
+    const now = new Date();
+    const dateTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}`;
+    XLSX.writeFile(wb, `prizebond-backup-${dateTime}.xlsx`);
+  };
+
+  const handleCheck = (chunkIndex) => {
+    const chunkSize = 100;
+    const start = chunkIndex * chunkSize;
+    const end = start + chunkSize;
+    const chunk = savedNumbers.slice(start, end);
+
+    if (chunk.length === 0) {
+      alert('No numbers in this range.');
+      return;
+    }
+
+    const paddedNumbers = chunk.map(entry => String(entry.number).padStart(7, '0'));
+    const numbersToCheck = paddedNumbers.join(',');
+    const url = `https://www.bb.org.bd/en/index.php/investfacility/prizebond?gsearch=${encodeURIComponent(numbersToCheck)}`;
+    window.open(url, '_blank');
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const data = new Uint8Array(event.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+      const newNumbers = json.flat().map(String).filter(num => num.trim().length > 0);
+
+      setSavedNumbers(prev => {
+        const existingNumbers = new Set(prev.map(entry => entry.number));
+        const uniqueNewEntries = newNumbers
+          .filter(number => !existingNumbers.has(number))
+          .map(number => ({ number, timestamp: new Date().toISOString() }));
+
+        const updated = [...prev, ...uniqueNewEntries];
+        localStorage.setItem('prizeBondNumbers', JSON.stringify(updated));
+        alert(`${uniqueNewEntries.length} new numbers imported.`);
+        return updated;
+      });
+    };
+    reader.readAsArrayBuffer(file);
+    e.target.value = null; // Reset file input
   };
 
   const checkWinning = (number) => {
@@ -127,13 +190,37 @@ export default function PrizeBondPage() {
           <div className={styles.scannedNumbers}>
             <div className={styles.scannedHeader}>
               <h3>Scanned Numbers ({savedNumbers.length})</h3>
-              <div>
+              <div className={styles.buttonGroup}>
+                <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
+                  <button onClick={exportToExcel} className={styles.exportButton}>
+                    Export
+                  </button>
+                  <label className={styles.importButton}>
+                    Import
+                    <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} style={{ display: 'none' }} />
+                  </label>
+                </div>
                 <button onClick={copyNumbers} className={styles.copyButton}>
                   Copy All
                 </button>
                 <button onClick={clearNumbers} className={styles.clearButton}>
                   Clear All
                 </button>
+                {!showCheckButtons ? (
+                  <button onClick={() => setShowCheckButtons(true)} className={styles.exportButton}>
+                    Check
+                  </button>
+                ) : (
+                  Array.from({ length: Math.ceil(savedNumbers.length / 100) }).map((_, index) => {
+                    const start = index * 100 + 1;
+                    const end = Math.min((index + 1) * 100, savedNumbers.length);
+                    return (
+                      <button key={index} onClick={() => handleCheck(index)} className={styles.exportButton}>
+                        Check ({start} - {end})
+                      </button>
+                    );
+                  })
+                )}
               </div>
             </div>
 
@@ -141,25 +228,22 @@ export default function PrizeBondPage() {
               {savedNumbers.length === 0 ? (
                 <p className={styles.emptyState}>No numbers scanned yet</p>
               ) : (
-                savedNumbers.slice().reverse().map((entry, index) => {
+                savedNumbers.reverse().map((entry, index) => {
                   const winning = checkWinning(entry.number);
                   return (
                     <div
                       key={index}
                       className={`${styles.numberItem} ${winning ? styles.winning : ''}`}
                     >
-                      <span className={styles.number}>{entry.number}</span>
+                      <span className={styles.number}>{entry.number?.padStart(7, '0')}</span>
                       {winning && (
                         <span className={styles.winLabel}>
                           {winning.prize} - {winning.amount}
                         </span>
                       )}
-                      <span className={styles.timestamp}>
-                        {new Date(entry.timestamp).toLocaleTimeString('bn-BD')}
-                      </span>
                       <div className={styles.actions}>
-                        <button onClick={() => handleEdit(entry.timestamp)} className={styles.editButton}>Edit</button>
-                        <button onClick={() => handleDelete(entry.timestamp)} className={styles.deleteButton}>Delete</button>
+                        <button onClick={() => handleEdit(entry.number)} className={styles.editButton}>Edit</button>
+                        <button onClick={() => handleDelete(entry.number)} className={styles.deleteButton}>Delete</button>
                       </div>
                     </div>
                   );

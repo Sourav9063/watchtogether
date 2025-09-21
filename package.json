@@ -22,7 +22,8 @@
     "socket.io-client": "^4.7.1",
     "srt-webvtt": "^2.0.0",
     "tesseract.js": "^6.0.1",
-    "utf-8-validate": "^5.0.10"
+    "utf-8-validate": "^5.0.10",
+    "xlsx": "^0.18.5"
   },
   "engines": {
     "node": "22.x"

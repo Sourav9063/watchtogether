@@ -26,13 +26,114 @@
   max-width: 1400px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 2fr 1fr;
   gap: 30px;
 }
 
 @media (max-width: 1024px) {
   .content {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  .header h1 {
+    font-size: 2rem;
+  }
+
+  .header p {
+    font-size: 1rem;
+  }
+
+  .scanSection,
+  .resultsSection {
+    padding: 20px;
+  }
+
+  .scanSection h2,
+  .resultsSection h3 {
+    font-size: 1.3rem;
+  }
+
+  .scannedHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .buttonGroup {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .exportButton, .importButton, .copyButton, .clearButton {
+    width: 100%;
+    margin-top: 5px;
+  }
+
+  .numberItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .number {
+    font-size: 1.1rem;
+  }
+
+  .winLabel {
+    font-size: 0.8rem;
+    padding: 3px 10px;
+  }
+
+  .timestamp {
+    font-size: 0.75rem;
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .info h4 {
+    font-size: 1.2rem;
+  }
+
+  .info li {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 1.8rem;
+  }
+
+  .header p {
+    font-size: 0.9rem;
+  }
+
+  .scanSection,
+  .resultsSection {
+    padding: 15px;
+  }
+
+  .scanSection h2,
+  .resultsSection h3 {
+    font-size: 1.2rem;
+  }
+
+  .number {
+    font-size: 1rem;
+  }
+
+  .editButton, .deleteButton {
+    padding: 4px 8px;
+    font-size: 0.7rem;
   }
 }
 
@@ -287,9 +388,43 @@
   cursor: pointer;
   font-weight: 600;
   transition: background 0.3s;
-  margin-right: 10px;
 }
 
 .copyButton:hover {
   background: #0056b3;
+}
+.buttonGroup {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.exportButton, .importButton {
+  text-align: center;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+  color: white;
+  width: 100%;
+  font-size: 0.9rem;
+  margin-top: 0;
+}
+
+.exportButton {
+  background-color: #28a745;
+}
+
+.exportButton:hover {
+  background-color: #218838;
+}
+
+.importButton {
+  background-color: #17a2b8;
+}
+
+.importButton:hover {
+  background-color: #138496;
 }

@@ -20,7 +20,7 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
   const [editingNumber, setEditingNumber] = useState(null); // { id: string, value: string }
   const [canvasPreview, setCanvasPreview] = useState("");
   const [roi, setRoi] = useState({ x: 0, y: 0, width: 0, height: 0 });
-  const [autoAdd, setAutoAdd] = useState(false);
+  const [autoAdd, setAutoAdd] = useState(true);
 
   // Initialize Tesseract worker
   useEffect(() => {
@@ -302,7 +302,6 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
           )}
         </div>
 
-        {Object.keys(detectedNumbers).length > 0 && (
           <div className={styles.detectedNumbersContainer}>
             <h4>Detected Numbers:</h4>
             <ul>
@@ -346,7 +345,6 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
                 ))}
             </ul>
           </div>
-        )}
       </div>
 
       {cameraError && <div className={styles.error}>{cameraError}</div>}
