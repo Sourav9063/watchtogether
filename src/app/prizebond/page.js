@@ -39,9 +39,45 @@ export default function PrizeBondPage() {
     });
   };
 
+  const handleDelete = (timestamp) => {
+    setSavedNumbers(prev => {
+      const updated = prev.filter(entry => entry.timestamp !== timestamp);
+      localStorage.setItem('prizeBondNumbers', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const handleEdit = (timestamp) => {
+    const entryToEdit = savedNumbers.find(entry => entry.timestamp === timestamp);
+    if (!entryToEdit) return;
+
+    const newNumber = prompt('Enter new number', entryToEdit.number);
+    if (newNumber && newNumber.trim()) {
+      setSavedNumbers(prev => {
+        const updated = prev.map(entry =>
+          entry.timestamp === timestamp ? { ...entry, number: newNumber.trim() } : entry
+        );
+        localStorage.setItem('prizeBondNumbers', JSON.stringify(updated));
+        return updated;
+      });
+    }
+  };
+
   const clearNumbers = () => {
     setSavedNumbers([]);
     localStorage.removeItem('prizeBondNumbers');
+  };
+
+  const copyNumbers = () => {
+    const numbersToCopy = savedNumbers.map(entry => entry.number).join('\n');
+    navigator.clipboard.writeText(numbersToCopy)
+      .then(() => {
+        alert('All numbers copied to clipboard!');
+      })
+      .catch(err => {
+        console.error('Failed to copy numbers: ', err);
+        alert('Failed to copy numbers. Please try again.');
+      });
   };
 
   const checkWinning = (number) => {
@@ -66,7 +102,7 @@ export default function PrizeBondPage() {
         </section>
 
         <section className={styles.resultsSection}>
-          <div className={styles.winningNumbers}>
+          {/* <div className={styles.winningNumbers}>
             <h3>Current Winning Numbers (120th Draw)</h3>
             <div className={styles.prizeList}>
               <div className={styles.prizeItem}>
@@ -86,14 +122,19 @@ export default function PrizeBondPage() {
                 <span className={styles.prizeNumber}>{winningNumbers.fourth.join(', ')}</span>
               </div>
             </div>
-          </div>
+          </div> */}
 
           <div className={styles.scannedNumbers}>
             <div className={styles.scannedHeader}>
               <h3>Scanned Numbers ({savedNumbers.length})</h3>
-              <button onClick={clearNumbers} className={styles.clearButton}>
-                Clear All
-              </button>
+              <div>
+                <button onClick={copyNumbers} className={styles.copyButton}>
+                  Copy All
+                </button>
+                <button onClick={clearNumbers} className={styles.clearButton}>
+                  Clear All
+                </button>
+              </div>
             </div>
 
             <div className={styles.numbersList}>
@@ -116,6 +157,10 @@ export default function PrizeBondPage() {
                       <span className={styles.timestamp}>
                         {new Date(entry.timestamp).toLocaleTimeString('bn-BD')}
                       </span>
+                      <div className={styles.actions}>
+                        <button onClick={() => handleEdit(entry.timestamp)} className={styles.editButton}>Edit</button>
+                        <button onClick={() => handleDelete(entry.timestamp)} className={styles.deleteButton}>Delete</button>
+                      </div>
                     </div>
                   );
                 })

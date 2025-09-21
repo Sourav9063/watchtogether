@@ -212,7 +212,6 @@
 .footer {
   max-width: 1400px;
   margin: 40px auto 0;
-  padding: 20px;
 }
 
 .info {
@@ -247,4 +246,50 @@
   color: #28a745;
   font-weight: bold;
   margin-right: 8px;
+}
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.editButton, .deleteButton {
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.editButton {
+  background-color: #ffc107;
+}
+
+.editButton:hover {
+  background-color: #e0a800;
+}
+
+.deleteButton {
+  background-color: #251819;
+}
+
+.deleteButton:hover {
+  background-color: #c82333;
+}
+.copyButton {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+  margin-right: 10px;
+}
+
+.copyButton:hover {
+  background: #0056b3;
 }
