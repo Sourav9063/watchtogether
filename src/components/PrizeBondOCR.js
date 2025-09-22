@@ -28,7 +28,7 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
   // Initialize Tesseract worker
   useEffect(() => {
     const initializeWorker = async () => {
-      const worker = await Tesseract.createWorker("ben", 1 );
+      const worker = await Tesseract.createWorker("ben", 1);
       await worker.setParameters({
         tessedit_char_whitelist: "কখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ০১২৩৪৫৬৭৮৯",
         tessjs_create_hocr: "0",
@@ -42,7 +42,9 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
 
     // Initialize canvas and context once
     canvasRef.current = document.createElement("canvas");
-    contextRef.current = canvasRef.current.getContext("2d", { willReadFrequently: true });
+    contextRef.current = canvasRef.current.getContext("2d", {
+      willReadFrequently: true,
+    });
 
     return () => {
       workerRef.current?.terminate();
@@ -222,7 +224,8 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
       const newNumbers = [];
       // Regex to match 2 characters (Bengali or English letters) followed by 7 Bengali digits
       // The first part (2 chars) is a non-capturing group, and the 7 digits are a capturing group.
-      const prizeBondRegex = /(?:[কখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ]{2})([০১২৩৪৫৬৭৮৯]{7})/g;
+      const prizeBondRegex =
+        /(?:[কখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ]{2})([০১২৩৪৫৬৭৮৯]{7})/g;
 
       texts.forEach((cleanedText) => {
         let match;
@@ -324,9 +327,7 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
                 left: `${(roi.x / videoRef.current.videoWidth) * 100}%`,
                 top: `${(roi.y / videoRef.current.videoHeight) * 100}%`,
                 width: `${(roi.width / videoRef.current.videoWidth) * 100}%`,
-                height: `${
-                  (roi.height / videoRef.current.videoHeight) * 100
-                }%`,
+                height: `${(roi.height / videoRef.current.videoHeight) * 100}%`,
                 borderColor:
                   confidence > 70
                     ? "#00ff00"
@@ -350,49 +351,56 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
           )}
         </div>
 
-          <div className={styles.detectedNumbersContainer}>
-            <h4>Detected Numbers:</h4>
-            <ul>
-              {Object.keys(detectedNumbers)
-                .sort((a, b) => detectedNumbers[b] - detectedNumbers[a])
-                .map((number) => (
-                  <li key={number}>
-                    {editingNumber && editingNumber.id === number ? (
-                      <div className={styles.editContainer}>
-                        <input
-                          type="text"
-                          value={editingNumber.value}
-                          onChange={(e) =>
-                            setEditingNumber({
-                              ...editingNumber,
-                              value: e.target.value,
-                            })
-                          }
-                          maxLength="7"
-                          pattern="[0-9]{7}"
-                        />
-                        <button onClick={handleSave}>Save</button>
-                        <button onClick={() => setEditingNumber(null)}>
-                          Cancel
-                        </button>
-                      </div>
-                    ) : (
-                      <div className={styles.detectedItem}>
-                        <span>{`${number} (${detectedNumbers[number]})`}</span>
-                        <div className={styles.itemActions}>
-                          <button onClick={() => handleAccept(number)}>
-                            Accept
-                          </button>
-                          <button onClick={() => handleEdit(number)}>
-                            Edit
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </li>
-                ))}
-            </ul>
+        <div className={styles.detectedNumbersContainer}>
+          <h4>Detected Numbers:</h4>
+          <div className={styles.autoAdd}>
+            <input
+              type="checkbox"
+              id="autoAdd"
+              checked={autoAdd}
+              onChange={(e) => setAutoAdd(e.target.checked)}
+            />
+            <label htmlFor="autoAdd">Auto Add</label>
           </div>
+          <ul>
+            {Object.keys(detectedNumbers)
+              .sort((a, b) => detectedNumbers[b] - detectedNumbers[a])
+              .map((number) => (
+                <li key={number}>
+                  {editingNumber && editingNumber.id === number ? (
+                    <div className={styles.editContainer}>
+                      <input
+                        type="text"
+                        value={editingNumber.value}
+                        onChange={(e) =>
+                          setEditingNumber({
+                            ...editingNumber,
+                            value: e.target.value,
+                          })
+                        }
+                        maxLength="7"
+                        pattern="[0-9]{7}"
+                      />
+                      <button onClick={handleSave}>Save</button>
+                      <button onClick={() => setEditingNumber(null)}>
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <div className={styles.detectedItem}>
+                      <span>{`${number} (${detectedNumbers[number]})`}</span>
+                      <div className={styles.itemActions}>
+                        <button onClick={() => handleAccept(number)}>
+                          Accept
+                        </button>
+                        <button onClick={() => handleEdit(number)}>Edit</button>
+                      </div>
+                    </div>
+                  )}
+                </li>
+              ))}
+          </ul>
+        </div>
       </div>
       {lastDetected && (
         <div className={styles.lastDetected}>
@@ -417,17 +425,7 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
             ? "Stop Scanning"
             : "Start Scanning"}
         </button>
-        <div className={styles.autoAdd}>
-          <input
-            type="checkbox"
-            id="autoAdd"
-            checked={autoAdd}
-            onChange={(e) => setAutoAdd(e.target.checked)}
-          />
-          <label htmlFor="autoAdd">Auto Add</label>
-        </div>
       </div>
-
 
       <div className={styles.manualEntry}>
         <input
@@ -472,4 +470,3 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
 };
 
 export default PrizeBondOCR;
-
