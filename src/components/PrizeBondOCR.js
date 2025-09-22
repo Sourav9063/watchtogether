@@ -115,6 +115,8 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
       }
     }
     clearTimeout(scanTimeoutRef.current);
+    setDetectedNumbers({});
+    setCanvasPreview("");
   };
 
   const toggleScanning = () => {
@@ -198,7 +200,6 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
     let data;
     try {
       ({ data } = await workerRef.current.recognize(canvas));
-      console.log(data.text)
       setConfidence(data.confidence);
     } catch (error) {
       console.error("OCR recognition error:", error);
@@ -258,9 +259,6 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
       scanFrame();
     } else {
       clearTimeout(scanTimeoutRef.current);
-      // Clear detected numbers and preview when scanning stops
-      setDetectedNumbers({});
-      setCanvasPreview("");
     }
     return () => clearTimeout(scanTimeoutRef.current);
   }, [isScanning, workerReady, scanFrame]);
@@ -299,7 +297,7 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
       if (sortedNumbers.length > 0) {
         const topNumber = sortedNumbers[0];
         const topNumberCount = detectedNumbers[topNumber];
-        if (topNumberCount > 10) {
+        if (topNumberCount >= 5) {
           handleAccept(topNumber);
         }
       }
