@@ -464,7 +464,6 @@
     overflow-x: auto;
     padding-bottom: 10px;
     flex-wrap: nowrap;
-    max-width: none;
   }
 
   .detectedNumbersContainer li {
