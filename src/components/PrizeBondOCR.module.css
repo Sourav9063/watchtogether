@@ -330,29 +330,6 @@
   transform: none;
 }
 
-@media (max-width: 768px) {
-  .scannerBody {
-    flex-direction: column;
-  }
-
-  .detectedNumbersContainer {
-    max-height: 250px;
-    width: 100%;
-  }
-
-  .detectedNumbersContainer ul {
-    display: flex;
-    overflow-x: auto;
-    padding-bottom: 10px;
-    flex-wrap: nowrap;
-    max-width: none;
-  }
-
-  .detectedNumbersContainer li {
-    flex: 0 0 auto;
-    width: 250px;
-  }
-}
 .detectedNumbersContainer {
   flex: 1;
   background: #f0f0f0;
@@ -442,7 +419,7 @@
   top: 10px;
   left: 10px;
   width: 200px;
-  height: 200px;
+  height: 50px;
   border: 2px solid #00ff88;
   border-radius: 5px;
   object-fit: cover;
@@ -470,4 +447,33 @@
   font-weight: 500;
   max-lines: 1;
   white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .scannerBody {
+    flex-direction: column;
+  }
+
+  .detectedNumbersContainer {
+    max-height: 250px;
+    width: 100%;
+  }
+
+  .detectedNumbersContainer ul {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    flex-wrap: nowrap;
+    max-width: none;
+  }
+
+  .detectedNumbersContainer li {
+    flex: 0 0 auto;
+    width: 250px;
+  }
+
+  .canvasPreview {
+    width: 160px;
+    height: 40px;
+  }
 }

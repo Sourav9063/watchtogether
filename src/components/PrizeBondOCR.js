@@ -9,6 +9,9 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
   const workerRef = useRef(null);
   const scanTimeoutRef = useRef(null);
   const roiRef = useRef(null);
+  const canvasRef = useRef(null); // Ref for the canvas element
+  const contextRef = useRef(null); // Ref for the 2D rendering context
+  const isRecognizingRef = useRef(false); // To prevent concurrent OCR recognition
 
   const [isScanning, setIsScanning] = useState(false);
   const [lastDetected, setLastDetected] = useState("");
@@ -27,7 +30,7 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
     const initializeWorker = async () => {
       const worker = await Tesseract.createWorker("ben", 1 );
       await worker.setParameters({
-        tessedit_char_whitelist: "০১২৩৪৫৬৭৮৯",
+        tessedit_char_whitelist: "কখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ০১২৩৪৫৬৭৮৯",
         tessjs_create_hocr: "0",
         tessjs_create_tsv: "0",
       });
@@ -37,9 +40,16 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
 
     initializeWorker();
 
+    // Initialize canvas and context once
+    canvasRef.current = document.createElement("canvas");
+    contextRef.current = canvasRef.current.getContext("2d", { willReadFrequently: true });
+
     return () => {
       workerRef.current?.terminate();
       setWorkerReady(false);
+      // Clean up canvas and context
+      canvasRef.current = null;
+      contextRef.current = null;
     };
   }, []);
 
@@ -87,6 +97,7 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
         videoRef.current.srcObject = stream;
         videoRef.current.onloadedmetadata = () => {
           updateRoi();
+          videoRef.current.play(); // Ensure video starts playing
         };
       }
       setCameraError("");
@@ -98,8 +109,10 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
 
   const stopCamera = () => {
     if (videoRef.current && videoRef.current.srcObject) {
-      videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
-      videoRef.current.srcObject = null;
+      if (videoRef.current.srcObject) {
+        videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
+        videoRef.current.srcObject = null;
+      }
     }
     clearTimeout(scanTimeoutRef.current);
   };
@@ -139,11 +152,28 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
       return;
     }
 
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d", { willReadFrequently: true });
+    if (isRecognizingRef.current) {
+      scanTimeoutRef.current = setTimeout(scanFrame, 100);
+      return;
+    }
+
+    isRecognizingRef.current = true; // Set flag to indicate recognition is in progress
+
+    const canvas = canvasRef.current;
+    const context = contextRef.current;
+
+    if (!canvas || !context) {
+      isRecognizingRef.current = false;
+      if (isScanning) {
+        scanTimeoutRef.current = setTimeout(scanFrame, 100);
+      }
+      return;
+    }
 
     canvas.width = roi.width;
     canvas.height = roi.height;
+
+    context.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas before drawing
 
     // Draw the ROI from the video onto the canvas
     context.drawImage(
@@ -159,32 +189,49 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
     );
 
     // Image preprocessing
+    // Apply filter to the context, then draw the image to apply it
     context.filter = "grayscale(1) contrast(2) brightness(1.2)";
-    context.drawImage(canvas, 0, 0, canvas.width, canvas.height);
+    context.drawImage(canvas, 0, 0, canvas.width, canvas.height); // Re-draw to apply filter
 
     setCanvasPreview(canvas.toDataURL("image/jpeg"));
 
-    const { data } = await workerRef.current.recognize(canvas);
-    setConfidence(data.confidence);
+    let data;
+    try {
+      ({ data } = await workerRef.current.recognize(canvas));
+      console.log(data.text)
+      setConfidence(data.confidence);
+    } catch (error) {
+      console.error("OCR recognition error:", error);
+      setConfidence(0); // Reset confidence on error
+      isRecognizingRef.current = false; // Reset flag even on error
+      if (isScanning) {
+        scanTimeoutRef.current = setTimeout(scanFrame, 100);
+      }
+      return;
+    } finally {
+      isRecognizingRef.current = false; // Reset flag after recognition
+    }
 
     const texts = data.text
       .split("\n")
       .map((text) => text.replace(/\s/g, ""))
-      .filter((text) => text.length > 5 && text.length < 10); // More flexible length
+      .filter((text) => text.length >= 7); // More flexible length
 
     if (texts.length > 0) {
       const newNumbers = [];
-      const bengali7DigitRegex = /[০১২৩৪৫৬৭৮৯]{7}/g; // Global flag to find all matches
+      // Regex to match 2 characters (Bengali or English letters) followed by 7 Bengali digits
+      // The first part (2 chars) is a non-capturing group, and the 7 digits are a capturing group.
+      const prizeBondRegex = /(?:[কখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ]{2})([০১২৩৪৫৬৭৮৯]{7})/g;
 
       texts.forEach((cleanedText) => {
-        const matches = cleanedText.match(bengali7DigitRegex);
-        if (matches) {
-          matches.forEach((match) => {
-            const detectedEnglish = translateBengaliToEnglish(match);
-            if (detectedEnglish.length === 7) {
-              newNumbers.push(detectedEnglish);
-            }
-          });
+        let match;
+        while ((match = prizeBondRegex.exec(cleanedText)) !== null) {
+          // The prize bond number is in the first capturing group (index 1)
+          const bengaliNumber = match[1];
+          const detectedEnglish = translateBengaliToEnglish(bengaliNumber);
+          if (detectedEnglish.length === 7) {
+            newNumbers.push(detectedEnglish);
+          }
         }
       });
 
@@ -211,6 +258,9 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
       scanFrame();
     } else {
       clearTimeout(scanTimeoutRef.current);
+      // Clear detected numbers and preview when scanning stops
+      setDetectedNumbers({});
+      setCanvasPreview("");
     }
     return () => clearTimeout(scanTimeoutRef.current);
   }, [isScanning, workerReady, scanFrame]);
@@ -249,7 +299,7 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
       if (sortedNumbers.length > 0) {
         const topNumber = sortedNumbers[0];
         const topNumberCount = detectedNumbers[topNumber];
-        if (topNumberCount > 5) {
+        if (topNumberCount > 10) {
           handleAccept(topNumber);
         }
       }
@@ -346,6 +396,12 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
             </ul>
           </div>
       </div>
+      {lastDetected && (
+        <div className={styles.lastDetected}>
+          <span>Last accepted:</span>
+          <strong>{lastDetected}</strong>
+        </div>
+      )}
 
       {cameraError && <div className={styles.error}>{cameraError}</div>}
 
@@ -374,12 +430,6 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
         </div>
       </div>
 
-      {lastDetected && (
-        <div className={styles.lastDetected}>
-          <span>Last accepted:</span>
-          <strong>{lastDetected}</strong>
-        </div>
-      )}
 
       <div className={styles.manualEntry}>
         <input
@@ -424,3 +474,4 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
 };
 
 export default PrizeBondOCR;
+
