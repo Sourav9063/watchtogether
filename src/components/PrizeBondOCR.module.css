@@ -51,7 +51,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -124,7 +125,6 @@
   font-size: 16px;
   font-weight: bold;
 }
-
 
 .processingOverlay p {
   margin: 0;
@@ -238,7 +238,7 @@
 .lastDetected strong {
   font-size: 1.3rem;
   color: #2d3436;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   letter-spacing: 2px;
 }
 
@@ -269,7 +269,7 @@
 }
 
 .instructions li:before {
-  content: '✅';
+  content: "✅";
   position: absolute;
   left: 0;
   top: 8px;
@@ -291,7 +291,7 @@
   min-width: 200px;
   padding: 12px 16px;
   font-size: 1.1rem;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   letter-spacing: 2px;
   border: 2px solid #b8c5d3;
   border-radius: 8px;
@@ -366,7 +366,7 @@
   border-radius: 8px;
   margin-bottom: 10px;
   font-size: 1.4rem;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
 }
 
 .itemActions button {

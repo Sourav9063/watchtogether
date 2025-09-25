@@ -60,7 +60,6 @@
   }
 
   .scannedHeader {
-    flex-direction: column;
     align-items: flex-start;
     gap: 15px;
   }
@@ -196,22 +195,24 @@
 .scannedNumbers {
   background: #f8f9fa;
   border-radius: 10px;
-  padding: 20px;
 }
 
 .scannedHeader {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
 }
 
-.scannedHeader h3 {
+.scannedHeader h2 {
   margin: 0;
+  margin-bottom: 20px;
   color: #333;
 }
 
 .clearButton {
+  margin-top: 0px;
   background: #dc3545;
   color: white;
   border: none;
@@ -380,6 +381,7 @@
   background-color: #c82333;
 }
 .copyButton {
+  margin-top: 0px;
   background: #007bff;
   color: white;
   border: none;

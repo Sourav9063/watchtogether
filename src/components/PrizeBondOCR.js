@@ -117,7 +117,6 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
       }
     }
     clearTimeout(scanTimeoutRef.current);
-    setDetectedNumbers({});
     setCanvasPreview("");
   };
 
@@ -269,10 +268,18 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
   const handleAccept = useCallback(
     (number) => {
       onNumberDetected(number);
-      setDetectedNumbers({});
+      if (autoAdd) {
+        setDetectedNumbers({});
+      } else {
+        setDetectedNumbers((prev) => {
+          const newNumbers = { ...prev };
+          delete newNumbers[number];
+          return newNumbers;
+        });
+      }
       setLastDetected(number);
     },
-    [onNumberDetected],
+    [onNumberDetected, autoAdd],
   );
 
   const handleEdit = (number) => {
@@ -286,7 +293,9 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
       /^\d{7}$/.test(editingNumber.value)
     ) {
       onNumberDetected(editingNumber.value);
-      setDetectedNumbers({});
+      if (autoAdd) {
+        setDetectedNumbers({});
+      }
       setLastDetected(editingNumber.value);
       setEditingNumber(null);
     }
@@ -441,6 +450,9 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
             if (manualInput.length === 7 && /^\d{7}$/.test(manualInput)) {
               setLastDetected(manualInput);
               onNumberDetected(manualInput);
+              if (autoAdd) {
+                setDetectedNumbers({});
+              }
               setManualInput("");
             }
           }}
