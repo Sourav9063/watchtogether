@@ -77,6 +77,26 @@ export default function PrizeBondPage() {
     }
   };
 
+    const handleSortAndDeduplicate = () => {
+    setSavedNumbers((prev) => {
+      // Use a Map to maintain insertion order while ensuring uniqueness based on the number
+      const uniqueNumbers = new Map();
+      prev.forEach(entry => {
+        if (!uniqueNumbers.has(entry.number)) {
+          uniqueNumbers.set(entry.number, entry);
+        }
+      });
+
+      const updated = Array.from(uniqueNumbers.values()).sort(
+        (a, b) => a.number - b.number
+      );
+      
+      localStorage.setItem("prizeBondNumbers", JSON.stringify(updated));
+      alert(`${prev.length - updated.length} duplicate(s) removed and list sorted.`);
+      return updated;
+    });
+  };
+
   const copyNumbers = () => {
     const numbersToCopy = savedNumbers.map((entry) => entry.number).join("\n");
     navigator.clipboard
@@ -239,6 +259,12 @@ export default function PrizeBondPage() {
                   </button>
                   <button onClick={clearNumbers} className={styles.clearButton}>
                     Clear All
+                  </button> 
+                  <button
+                    onClick={handleSortAndDeduplicate}
+                    className={styles.copyButton}
+                  >
+                    Sort & Deduplicate
                   </button>
                 </div>
                 {!showCheckButtons ? (
