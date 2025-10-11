@@ -171,7 +171,7 @@ export default function PrizeBondPage() {
       setSavedNumbers((prev) => {
         const existingNumbers = new Set(prev.map((entry) => entry.number));
         const uniqueNewEntries = newNumbers
-          .filter((number) => !existingNumbers.has(number))
+          .filter((number) => !existingNumbers.has(number) && Number.isInteger(+number))
           .map((number) => ({ number, timestamp: new Date().toISOString() }));
 
         const updated = [...prev, ...uniqueNewEntries].sort(
@@ -260,13 +260,13 @@ export default function PrizeBondPage() {
                   <button onClick={clearNumbers} className={styles.clearButton}>
                     Clear All
                   </button> 
+                </div>
                   <button
                     onClick={handleSortAndDeduplicate}
                     className={styles.copyButton}
                   >
                     Sort & Deduplicate
                   </button>
-                </div>
                 {!showCheckButtons ? (
                   <button
                     onClick={() => setShowCheckButtons(true)}
