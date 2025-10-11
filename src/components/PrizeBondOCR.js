@@ -268,18 +268,10 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
   const handleAccept = useCallback(
     (number) => {
       onNumberDetected(number);
-      if (autoAdd) {
-        setDetectedNumbers({});
-      } else {
-        setDetectedNumbers((prev) => {
-          const newNumbers = { ...prev };
-          delete newNumbers[number];
-          return newNumbers;
-        });
-      }
+      setDetectedNumbers({});
       setLastDetected(number);
     },
-    [onNumberDetected, autoAdd],
+    [onNumberDetected],
   );
 
   const handleEdit = (number) => {
