@@ -309,7 +309,7 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
       if (sortedNumbers.length > 0) {
         const topNumber = sortedNumbers[0];
         const topNumberCount = detectedNumbers[topNumber];
-        if (topNumberCount >= 5) {
+        if (topNumberCount >= 10) {
           handleAccept(topNumber);
         }
       }
