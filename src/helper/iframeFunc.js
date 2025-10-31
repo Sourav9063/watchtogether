@@ -3,7 +3,7 @@ import config from "@/config";
 export const spacer = "-";
 
 export const getIframeUrl = ({ iframeUrl, full = true }) => {
-  if (iframeUrl.type == "anime") {
+  if (iframeUrl.type === "anime") {
     if (
       ![
         config.iframe.url7,
@@ -68,29 +68,29 @@ const getUrl8_9 = ({ iframeUrl }) => {
   }
 };
 const getUrl4 = ({ iframeUrl }) => {
-  if (iframeUrl.type == "movie") {
+  if (iframeUrl.type === "movie") {
     return `${iframeUrl.baseUrl}/embed/{iframeUrl.id}`;
   }
   return `${iframeUrl.baseUrl}/embedtv/${iframeUrl.id}?s=${iframeUrl.season}&s=1`;
 };
 
 const getUrl3 = ({ iframeUrl }) => {
-  if (iframeUrl.type == "movie")
+  if (iframeUrl.type === "movie")
     return `${iframeUrl.baseUrl}?video_id=${iframeUrl.id}&tmdb=1`;
   return `${iframeUrl.baseUrl}?video_id=${iframeUrl.id}&tmdb=1&s=${iframeUrl.season}&e=${iframeUrl.episode}`;
 };
 
 const getUrl6 = ({ iframeUrl }) => {
-  if (iframeUrl.type == "movie")
+  if (iframeUrl.type === "movie")
     return `${iframeUrl.baseUrl}/movie/${iframeUrl.id}`;
   return `${iframeUrl.baseUrl}/tv/${iframeUrl.id}-${iframeUrl.season}-${iframeUrl.episode}`;
 };
 
 const getUrl7 = ({ iframeUrl }) => {
-  if (iframeUrl.type == "movie") {
+  if (iframeUrl.type === "movie") {
     return `${iframeUrl.baseUrl}/movie/${iframeUrl.id}`;
   }
-  if (iframeUrl.type == "anime") {
+  if (iframeUrl.type === "anime") {
     return `${iframeUrl.baseUrl}/anime/${iframeUrl.id}/${iframeUrl.episode}/${
       iframeUrl.dub || "0"
     }`;
@@ -99,7 +99,7 @@ const getUrl7 = ({ iframeUrl }) => {
 };
 
 const getUrl13_14 = ({ iframeUrl }) => {
-  if (iframeUrl.type == "movie")
+  if (iframeUrl.type === "movie")
     return `${iframeUrl.baseUrl}?type=movie&id=${iframeUrl.id}`;
   return `${iframeUrl.baseUrl}?type=tv&id=${iframeUrl.id}&season=${iframeUrl.season}&episode=${iframeUrl.episode}`;
 };
@@ -114,6 +114,8 @@ const getUrl16 = ({ iframeUrl }) => {
 };
 
 const getUrl17 = ({ iframeUrl }) => {
+  if (iframeUrl.type === "movie")
+    return `${iframeUrl.baseUrl}/${iframeUrl.id}
   return `${iframeUrl.baseUrl}/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
 };
 
@@ -142,14 +144,14 @@ export const getIframeObjectFromUrl = ({ url }) => {
   const queryStringSplit = queryString.split(spacer);
   const [baseUrlIndex, type, id, season, episode] = queryStringSplit;
 
-  if (type == "movie") {
+  if (type === "movie") {
     if (!isIframeObjectValid({ iframeObj: { type, id } })) return null;
     return {
       type: type,
       id: id || "",
       baseUrl: getSrc(Number(baseUrlIndex)),
     };
-  } else if (type == "tv") {
+  } else if (type === "tv") {
     if (!isIframeObjectValid({ iframeObj: { type, id, season, episode } }))
       return null;
     return {
@@ -159,7 +161,7 @@ export const getIframeObjectFromUrl = ({ url }) => {
       episode: !episode ? 1 : Number(episode),
       baseUrl: getSrc(Number(baseUrlIndex)),
     };
-  } else if (type == "anime") {
+  } else if (type === "anime") {
     if (!isIframeObjectValid({ iframeObj: { type, id, season, episode } }))
       return null;
     return {
@@ -177,14 +179,14 @@ export const getIframeObjectFromUrl = ({ url }) => {
 export const isIframeObjectValid = ({ iframeObj }) => {
   if (!iframeObj) return false;
   const { type, id, season, episode } = iframeObj;
-  if (type == "movie") {
-    if (typeof id == "undefined" || id == null) return false;
+  if (type === "movie") {
+    if (typeof id === "undefined" || id === null) return false;
     return true;
-  } else if (type == "tv") {
-    if (typeof id == "undefined" || id == null) return false;
+  } else if (type === "tv") {
+    if (typeof id === "undefined" || id === null) return false;
     return true;
-  } else if (type == "anime") {
-    if (typeof id == "undefined" || id == null) return false;
+  } else if (type === "anime") {
+    if (typeof id === "undefined" || id === null) return false;
     return true;
   } else {
     return false;
@@ -220,13 +222,13 @@ export const setSeasonAndEpisode = ({
   localStorage.setItem("tvData", JSON.stringify(tvDataParsed));
 };
 
-// if (iframeUrl.baseUrl == config.iframe.url4) {
+// if (iframeUrl.baseUrl === config.iframe.url4) {
 //   return getUrl4({ iframeUrl, full });
 // }
 
 // const getUrl4 = ({ iframeUrl, full }) => {
 //   const { type, id, season, episode } = iframeUrl;
-//   if (type == "movie") {
+//   if (type === "movie") {
 //     return (full ? iframeUrl.baseUrl : "") + "/embed/" + iframeUrl.id;
 //   } else {
 //     return (
