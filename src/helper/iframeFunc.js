@@ -115,7 +115,7 @@ const getUrl16 = ({ iframeUrl }) => {
 
 const getUrl17 = ({ iframeUrl }) => {
   if (iframeUrl.type === "movie")
-    return `${iframeUrl.baseUrl}/${iframeUrl.id}
+    return `${iframeUrl.baseUrl}/${iframeUrl.id}`
   return `${iframeUrl.baseUrl}/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
 };
 
