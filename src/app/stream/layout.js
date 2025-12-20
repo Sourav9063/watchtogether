@@ -8,10 +8,10 @@ export const metadata = {
 };
 export const revalidate = 21600;
 
-export default function RootLayout({ children }) {
+export default function StreamLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
+    <>
+      {children}
+    </>
   );
 }

@@ -3,7 +3,7 @@ import React from "react";
 export default function BackLight({
   id = "back-light",
   stdDeviation = 50,
-  saturation = 3,
+  saturation = 6,
   width = "200%",
   height = "200%",
 }) {

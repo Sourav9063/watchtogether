@@ -7,10 +7,10 @@ export const metadata = {
     "Simple website to play videos. Highly suggested to use an Ad blocker like uBlock, or Adblock.",
 };
 
-export default function RootLayout({ children }) {
+export default function BigTwoLayout({ children }) {
   return (
     <>
-      <body className={inter.className}>{children}</body>
+      {children}
     </>
   );
 }

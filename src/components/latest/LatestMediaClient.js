@@ -5,14 +5,16 @@ import React from "react";
 import { Stores } from "@/helper/CONSTANTS";
 import styles from "./LatestMedia.module.css";
 import { useHorizontalScroll } from "@/helper/hooks/useHorizontalScroll";
+import { useIsMobile } from "@/helper/hooks/useDeviceType";
 
 export default function LatestMediaClient({ data, type }) {
   const [, setSearchResults] = useStore(Stores.searchResults);
   const [, setIframeUrl] = useStore(Stores.iframeUrl);
+  const isMoble = useIsMobile();
   const ref = useHorizontalScroll();
   return (
     <div className={styles["cards"]} ref={ref}>
-      {data?.map((item) => {
+      {data?.slice(0, isMoble ? 20 : data?.length).map((item) => {
         if (!item.id) return;
         return (
           <TmdbCard
