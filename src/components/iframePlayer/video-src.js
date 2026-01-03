@@ -15,6 +15,9 @@ export default function VideoSrc() {
       case config.iframe.url1:
         suffix = " (All)";
         break;
+      case config.iframe.url20:
+        suffix = " (All-Alt)";
+        break;
       case config.iframe.url2:
         suffix = " (Fast)";
         break;
