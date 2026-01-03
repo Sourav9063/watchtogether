@@ -6,7 +6,6 @@ import HoverSeEp from "./iframePlayer/hoverSeEp";
 import InitIframeStore from "./Provider/InitIframeStore";
 import LatestMedia, { LatestType } from "@/components/latest/LatestMedia";
 import styles from "./IframeWrapper.module.css";
-import { randomRGBA } from "@/helper/customFunc";
 
 export default function IframeWrapper() {
   return (
@@ -16,10 +15,6 @@ export default function IframeWrapper() {
       <HoverSeEp />
       <IframePlayer />
       <div
-        style={{
-          "--left-color": randomRGBA(0.4),
-          "--right-color": randomRGBA(0.4),
-        }}
         className={styles["wrapper-history"]}
       >
         <TmdbSearch />

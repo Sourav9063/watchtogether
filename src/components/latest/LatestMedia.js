@@ -1,7 +1,6 @@
 import styles from "./LatestMedia.module.css";
 import config from "@/config";
 import LatestMediaClient from "./LatestMediaClient";
-import { randomRGBA } from "@/helper/customFunc";
 
 // export const LatestType = {
 //   MOVIE_NEW: "/movie/new",

@@ -12,7 +12,7 @@ const LivePage = async () => {
 
   return (
     <>
-      <BackLight />
+      {/* <BackLight /> */}
       <StreamNavigation />
       <Suspense fallback={<div>Loading...</div>}>
         <LiveClientComponent serverInitialChannels={initialChannels} />

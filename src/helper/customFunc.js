@@ -89,7 +89,7 @@ export function secondsToHMS(seconds) {
   return formattedTime;
 }
 
-export const randomRGBA = (alpha = 0.25) => {
+export const randomRGBA = (alpha = 0.20) => {
   const r = Math.floor(Math.random() * 255);
   const g = Math.floor(Math.random() * 255);
   const b = Math.floor(Math.random() * 255);

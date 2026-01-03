@@ -8,7 +8,7 @@ export default function Personal() {
   return (
     <>
       <main className={styles.main}>
-        <BackLight />
+        {/* <BackLight /> */}
         <Link
           href={"/stream"}
           style={{ textDecoration: "none"}}

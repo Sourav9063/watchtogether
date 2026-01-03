@@ -10,5 +10,5 @@
       rgba(201, 32, 184, 0) 50%
     ),
     linear-gradient(321.27deg, rgba(0, 70, 209, 0) 50%, var(--right-color) 100%); */
-  background-color: rgb(var(--background-end-rgb));
+  /* background-color: rgb(var(--background-end-rgb)); */
 }

@@ -9,7 +9,6 @@ import {
   getCustomLink,
   getUserNameOrCustomLink,
   isURL,
-  randomRGBA,
   secondsToHMS,
 } from "@/helper/customFunc";
 import { db, setRoom, setRoomAction } from "@/db/dbConnection";
@@ -174,10 +173,6 @@ export default function FirebaseVideoPlayer() {
       .catch((error) => {
         console.log("Error getting document:", error);
       });
-
-    const main = document.querySelector("." + styleMain.main);
-    main.style.setProperty("--left-color", randomRGBA());
-    main.style.setProperty("--right-color", randomRGBA());
 
     return onSnapshot(playerAction, (snapshot) => {
       const data = snapshot.data();

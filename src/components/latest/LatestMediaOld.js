@@ -1,7 +1,6 @@
 import styles from "./LatestMedia.module.css";
 import config from "@/config";
 import LatestMediaClient from "./LatestMediaClient";
-import { randomRGBA } from "@/helper/customFunc";
 
 export const LatestType = {
   MOVIE_NEW: "/movie/new",
@@ -83,10 +82,6 @@ export default async function LatestMediaOld({
   };
   return (
     <section
-      style={{
-        "--left-color": randomRGBA(0.4),
-        "--right-color": randomRGBA(0.4),
-      }}
       className={styles["section"]}
     >
       <h1 className={styles["header"]}>{header[type]}</h1>
