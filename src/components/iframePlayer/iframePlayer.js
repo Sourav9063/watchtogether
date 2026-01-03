@@ -17,6 +17,7 @@ export default function IframePlayer() {
           <div id="iframe-player" className={`${styles["iframe-wrapper"]} `}>
             <iframe
               allowFullScreen={true}
+              sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"
               className={`${styles["iframe"]} back-light `}
               src={getIframeUrl({ iframeUrl: iframeUrl })}
             />
