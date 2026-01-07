@@ -9,10 +9,7 @@ export default function Personal() {
     <>
       <main className={styles.main}>
         {/* <BackLight /> */}
-        <Link
-          href={"/stream"}
-          style={{ textDecoration: "none"}}
-        >
+        <Link href={"/stream"} style={{ textDecoration: "none" }}>
           <h1>Stream</h1>
         </Link>
         <StreamNavigation />
@@ -61,6 +58,11 @@ export default function Personal() {
         >
           Please give it a star!⭐
         </Link>
+        <p>
+          Sync Play does not host any files itself but instead only display&apos;s
+          content from 3rd party providers. Legal issues should be taken up with
+          them.
+        </p>
       </main>
     </>
   );

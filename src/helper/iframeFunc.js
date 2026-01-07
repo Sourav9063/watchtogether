@@ -10,6 +10,7 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
         config.iframe.url9,
         config.iframe.url8,
         config.iframe.url16,
+        config.iframe.url25,
       ].includes(iframeUrl.baseUrl)
     ) {
       iframeUrl.baseUrl = config.iframe.url9;
@@ -33,9 +34,14 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
       case config.iframe.url15:
         return getUrl13_14({ iframeUrl });
       case config.iframe.url16:
+      case config.iframe.url25:
         return getUrl16({ iframeUrl });
       case config.iframe.url17:
         return getUrl17({ iframeUrl });
+      case config.iframe.url21:
+        return getDefaultUrl({ iframeUrl }) + "?play=true";
+      case config.iframe.url23:
+        return getUrl23({ iframeUrl });
       default:
         return getDefaultUrl({ iframeUrl });
     }
@@ -67,6 +73,16 @@ const getUrl8_9 = ({ iframeUrl }) => {
       return `${iframeUrl.baseUrl}/tv/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
   }
 };
+
+const getUrl23 = ({ iframeUrl }) => {
+  switch (iframeUrl.type) {
+    case "movie":
+      return `${iframeUrl.baseUrl}/tmdb-movie-${iframeUrl.id}`;
+    default:
+      return `${iframeUrl.baseUrl}/tmdb-tv-${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
+  }
+};
+
 const getUrl4 = ({ iframeUrl }) => {
   if (iframeUrl.type === "movie") {
     return `${iframeUrl.baseUrl}/embed/{iframeUrl.id}`;
@@ -114,8 +130,7 @@ const getUrl16 = ({ iframeUrl }) => {
 };
 
 const getUrl17 = ({ iframeUrl }) => {
-  if (iframeUrl.type === "movie")
-    return `${iframeUrl.baseUrl}/${iframeUrl.id}`
+  if (iframeUrl.type === "movie") return `${iframeUrl.baseUrl}/${iframeUrl.id}`;
   return `${iframeUrl.baseUrl}/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
 };
 

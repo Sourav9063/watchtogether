@@ -24,15 +24,15 @@ export default function VideoSrc() {
       case config.iframe.url3:
         suffix = " (Variety)";
         break;
-      case config.iframe.url7:
+      case config.iframe.url25:
         prefix = "Anime";
         suffix = "";
         break;
       case config.iframe.url9:
-        suffix = " (Best)";
+        suffix = " (Alt)";
         break;
       case config.iframe.url8:
-        suffix = " (Alt)";
+        suffix = " (Best)";
         break;
       case config.iframe.url13:
         suffix = " (Torrent)";
@@ -46,6 +46,12 @@ export default function VideoSrc() {
       case config.iframe.url17:
         suffix = " (X)";
         break;
+      case config.iframe.url21:
+        suffix = " (King)";
+        break;
+      case config.iframe.url23:
+        suffix = " (P)";
+        break;
       default:
         break;
     }
@@ -54,7 +60,7 @@ export default function VideoSrc() {
   return (
     <div className={styles["src"]}>
       <div className={`${styles["src-list"]} ${styles[""]} `}>
-        {(showAll ? config.iframe.urls : config.iframe.urls.slice(0, 8)).map(
+        {(showAll ? config.iframe.urls : config.iframe.urls.slice(0, 16)).map(
           (url, index) => {
             return (
               <button
@@ -74,7 +80,7 @@ export default function VideoSrc() {
                 {getSourceText(url, index)}
               </button>
             );
-          }
+          },
         )}
         {config.iframe.urls.length > 5 && (
           <button onClick={() => setShowAll(!showAll)}>
