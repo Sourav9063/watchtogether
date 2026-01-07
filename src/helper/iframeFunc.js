@@ -42,6 +42,8 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
         return getDefaultUrl({ iframeUrl }) + "?play=true";
       case config.iframe.url23:
         return getUrl23({ iframeUrl });
+      case config.iframe.url27:
+        return getUrl27({ iframeUrl });
       default:
         return getDefaultUrl({ iframeUrl });
     }
@@ -120,6 +122,11 @@ const getUrl13_14 = ({ iframeUrl }) => {
   return `${iframeUrl.baseUrl}?type=tv&id=${iframeUrl.id}&season=${iframeUrl.season}&episode=${iframeUrl.episode}`;
 };
 
+const getUrl27 = ({ iframeUrl }) => {
+  if (iframeUrl.type === "movie")
+    return `${iframeUrl.baseUrl}/${iframeUrl.id}`;
+  return `${iframeUrl.baseUrl}/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
+};
 const getUrl16 = ({ iframeUrl }) => {
   if (iframeUrl.type === "anime")
     return `${iframeUrl.baseUrl}/anime/${iframeUrl.id}/${iframeUrl.episode}/${

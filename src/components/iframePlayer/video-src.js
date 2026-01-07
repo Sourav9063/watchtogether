@@ -60,10 +60,11 @@ export default function VideoSrc() {
   return (
     <div className={styles["src"]}>
       <div className={`${styles["src-list"]} ${styles[""]} `}>
-        {(showAll ? config.iframe.urls : config.iframe.urls.slice(0, 16)).map(
+        {(showAll ? config.iframe.urls : config.iframe.urls.slice(0, 19)).map(
           (url, index) => {
             return (
               <button
+                // title={url}
                 key={index}
                 style={{
                   backgroundColor:
