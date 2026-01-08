@@ -4,10 +4,12 @@ import config from "@/config";
 import { useStore } from "@/helper/hooks/useStore";
 import { Stores } from "@/helper/CONSTANTS";
 import { useState } from "react";
+import { useIsMobile } from "@/helper/hooks/useDeviceType";
 
 export default function VideoSrc() {
   const [iframeUrl, setIframeUrl] = useStore(Stores.iframeUrl);
   const [showAll, setShowAll] = useState(false);
+  const isMobile = useIsMobile();
   const getSourceText = (url, index) => {
     let prefix = `Source ${index + 1}`;
     let suffix = "";
@@ -26,6 +28,10 @@ export default function VideoSrc() {
         break;
       case config.iframe.url25:
         prefix = "Anime";
+        suffix = "";
+        break;
+      case config.iframe.url30:
+        prefix = "Multi";
         suffix = "";
         break;
       case config.iframe.url9:
@@ -60,29 +66,30 @@ export default function VideoSrc() {
   return (
     <div className={styles["src"]}>
       <div className={`${styles["src-list"]} ${styles[""]} `}>
-        {(showAll ? config.iframe.urls : config.iframe.urls.slice(0, 19)).map(
-          (url, index) => {
-            return (
-              <button
-                // title={url}
-                key={index}
-                style={{
-                  backgroundColor:
-                    iframeUrl.baseUrl === url
-                      ? " var(--hover-color)"
-                      : "var(--primary-color)",
-                }}
-                onClick={() => {
-                  setIframeUrl((state) => {
-                    return { ...state, baseUrl: url };
-                  });
-                }}
-              >
-                {getSourceText(url, index)}
-              </button>
-            );
-          },
-        )}
+        {(showAll
+          ? config.iframe.urls
+          : config.iframe.urls.slice(0, isMobile ? 10 : 19)
+        ).map((url, index) => {
+          return (
+            <button
+              // title={url}
+              key={index}
+              style={{
+                backgroundColor:
+                  iframeUrl.baseUrl === url
+                    ? " var(--hover-color)"
+                    : "var(--primary-color)",
+              }}
+              onClick={() => {
+                setIframeUrl((state) => {
+                  return { ...state, baseUrl: url };
+                });
+              }}
+            >
+              {getSourceText(url, index)}
+            </button>
+          );
+        })}
         {config.iframe.urls.length > 5 && (
           <button onClick={() => setShowAll(!showAll)}>
             {showAll ? "Show Less" : "Show More"}

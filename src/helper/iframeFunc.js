@@ -32,6 +32,7 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
       case config.iframe.url13:
       case config.iframe.url14:
       case config.iframe.url15:
+      case config.iframe.url31:
         return getUrl13_14({ iframeUrl });
       case config.iframe.url16:
       case config.iframe.url25:
@@ -44,6 +45,8 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
         return getUrl23({ iframeUrl });
       case config.iframe.url27:
         return getUrl27({ iframeUrl });
+      case config.iframe.url30:
+        return getUrl30({ iframeUrl });
       default:
         return getDefaultUrl({ iframeUrl });
     }
@@ -123,8 +126,7 @@ const getUrl13_14 = ({ iframeUrl }) => {
 };
 
 const getUrl27 = ({ iframeUrl }) => {
-  if (iframeUrl.type === "movie")
-    return `${iframeUrl.baseUrl}/${iframeUrl.id}`;
+  if (iframeUrl.type === "movie") return `${iframeUrl.baseUrl}/${iframeUrl.id}`;
   return `${iframeUrl.baseUrl}/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
 };
 const getUrl16 = ({ iframeUrl }) => {
@@ -139,6 +141,12 @@ const getUrl16 = ({ iframeUrl }) => {
 const getUrl17 = ({ iframeUrl }) => {
   if (iframeUrl.type === "movie") return `${iframeUrl.baseUrl}/${iframeUrl.id}`;
   return `${iframeUrl.baseUrl}/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
+};
+
+const getUrl30 = ({ iframeUrl }) => {
+  if (iframeUrl.type === "movie")
+    return `${iframeUrl.baseUrl}/movie/?id=${iframeUrl.id}`;
+  return `${iframeUrl.baseUrl}/tv/?id=${iframeUrl.id}&s=${iframeUrl.season}&e=${iframeUrl.episode}`;
 };
 
 export const getBaseUrlIndex = (src) => {
