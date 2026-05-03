@@ -32,6 +32,7 @@ const config = {
     url30: process.env.NEXT_PUBLIC_PERSONAL_url30,
     url31: process.env.NEXT_PUBLIC_PERSONAL_url31,
     url32: process.env.NEXT_PUBLIC_PERSONAL_url32,
+    url33: process.env.NEXT_PUBLIC_PERSONAL_url33,
     urls: [
       process.env.NEXT_PUBLIC_PERSONAL_url25,
       process.env.NEXT_PUBLIC_PERSONAL_url30,
@@ -40,6 +41,7 @@ const config = {
       process.env.NEXT_PUBLIC_PERSONAL_url17,
       process.env.NEXT_PUBLIC_PERSONAL_url15,
       process.env.NEXT_PUBLIC_PERSONAL_url2,
+      process.env.NEXT_PUBLIC_PERSONAL_url33,
       process.env.NEXT_PUBLIC_PERSONAL_url21,
       process.env.NEXT_PUBLIC_PERSONAL_url22,
       process.env.NEXT_PUBLIC_PERSONAL_url24,
