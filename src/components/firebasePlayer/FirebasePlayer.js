@@ -18,9 +18,11 @@ import MessageBox from "../message/MessageBox";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { default as toWebVTT } from "srt-webvtt";
 import useOnlineStatus from "@/helper/hooks/useOnlineStatus";
+import { useMounted } from "@/hooks/useMounted";
 
 export default function FirebaseVideoPlayer() {
   const isOnline = useOnlineStatus();
+  const mounted = useMounted();
   const videoPlayerRef = useRef(null);
   const controlBySocketRef = useRef(false);
   const searchParams = useSearchParams();
@@ -117,6 +119,7 @@ export default function FirebaseVideoPlayer() {
   }, [src]);
 
   useEffect(() => {
+    if (!videoPlayerRef.current) return;
     videoPlayerRef.current.name = isURL(searchParams.get("name"))
       ? searchParams.get("name")
       : null;
@@ -378,7 +381,8 @@ export default function FirebaseVideoPlayer() {
             !src ? styles["video-wrapper-null"] : ""
           } `}
         >
-          <ReactPlayer
+          {mounted && (
+            <ReactPlayer
             width={"100%"}
             height={"100%"}
             className={styles["video-player"]}
@@ -417,6 +421,7 @@ export default function FirebaseVideoPlayer() {
               },
             }}
           ></ReactPlayer>
+          )}
         </div>
         <MessageBox />
       </div>
