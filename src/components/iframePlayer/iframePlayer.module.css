@@ -78,6 +78,10 @@
   border-color: var(--left-color);
   border-width: 2px;
 }
+.season .select {
+  min-width: 64px;
+  text-align: center;
+}
 .episode * {
   border-color: var(--right-color);
   border-width: 2px;
@@ -124,6 +128,8 @@
 }
 .hover-se-ep > .wrapper {
   /* display: none; */
+  max-width: calc(100vw - 0.5rem);
+  overflow-x: auto;
   border-radius: 5px;
   background: linear-gradient(
       218.73deg,
@@ -142,6 +148,13 @@
 .hover-se-ep > .wrapper > div {
   margin: 0;
   padding: 0.5rem;
+}
+.hover-se-ep .season-episode {
+  width: max-content;
+}
+.hover-se-ep .season-episode > .buttons {
+  flex: 0 0 auto;
+  width: auto;
 }
 .hover-se-ep:hover > .wrapper {
   animation: hover-se-ep 0.4s ease forwards;

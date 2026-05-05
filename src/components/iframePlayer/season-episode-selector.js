@@ -7,7 +7,9 @@ import {
   useTmdbTvDetails,
 } from "@/helper/hooks/useTmdbSearch";
 
-const buildNumberOptions = ({ count, selectedValue, label }) => {
+const formatTwoDigitNumber = (value) => String(value).padStart(2, "0");
+
+const buildNumberOptions = ({ count, selectedValue, label, formatLabel }) => {
   const total = Math.max(Number(count) || 0, Number(selectedValue) || 1);
 
   return Array.from({ length: total }, (_, index) => {
@@ -15,21 +17,30 @@ const buildNumberOptions = ({ count, selectedValue, label }) => {
 
     return {
       value,
-      label: `${label} ${value}`,
+      label: formatLabel ? formatLabel(value) : `${label} ${value}`,
     };
   });
 };
 
-const mergeSelectedOption = ({ options, selectedValue, label }) => {
+const mergeSelectedOption = ({
+  options,
+  selectedValue,
+  label,
+  formatLabel,
+}) => {
   const selected = Number(selectedValue) || 1;
 
   if (options.some((option) => option.value === selected)) {
     return options;
   }
 
-  return [...options, { value: selected, label: `${label} ${selected}` }].sort(
-    (first, second) => first.value - second.value,
-  );
+  return [
+    ...options,
+    {
+      value: selected,
+      label: formatLabel ? formatLabel(selected) : `${label} ${selected}`,
+    },
+  ].sort((first, second) => first.value - second.value);
 };
 
 export default function SeasonEpisodeSelector({ id }) {
@@ -59,19 +70,21 @@ export default function SeasonEpisodeSelector({ id }) {
         .sort((first, second) => first.season_number - second.season_number)
         .map((season) => ({
           value: season.season_number,
-          label: season.name || `Season ${season.season_number}`,
+          label: formatTwoDigitNumber(season.season_number),
         })) || [];
 
     const fallbackSeasons = buildNumberOptions({
       count: tvDetails?.number_of_seasons || selectedSeason + 4,
       selectedValue: selectedSeason,
       label: "Season",
+      formatLabel: formatTwoDigitNumber,
     });
 
     return mergeSelectedOption({
       options: tmdbSeasons.length ? tmdbSeasons : fallbackSeasons,
       selectedValue: selectedSeason,
       label: "Season",
+      formatLabel: formatTwoDigitNumber,
     });
   }, [selectedSeason, shouldFetchTvData, tvDetails]);
 
