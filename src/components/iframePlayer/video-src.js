@@ -3,13 +3,9 @@ import styles from "./iframePlayer.module.css";
 import config from "@/config";
 import { useStore } from "@/helper/hooks/useStore";
 import { Stores } from "@/helper/CONSTANTS";
-import { useState } from "react";
-import { useIsMobile } from "@/helper/hooks/useDeviceType";
 
 export default function VideoSrc() {
   const [iframeUrl, setIframeUrl] = useStore(Stores.iframeUrl);
-  const [showAll, setShowAll] = useState(false);
-  const isMobile = useIsMobile();
   const getSourceText = (url, index) => {
     let prefix = `Source ${index + 1}`;
     let suffix = "";
@@ -63,55 +59,51 @@ export default function VideoSrc() {
     }
     return prefix + suffix;
   };
+
+  const selectedSource = iframeUrl?.baseUrl || config.iframe.urls[0];
+
   return (
     <div className={styles["src"]}>
-      <div className={`${styles["src-list"]} ${styles[""]} `}>
-        {(showAll
-          ? config.iframe.urls
-          : config.iframe.urls.slice(0, isMobile ? 10 : 19)
-        ).map((url, index) => {
-          return (
-            <button
-              // title={url}
-              key={index}
-              style={{
-                backgroundColor:
-                  iframeUrl.baseUrl === url
-                    ? " var(--hover-color)"
-                    : "var(--primary-color)",
-              }}
-              onClick={() => {
+      <div className={`${styles.controlPanel} ${styles.sourcePanel}`}>
+        <div className={styles.sourceActions}>
+          <div className={`${styles["buttons"]} ${styles.selectControls}`}>
+            <h3 className={styles["name"]}>Source</h3>
+            <span className={styles.controlDivider}>:</span>
+            <select
+              aria-label="Source"
+              className={`${styles["select"]} ${styles.sourceSelect}`}
+              value={selectedSource}
+              onChange={(event) => {
                 setIframeUrl((state) => {
-                  return { ...state, baseUrl: url };
+                  return { ...state, baseUrl: event.target.value };
                 });
               }}
             >
-              {getSourceText(url, index)}
-            </button>
-          );
-        })}
-        {config.iframe.urls.length > 5 && (
-          <button onClick={() => setShowAll(!showAll)}>
-            {showAll ? "Show Less" : "Show More"}
+              {config.iframe.urls.map((url, index) => (
+                <option key={url} value={url}>
+                  {getSourceText(url, index)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button
+            className={styles["focus"]}
+            onClick={(e) => {
+              e.preventDefault();
+              document
+                .querySelector("#iframe-player")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+          >
+            Focus
           </button>
-        )}
+        </div>
       </div>
       <p>
         {
           "*If current server doesn't work please try other servers. You can download from some server."
         }
       </p>
-      <button
-        className={styles["focus"]}
-        onClick={(e) => {
-          e.preventDefault();
-          document
-            .querySelector("#iframe-player")
-            ?.scrollIntoView({ behavior: "smooth" });
-        }}
-      >
-        Focus
-      </button>
     </div>
   );
 }
