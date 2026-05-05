@@ -9,7 +9,9 @@ export const Constants = {
   LocalStorageKey: {
     TV_DATA: "tvData",
     WATCH_HISTORY: "watchHistory",
-    CHANNEL_HISTORY: "channelHistory"
+    CHANNEL_HISTORY: "channelHistory",
+    TMDB_TV_DETAILS_CACHE: "tmdbTvDetailsCache",
+    TMDB_SEASON_EPISODES_CACHE: "tmdbSeasonEpisodesCache",
   },
 };
 

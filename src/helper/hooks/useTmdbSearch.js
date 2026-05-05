@@ -1,7 +1,11 @@
 import config from "@/config";
 import { useEffect, useState } from "react";
 import { useDebounce } from "./useDebounce";
-import { getLocalStorage } from "../functions/localStorageFn";
+import {
+  getLocalStorage,
+  getLocalStorageCache,
+  setLocalStorageCache,
+} from "../functions/localStorageFn";
 import { Constants, Stores } from "../CONSTANTS";
 import { useStore } from "./useStore";
 import { searchAnime } from "@/components/tmdbSearch/WatchAnime";
@@ -144,6 +148,18 @@ export const useTmdbTvDetails = ({ id, enabled = true } = {}) => {
     }
 
     const controller = new AbortController();
+    const cacheKey = String(id);
+    const cachedDetails = getLocalStorageCache({
+      key: Constants.LocalStorageKey.TMDB_TV_DETAILS_CACHE,
+      cacheKey,
+    });
+
+    if (cachedDetails) {
+      setDetails(cachedDetails);
+      setStatus("success");
+      setError(null);
+      return;
+    }
 
     async function fetchData() {
       setStatus("loading");
@@ -155,6 +171,11 @@ export const useTmdbTvDetails = ({ id, enabled = true } = {}) => {
           signal: controller.signal,
         });
         setDetails(data);
+        setLocalStorageCache({
+          key: Constants.LocalStorageKey.TMDB_TV_DETAILS_CACHE,
+          cacheKey,
+          value: data,
+        });
         setStatus("success");
       } catch (err) {
         if (err.name === "AbortError") return;
@@ -194,6 +215,18 @@ export const useTmdbSeasonEpisodes = ({
     }
 
     const controller = new AbortController();
+    const cacheKey = `${id}:${season}`;
+    const cachedSeasonEpisodes = getLocalStorageCache({
+      key: Constants.LocalStorageKey.TMDB_SEASON_EPISODES_CACHE,
+      cacheKey,
+    });
+
+    if (cachedSeasonEpisodes) {
+      setSeasonEpisodes(cachedSeasonEpisodes);
+      setStatus("success");
+      setError(null);
+      return;
+    }
 
     async function fetchData() {
       setStatus("loading");
@@ -205,6 +238,11 @@ export const useTmdbSeasonEpisodes = ({
           signal: controller.signal,
         });
         setSeasonEpisodes(data);
+        setLocalStorageCache({
+          key: Constants.LocalStorageKey.TMDB_SEASON_EPISODES_CACHE,
+          cacheKey,
+          value: data,
+        });
         setStatus("success");
       } catch (err) {
         if (err.name === "AbortError") return;

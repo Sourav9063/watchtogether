@@ -42,6 +42,69 @@ export const getLocalStorage = ({ key, emptyReturn = null }) => {
   return existingParsed;
 };
 
+const DEFAULT_CACHE_TTL = 24 * 60 * 60;
+
+const getLocalStorageObject = ({ key }) => {
+  const value = getLocalStorage({ key, emptyReturn: {} });
+
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return {};
+  }
+
+  return value;
+};
+
+export const getLocalStorageCache = ({ key, cacheKey, emptyReturn = null }) => {
+  if (!check()) return emptyReturn;
+
+  try {
+    const cache = getLocalStorageObject({ key });
+    const item = cache?.[cacheKey];
+
+    if (!item?.expiresAt || Date.now() > item.expiresAt) {
+      if (cacheKey in cache) {
+        delete cache[cacheKey];
+        localStorage.setItem(key, JSON.stringify(cache));
+      }
+
+      return emptyReturn;
+    }
+
+    return item.value ?? emptyReturn;
+  } catch (err) {
+    console.log(err);
+    return emptyReturn;
+  }
+};
+
+export const setLocalStorageCache = ({
+  key,
+  cacheKey,
+  value,
+  ttl = DEFAULT_CACHE_TTL,
+}) => {
+  if (!check()) return;
+
+  try {
+    const cache = getLocalStorageObject({ key });
+
+    localStorage.setItem(
+      key,
+      JSON.stringify({
+        ...cache,
+        [cacheKey]: {
+          value,
+          expiresAt: Date.now() + ttl * 1000,
+        },
+      }),
+    );
+
+    return value;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export const removeLocalStorage = ({ key }) => {
   if (!check()) return;
   localStorage.removeItem(key);
