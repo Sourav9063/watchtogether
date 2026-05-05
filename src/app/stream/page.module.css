@@ -24,6 +24,146 @@
   /* max-height: 100vh;
   overflow-y: scroll; */
 }
+
+.hero,
+.categorySection,
+.infoSection,
+.footer {
+  width: min(100% - 2rem, 1080px);
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 auto 1rem;
+  text-align: center;
+}
+
+.brandLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.brandLink h1 {
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.lead {
+  max-width: 760px;
+  color: color-mix(in srgb, var(--text-color) 78%, transparent);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.playerSection {
+  width: 100%;
+}
+
+.categorySection,
+.infoSection {
+  margin-top: 4rem;
+}
+
+.sectionHeader {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.sectionHeader h2,
+.infoSection h2 {
+  font-size: 1.4rem;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.sectionHeader p,
+.infoSection p {
+  color: color-mix(in srgb, var(--text-color) 76%, transparent);
+  line-height: 1.65;
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.75rem;
+}
+
+.categoryCard {
+  display: grid;
+  gap: 0.55rem;
+  min-height: 150px;
+  padding: 1rem;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid rgba(var(--foreground-rgb), 0.14);
+  border-radius: 8px;
+  background: var(--background-transparent);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.categoryCard:hover {
+  border-color: rgba(var(--foreground-rgb), 0.36);
+  transform: translateY(-2px);
+}
+
+.categoryCard h3 {
+  font-size: 1rem;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+.categoryCard p {
+  color: color-mix(in srgb, var(--text-color) 72%, transparent);
+  font-size: 0.93rem;
+  line-height: 1.55;
+}
+
+.infoSection {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.infoGrid a,
+.footer a {
+  color: inherit;
+  text-underline-offset: 0.2em;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  margin: 3rem auto 1.5rem;
+}
+
+@media screen and (max-width: 600px) {
+  .hero,
+  .categorySection,
+  .infoSection,
+  .footer {
+    width: min(100% - 1rem, 1080px);
+  }
+
+  .categorySection,
+  .infoSection {
+    margin-top: 2.5rem;
+  }
+
+  .categoryGrid,
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+}
 /* 
 .main button {
   background: linear-gradient(

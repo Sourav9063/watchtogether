@@ -1,11 +1,12 @@
 "use client";
 
+import { use } from "react";
 import config from "@/config";
 import styles from "../../../components/iframePlayer/iframePlayer.module.css";
 import FloatingNav from "@/components/stream/FloatingNav";
 
 export default function Stream({ params }) {
-  const { type } = params;
+  const { type } = use(params);
   const baseUrl = config.iframe.url15.split("/embed")[0];
   const src = `${baseUrl}/${type}`;
 
