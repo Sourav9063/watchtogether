@@ -69,7 +69,7 @@ export function PasteHistory() {
           >
             <input
               ref={autoFocusFn}
-              autofocus={true}
+              autoFocus={true}
               placeholder="Paste JSON"
               className={styles["paste-input"]}
               type="text"
