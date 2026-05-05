@@ -1,5 +1,7 @@
 export const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
 export const MAX_TMDB_PAGE = 500;
+export const PREFETCH_TMDB_PAGE_COUNT = 3;
+export const BROWSE_PAGE_PREFETCH_BATCH_SIZE = 3;
 export const TMDB_REVALIDATE_SECONDS = 60 * 60 * 24;
 
 export const mediaSections = [
@@ -53,6 +55,11 @@ export function normalizeTmdbItem(item, mediaType, genresById) {
   };
 }
 
-export function createTmdbBrowseKey(endpoint, mediaType, genreId = "") {
-  return `${endpoint}:${mediaType}:${genreId || ""}`;
+export function createTmdbBrowseKey(
+  endpoint,
+  mediaType,
+  genreId = "",
+  page = 1,
+) {
+  return `${endpoint}:${mediaType}:${genreId || ""}:page-${page}`;
 }

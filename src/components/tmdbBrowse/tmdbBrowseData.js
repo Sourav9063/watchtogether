@@ -2,6 +2,7 @@ import config from "@/config";
 import {
   createTmdbBrowseKey,
   mediaSections,
+  PREFETCH_TMDB_PAGE_COUNT,
   TMDB_REVALIDATE_SECONDS,
 } from "./tmdbBrowseConstants";
 
@@ -82,25 +83,35 @@ export async function getTmdbBrowseInitialData() {
     tv: tvGenres.genres || [],
   };
   const firstMovieGenreId = genres.movie[0]?.id ? String(genres.movie[0].id) : "";
-  const mediaRequests = mediaSections.map(async (section) => {
-    const data = await fetchTmdbBrowse(section.endpoint, { page: 1 });
-    return [
-      createTmdbBrowseKey(section.endpoint, section.mediaType),
-      data,
-    ];
-  });
-  const genreRequest = firstMovieGenreId
-    ? fetchTmdbBrowse("/discover/movie", {
-        page: 1,
-        with_genres: firstMovieGenreId,
-      }).then((data) => [
-        createTmdbBrowseKey("/discover/movie", "movie", firstMovieGenreId),
+  const prefetchPages = Array.from(
+    { length: PREFETCH_TMDB_PAGE_COUNT },
+    (_, index) => index + 1,
+  );
+  const mediaRequests = mediaSections.flatMap((section) =>
+    prefetchPages.map(async (page) => {
+      const data = await fetchTmdbBrowse(section.endpoint, { page });
+      return [
+        createTmdbBrowseKey(section.endpoint, section.mediaType, "", page),
         data,
-      ])
-    : Promise.resolve(null);
+      ];
+    }),
+  );
+  const genreRequest = firstMovieGenreId
+    ? prefetchPages.map(async (page) => {
+        const data = await fetchTmdbBrowse("/discover/movie", {
+          page,
+          with_genres: firstMovieGenreId,
+        });
+
+        return [
+          createTmdbBrowseKey("/discover/movie", "movie", firstMovieGenreId, page),
+          data,
+        ];
+      })
+    : [];
   const initialMediaEntries = await Promise.all([
     ...mediaRequests,
-    genreRequest,
+    ...genreRequest,
   ]);
 
   return {

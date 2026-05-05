@@ -43,11 +43,40 @@
 .pagination {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.45rem;
   flex: 0 0 auto;
+  padding: 0.28rem;
+  border: 1px solid rgba(var(--foreground-rgb), 0.14);
+  border-radius: 8px;
+  background:
+    linear-gradient(218.73deg, var(--left-color) 0%, transparent 58%),
+    linear-gradient(321.27deg, transparent 48%, var(--right-color) 100%),
+    color-mix(in srgb, var(--background-transparent) 82%, transparent);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(10px);
 }
 
-.pageButton,
+.pageButton {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  margin-top: 0;
+  padding: 0;
+  border: 1px solid rgba(var(--foreground-rgb), 0.16);
+  border-radius: 8px;
+  background:
+    linear-gradient(218.73deg, var(--left-color) 0%, transparent 62%),
+    linear-gradient(321.27deg, transparent 44%, var(--right-color) 100%),
+    linear-gradient(
+      180deg,
+      rgba(var(--foreground-rgb), 0.1),
+      rgba(var(--foreground-rgb), 0.02)
+    ),
+    rgba(100, 91, 255, 0.1);
+  color: var(--text-color);
+  box-shadow: inset 0 1px 0 rgba(var(--foreground-rgb), 0.12);
+}
+
 .mediaToggle button {
   width: auto;
   height: 38px;
@@ -56,16 +85,87 @@
   white-space: nowrap;
 }
 
+.pageButton:hover:not(:disabled) {
+  border-color: rgba(var(--foreground-rgb), 0.24);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.previousPageButton:hover:not(:disabled) {
+  background:
+    linear-gradient(180deg, rgba(var(--foreground-rgb), 0.08), transparent),
+    var(--left-color);
+}
+
+.nextPageButton:hover:not(:disabled) {
+  background:
+    linear-gradient(180deg, rgba(var(--foreground-rgb), 0.08), transparent),
+    var(--right-color);
+}
+
+.pageButton:focus-visible {
+  outline: 2px solid rgba(100, 91, 255, 0.9);
+  outline-offset: 2px;
+}
+
 .pageButton:disabled,
 .genreSelect select:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
 
+.pageButton:disabled:hover {
+  background:
+    linear-gradient(218.73deg, var(--left-color) 0%, transparent 62%),
+    linear-gradient(321.27deg, transparent 44%, var(--right-color) 100%),
+    linear-gradient(
+      180deg,
+      rgba(var(--foreground-rgb), 0.1),
+      rgba(var(--foreground-rgb), 0.02)
+    ),
+    rgba(100, 91, 255, 0.1);
+  transform: none;
+}
+
+.pageButtonIcon {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .pageCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-width: 112px;
+  height: 38px;
+  padding: 0 0.75rem;
+  border: 1px solid rgba(var(--foreground-rgb), 0.1);
+  border-radius: 8px;
+  background: rgba(var(--foreground-rgb), 0.06);
   color: color-mix(in srgb, var(--text-color) 76%, transparent);
   font-size: 0.9rem;
+  line-height: 1;
   white-space: nowrap;
+}
+
+.pageCount strong {
+  color: var(--text-color);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.pageCountLabel {
+  color: color-mix(in srgb, var(--text-color) 58%, transparent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .status {
@@ -175,14 +275,23 @@
 
   .pageButton,
   .mediaToggle button {
-    flex: 1;
     min-width: 0;
   }
 
+  .mediaToggle button {
+    flex: 1;
+  }
+
+  .pageButton {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+  }
+
   .pageCount {
-    display: grid;
-    min-width: 84px;
-    place-items: center;
+    flex: 1;
+    min-width: 0;
+    height: 42px;
   }
 
   .cards {

@@ -6,6 +6,7 @@ import { useHorizontalScroll } from "@/helper/hooks/useHorizontalScroll";
 import { useStore } from "@/helper/hooks/useStore";
 import { use, useEffect, useMemo, useState } from "react";
 import {
+  BROWSE_PAGE_PREFETCH_BATCH_SIZE,
   createTmdbBrowseKey,
   MAX_TMDB_PAGE,
   mediaSections,
@@ -16,7 +17,7 @@ import styles from "./TmdbBrowse.module.css";
 const browseMediaCache = new Map();
 
 async function fetchBrowseMedia(endpoint, page, genreId, signal) {
-  const cacheKey = createTmdbBrowseKey(endpoint, String(page), genreId);
+  const cacheKey = createTmdbBrowseKey(endpoint, "request", genreId, page);
   const cachedData = browseMediaCache.get(cacheKey);
 
   if (cachedData) {
@@ -53,33 +54,57 @@ function getSectionState(data) {
   };
 }
 
+function PaginationIcon({ direction }) {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      viewBox="0 0 24 24"
+      className={styles.pageButtonIcon}
+    >
+      <path
+        d={
+          direction === "previous"
+            ? "M15 18L9 12L15 6"
+            : "M9 6L15 12L9 18"
+        }
+      />
+    </svg>
+  );
+}
+
 function Pagination({ page, totalPages, onPageChange, disabled }) {
   const safeTotalPages = Math.max(totalPages || 1, 1);
   const canGoPrevious = page > 1 && !disabled;
   const canGoNext = page < safeTotalPages && !disabled;
 
   return (
-    <div className={styles.pagination}>
+    <nav className={styles.pagination} aria-label="Pagination">
       <button
-        className={styles.pageButton}
+        className={`${styles.pageButton} ${styles.previousPageButton}`}
         disabled={!canGoPrevious}
         onClick={() => onPageChange((currentPage) => currentPage - 1)}
+        aria-label="Previous page"
         type="button"
       >
-        Prev
+        <PaginationIcon direction="previous" />
       </button>
       <span className={styles.pageCount}>
-        Page {page} / {safeTotalPages}
+        <span className={styles.pageCountLabel}>Page</span>
+        <strong>{page}</strong>
+        <span>/</span>
+        <span>{safeTotalPages}</span>
       </span>
       <button
-        className={styles.pageButton}
+        className={`${styles.pageButton} ${styles.nextPageButton}`}
         disabled={!canGoNext}
         onClick={() => onPageChange((currentPage) => currentPage + 1)}
+        aria-label="Next page"
         type="button"
       >
-        Next
+        <PaginationIcon direction="next" />
       </button>
-    </div>
+    </nav>
   );
 }
 
@@ -90,14 +115,18 @@ function TmdbMediaSection({
   genresById,
   genreId,
   headerActions,
-  initialData,
+  initialMediaByKey,
   isGenreSection = false,
 }) {
   const [, setSearchResults] = useStore(Stores.searchResults);
   const [, setIframeUrl] = useStore(Stores.iframeUrl);
   const cardsRef = useHorizontalScroll();
-  const initialState = useMemo(() => getSectionState(initialData), [initialData]);
   const [page, setPage] = useState(1);
+  const initialData =
+    initialMediaByKey[
+      createTmdbBrowseKey(endpoint, mediaType, genreId, page)
+    ];
+  const initialState = useMemo(() => getSectionState(initialData), [initialData]);
   const [rawItems, setRawItems] = useState(initialState.rawItems);
   const [totalPages, setTotalPages] = useState(initialState.totalPages);
   const [status, setStatus] = useState(initialState.status);
@@ -108,7 +137,7 @@ function TmdbMediaSection({
   }, [endpoint, genreId, mediaType]);
 
   useEffect(() => {
-    if (page === 1 && initialData) {
+    if (initialData) {
       setRawItems(initialState.rawItems);
       setTotalPages(initialState.totalPages);
       setStatus(initialState.status);
@@ -150,6 +179,32 @@ function TmdbMediaSection({
       controller.abort();
     };
   }, [endpoint, genreId, initialData, initialState, page]);
+
+  useEffect(() => {
+    if (page % BROWSE_PAGE_PREFETCH_BATCH_SIZE !== 0) {
+      return;
+    }
+
+    const nextPages = Array.from(
+      { length: BROWSE_PAGE_PREFETCH_BATCH_SIZE },
+      (_, index) => page + index + 1,
+    ).filter((nextPage) => nextPage <= totalPages);
+    const controller = new AbortController();
+
+    nextPages.forEach((nextPage) => {
+      fetchBrowseMedia(endpoint, nextPage, genreId, controller.signal).catch(
+        (err) => {
+          if (err.name !== "AbortError") {
+            console.log(err);
+          }
+        },
+      );
+    });
+
+    return () => {
+      controller.abort();
+    };
+  }, [endpoint, genreId, page, totalPages]);
 
   const items = useMemo(
     () =>
@@ -213,9 +268,6 @@ function GenreSection({ genres, genresByType, initialMediaByKey }) {
     (genre) => String(genre.id) === genreId,
   );
   const endpoint = `/discover/${mediaType}`;
-  const initialData =
-    initialMediaByKey[createTmdbBrowseKey(endpoint, mediaType, genreId)];
-
   useEffect(() => {
     setGenreId((currentGenreId) => {
       if (activeGenres.some((genre) => String(genre.id) === currentGenreId)) {
@@ -268,7 +320,7 @@ function GenreSection({ genres, genresByType, initialMediaByKey }) {
               </label>
             </div>
           }
-          initialData={initialData}
+          initialMediaByKey={initialMediaByKey}
           isGenreSection
           mediaType={mediaType}
           title={`${selectedGenre?.name || "Genre"}`}
@@ -296,11 +348,7 @@ export default function TmdbBrowseClient({ initialDataPromise }) {
         <TmdbMediaSection
           endpoint={section.endpoint}
           genresById={genresByType[section.mediaType]}
-          initialData={
-            initialMediaByKey[
-              createTmdbBrowseKey(section.endpoint, section.mediaType)
-            ]
-          }
+          initialMediaByKey={initialMediaByKey}
           key={section.key}
           mediaType={section.mediaType}
           title={section.title}
