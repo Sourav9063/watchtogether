@@ -5,6 +5,7 @@ import IframeUseEffects from "./UseEffectWrappers/IframeUseEffects";
 import HoverSeEp from "./iframePlayer/hoverSeEp";
 import InitIframeStore from "./Provider/InitIframeStore";
 import LatestMedia, { LatestType } from "@/components/latest/LatestMedia";
+import TmdbBrowse from "@/components/tmdbBrowse/TmdbBrowse";
 import styles from "./IframeWrapper.module.css";
 
 export default function IframeWrapper() {
@@ -20,6 +21,7 @@ export default function IframeWrapper() {
         <TmdbSearch />
         <TmdbSearchResults />
       </div>
+      <TmdbBrowse />
       <LatestMedia type={LatestType.MOVIE_ADD} />
       <LatestMedia type={LatestType.TV_ADD} />
     </>
