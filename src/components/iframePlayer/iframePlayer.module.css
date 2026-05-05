@@ -64,7 +64,8 @@
   background-color: black;
   font-weight: bold;
 }
-.buttons > input {
+.buttons > input,
+.buttons > .select {
   font-weight: bold;
   font-size: 0.82rem;
 }
@@ -90,14 +91,22 @@
 }
 .buttons > button {
   margin-top: 0px;
+  padding-inline: 0.55rem;
   background-color: transparent;
   color: var(--text-color);
 }
-.season button:hover {
+.buttons > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.season button:hover:not(:disabled) {
   background-color: var(--left-color);
 }
-.episode button:hover {
+.episode button:hover:not(:disabled) {
   background-color: var(--right-color);
+}
+.episode .select {
+  min-width: 260px;
 }
 .hover-se-ep {
   position: fixed;
@@ -175,6 +184,9 @@
   }
   .select-wrapper {
     width: 100%;
+  }
+  .episode .select {
+    min-width: min(260px, calc(100vw - 2rem));
   }
   /* .iframe-wrapper {
     padding-block: 0px;

@@ -1,7 +1,3 @@
-import {
-  useQuery,
-  useSearchResults,
-} from "@/components/Provider/IframeDataProvider";
 import config from "@/config";
 import { useEffect, useState } from "react";
 import { useDebounce } from "./useDebounce";
@@ -120,38 +116,112 @@ export const useTmdbSearch = () => {
   return status;
 };
 
-// export const useTmdbDetails = ({ type = "tv", id }) => {
-//   const [details, setDetails] = useState(null);
-//   useEffect(() => {
-//     fetch(
-//       `https://api.themoviedb.org/3/${type}/${id}?api_key=${config.tmdbApiKey}`
-//     )
-//       .then((res) => res.json())
-//       .then((data) => {
-//         console.log(data);
-//         setDetails(data);
-//       })
-//       .catch((err) => {
-//         console.log(err);
-//       });
-//   }, [id, type]);
-//   return details;
-// };
+const getTmdbUrl = (path) => {
+  return `https://api.themoviedb.org/3${path}?api_key=${config.tmdbApiKey}`;
+};
 
-// export const useTmdbGetSeasonsEpisodes = ({ type = "tv", id, season }) => {
-//   const [seasonsEpisodes, setSeasonsEpisodes] = useState(null);
-//   useEffect(() => {
-//     fetch(
-//       `https://api.themoviedb.org/3/${type}/${id}/season/${season}?api_key=${config.tmdbApiKey}`
-//     )
-//       .then((res) => res.json())
-//       .then((data) => {
-//         console.log(data);
-//         setSeasonsEpisodes(data);
-//       })
-//       .catch((err) => {
-//         console.log(err);
-//       });
-//   }, [id, type, season]);
-//   return seasonsEpisodes;
-// };
+const fetchTmdbJson = async ({ path, signal }) => {
+  const response = await fetch(getTmdbUrl(path), { signal });
+
+  if (!response.ok) {
+    throw new Error(`TMDB request failed: ${response.status}`);
+  }
+
+  return response.json();
+};
+
+export const useTmdbTvDetails = ({ id, enabled = true } = {}) => {
+  const [details, setDetails] = useState(null);
+  const [status, setStatus] = useState("idle");
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!enabled || !id || !config.tmdbApiKey) {
+      setDetails(null);
+      setStatus("idle");
+      setError(null);
+      return;
+    }
+
+    const controller = new AbortController();
+
+    async function fetchData() {
+      setStatus("loading");
+      setError(null);
+
+      try {
+        const data = await fetchTmdbJson({
+          path: `/tv/${id}`,
+          signal: controller.signal,
+        });
+        setDetails(data);
+        setStatus("success");
+      } catch (err) {
+        if (err.name === "AbortError") return;
+
+        console.log(err);
+        setDetails(null);
+        setError(err);
+        setStatus("error");
+      }
+    }
+
+    fetchData();
+
+    return () => {
+      controller.abort();
+    };
+  }, [id, enabled]);
+
+  return { details, status, error };
+};
+
+export const useTmdbSeasonEpisodes = ({
+  id,
+  season,
+  enabled = true,
+} = {}) => {
+  const [seasonEpisodes, setSeasonEpisodes] = useState(null);
+  const [status, setStatus] = useState("idle");
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!enabled || !id || !season || !config.tmdbApiKey) {
+      setSeasonEpisodes(null);
+      setStatus("idle");
+      setError(null);
+      return;
+    }
+
+    const controller = new AbortController();
+
+    async function fetchData() {
+      setStatus("loading");
+      setError(null);
+
+      try {
+        const data = await fetchTmdbJson({
+          path: `/tv/${id}/season/${season}`,
+          signal: controller.signal,
+        });
+        setSeasonEpisodes(data);
+        setStatus("success");
+      } catch (err) {
+        if (err.name === "AbortError") return;
+
+        console.log(err);
+        setSeasonEpisodes(null);
+        setError(err);
+        setStatus("error");
+      }
+    }
+
+    fetchData();
+
+    return () => {
+      controller.abort();
+    };
+  }, [id, season, enabled]);
+
+  return { seasonEpisodes, status, error };
+};
