@@ -1,0 +1,322 @@
+"use client";
+
+import TmdbCard from "@/components/TmdbSearchResults/TmdbCard";
+import { Stores } from "@/helper/CONSTANTS";
+import { useHorizontalScroll } from "@/helper/hooks/useHorizontalScroll";
+import { useStore } from "@/helper/hooks/useStore";
+import { use, useEffect, useMemo, useState } from "react";
+import {
+  createTmdbBrowseKey,
+  MAX_TMDB_PAGE,
+  mediaSections,
+  normalizeTmdbItem,
+} from "./tmdbBrowseConstants";
+import styles from "./TmdbBrowse.module.css";
+
+const browseMediaCache = new Map();
+
+async function fetchBrowseMedia(endpoint, page, genreId, signal) {
+  const cacheKey = createTmdbBrowseKey(endpoint, String(page), genreId);
+  const cachedData = browseMediaCache.get(cacheKey);
+
+  if (cachedData) {
+    return cachedData;
+  }
+
+  const searchParams = new URLSearchParams({
+    endpoint,
+    page: String(page),
+  });
+
+  if (genreId) {
+    searchParams.set("genreId", genreId);
+  }
+
+  const response = await fetch(`/api/tmdb/browse?${searchParams}`, { signal });
+
+  if (!response.ok) {
+    throw new Error(`TMDB request failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+  browseMediaCache.set(cacheKey, data);
+
+  return data;
+}
+
+function getSectionState(data) {
+  return {
+    error: data?.error ? new Error(data.error) : null,
+    rawItems: data?.results || [],
+    status: data?.error ? "error" : "success",
+    totalPages: Math.min(data?.total_pages || 1, MAX_TMDB_PAGE),
+  };
+}
+
+function Pagination({ page, totalPages, onPageChange, disabled }) {
+  const safeTotalPages = Math.max(totalPages || 1, 1);
+  const canGoPrevious = page > 1 && !disabled;
+  const canGoNext = page < safeTotalPages && !disabled;
+
+  return (
+    <div className={styles.pagination}>
+      <button
+        className={styles.pageButton}
+        disabled={!canGoPrevious}
+        onClick={() => onPageChange((currentPage) => currentPage - 1)}
+        type="button"
+      >
+        Prev
+      </button>
+      <span className={styles.pageCount}>
+        Page {page} / {safeTotalPages}
+      </span>
+      <button
+        className={styles.pageButton}
+        disabled={!canGoNext}
+        onClick={() => onPageChange((currentPage) => currentPage + 1)}
+        type="button"
+      >
+        Next
+      </button>
+    </div>
+  );
+}
+
+function TmdbMediaSection({
+  title,
+  mediaType,
+  endpoint,
+  genresById,
+  genreId,
+  headerActions,
+  initialData,
+  isGenreSection = false,
+}) {
+  const [, setSearchResults] = useStore(Stores.searchResults);
+  const [, setIframeUrl] = useStore(Stores.iframeUrl);
+  const cardsRef = useHorizontalScroll();
+  const initialState = useMemo(() => getSectionState(initialData), [initialData]);
+  const [page, setPage] = useState(1);
+  const [rawItems, setRawItems] = useState(initialState.rawItems);
+  const [totalPages, setTotalPages] = useState(initialState.totalPages);
+  const [status, setStatus] = useState(initialState.status);
+  const [error, setError] = useState(initialState.error);
+
+  useEffect(() => {
+    setPage(1);
+  }, [endpoint, genreId, mediaType]);
+
+  useEffect(() => {
+    if (page === 1 && initialData) {
+      setRawItems(initialState.rawItems);
+      setTotalPages(initialState.totalPages);
+      setStatus(initialState.status);
+      setError(initialState.error);
+      return;
+    }
+
+    const controller = new AbortController();
+
+    async function fetchData() {
+      setStatus("loading");
+      setError(null);
+
+      try {
+        const data = await fetchBrowseMedia(
+          endpoint,
+          page,
+          genreId,
+          controller.signal,
+        );
+        const nextState = getSectionState(data);
+        setRawItems(nextState.rawItems);
+        setTotalPages(nextState.totalPages);
+        setStatus(nextState.status);
+        setError(nextState.error);
+      } catch (err) {
+        if (err.name === "AbortError") return;
+
+        console.log(err);
+        setRawItems([]);
+        setError(err);
+        setStatus("error");
+      }
+    }
+
+    fetchData();
+
+    return () => {
+      controller.abort();
+    };
+  }, [endpoint, genreId, initialData, initialState, page]);
+
+  const items = useMemo(
+    () =>
+      rawItems
+        .map((item) => normalizeTmdbItem(item, mediaType, genresById))
+        .filter(
+          (item) => item.id && (item.poster_image_url || item.backdrop_image_url),
+        ),
+    [genresById, mediaType, rawItems],
+  );
+
+  return (
+    <section
+      className={`${styles.section} ${
+        isGenreSection ? styles.genreSection : ""
+      }`}
+    >
+      <div className={styles.sectionHeader}>
+        <div className={styles.titleBlock}>
+          <h2>{title}</h2>
+        </div>
+        {headerActions}
+        <Pagination
+          disabled={status === "loading"}
+          onPageChange={setPage}
+          page={page}
+          totalPages={totalPages}
+        />
+      </div>
+
+      {status === "error" && (
+        <p className={styles.status}>{error?.message || "Failed to load"}</p>
+      )}
+      {status === "success" && items.length === 0 && (
+        <p className={styles.status}>No result found</p>
+      )}
+
+      <div className={styles.cards} ref={cardsRef}>
+        {items.map((item) => (
+          <TmdbCard
+            details={item}
+            key={`${mediaType}-${item.id}`}
+            setIframeUrl={setIframeUrl}
+            setSearchResults={setSearchResults}
+            showType={false}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function GenreSection({ genres, genresByType, initialMediaByKey }) {
+  const [mediaType, setMediaType] = useState("movie");
+  const activeGenres = useMemo(
+    () => genres[mediaType] || [],
+    [genres, mediaType],
+  );
+  const [genreId, setGenreId] = useState("");
+  const selectedGenre = activeGenres.find(
+    (genre) => String(genre.id) === genreId,
+  );
+  const endpoint = `/discover/${mediaType}`;
+  const initialData =
+    initialMediaByKey[createTmdbBrowseKey(endpoint, mediaType, genreId)];
+
+  useEffect(() => {
+    setGenreId((currentGenreId) => {
+      if (activeGenres.some((genre) => String(genre.id) === currentGenreId)) {
+        return currentGenreId;
+      }
+
+      return activeGenres[0]?.id ? String(activeGenres[0].id) : "";
+    });
+  }, [activeGenres]);
+
+  return (
+    <section className={styles.genreBlock}>
+      {genreId && (
+        <TmdbMediaSection
+          endpoint={endpoint}
+          genreId={genreId}
+          genresById={genresByType[mediaType]}
+          headerActions={
+            <div className={styles.genreControls}>
+              <div className={styles.mediaToggle} aria-label="Genre media type">
+                <button
+                  className={mediaType === "movie" ? styles.activeToggle : ""}
+                  onClick={() => setMediaType("movie")}
+                  type="button"
+                >
+                  Movies
+                </button>
+                <button
+                  className={mediaType === "tv" ? styles.activeToggle : ""}
+                  onClick={() => setMediaType("tv")}
+                  type="button"
+                >
+                  TV Shows
+                </button>
+              </div>
+
+              <label className={styles.genreSelect}>
+                <span>Genre</span>
+                <select
+                  disabled={activeGenres.length === 0}
+                  onChange={(event) => setGenreId(event.target.value)}
+                  value={genreId}
+                >
+                  {activeGenres.map((genre) => (
+                    <option key={genre.id} value={genre.id}>
+                      {genre.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          }
+          initialData={initialData}
+          isGenreSection
+          mediaType={mediaType}
+          title={`${selectedGenre?.name || "Genre"}`}
+        />
+      )}
+    </section>
+  );
+}
+
+export default function TmdbBrowseClient({ initialDataPromise }) {
+  const { genres, initialMediaByKey } = use(initialDataPromise);
+  const genresByType = useMemo(
+    () => ({
+      movie: Object.fromEntries(
+        genres.movie.map((genre) => [genre.id, genre.name]),
+      ),
+      tv: Object.fromEntries(genres.tv.map((genre) => [genre.id, genre.name])),
+    }),
+    [genres],
+  );
+
+  return (
+    <div className={styles.browse}>
+      {mediaSections.map((section) => (
+        <TmdbMediaSection
+          endpoint={section.endpoint}
+          genresById={genresByType[section.mediaType]}
+          initialData={
+            initialMediaByKey[
+              createTmdbBrowseKey(section.endpoint, section.mediaType)
+            ]
+          }
+          key={section.key}
+          mediaType={section.mediaType}
+          title={section.title}
+        />
+      ))}
+
+      {(genres.movie.length > 0 || genres.tv.length > 0) && (
+        <GenreSection
+          genres={genres}
+          genresByType={genresByType}
+          initialMediaByKey={initialMediaByKey}
+        />
+      )}
+      {genres.movie.length === 0 && genres.tv.length === 0 && (
+        <p className={styles.status}>Genre list failed to load</p>
+      )}
+    </div>
+  );
+}
