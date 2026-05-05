@@ -43,6 +43,25 @@ const mergeSelectedOption = ({
   ].sort((first, second) => first.value - second.value);
 };
 
+function StepIcon({ direction }) {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      viewBox="0 0 24 24"
+      className={styles.stepButtonIcon}
+    >
+      <path
+        d={
+          direction === "previous"
+            ? "M15 18L9 12L15 6"
+            : "M9 6L15 12L9 18"
+        }
+      />
+    </svg>
+  );
+}
+
 export default function SeasonEpisodeSelector({ id }) {
   const [iframeUrl, setIframeUrl] = useStore(Stores.iframeUrl);
   const [isAnime] = useStore(Stores.isAnime);
@@ -183,7 +202,9 @@ export default function SeasonEpisodeSelector({ id }) {
   return (
     <div className={`${styles["season-episode"]} ${styles[""]} `}>
       {isAnimePlayer ? (
-        <div className={`${styles["season"]} ${styles["select-wrapper"]} `}>
+        <div
+          className={`${styles["season"]} ${styles.controlPanel} ${styles["select-wrapper"]}`}
+        >
           <select
             className={styles["select"]}
             name="Dub"
@@ -195,10 +216,10 @@ export default function SeasonEpisodeSelector({ id }) {
           </select>
         </div>
       ) : (
-        <div className={`${styles["season"]} ${styles["buttons"]} `}>
-          <div className={`${styles["buttons"]} ${styles[""]} `}>
+        <div className={`${styles["season"]} ${styles.controlPanel}`}>
+          <div className={`${styles["buttons"]} ${styles.selectControls}`}>
             <h3 className={styles["name"]}>Season</h3>
-            <h3>:</h3>
+            <span className={styles.controlDivider}>:</span>
             <select
               aria-label="Season"
               className={styles["select"]}
@@ -212,27 +233,31 @@ export default function SeasonEpisodeSelector({ id }) {
               ))}
             </select>
           </div>
-          <div className={`${styles["buttons"]} ${styles[""]} `}>
+          <div className={`${styles["buttons"]} ${styles.stepControls}`}>
             <button
+              aria-label="Previous season"
+              className={`${styles.stepButton} ${styles.previousStepButton}`}
               disabled={selectedSeason <= firstSeason}
               onClick={() => stepSeason(-1)}
             >
-              Prev
+              <StepIcon direction="previous" />
             </button>
             <button
+              aria-label="Next season"
+              className={`${styles.stepButton} ${styles.nextStepButton}`}
               disabled={selectedSeason >= lastSeason}
               onClick={() => stepSeason(1)}
             >
-              Next
+              <StepIcon direction="next" />
             </button>
           </div>
         </div>
       )}
 
-      <div className={`${styles["episode"]} ${styles["buttons"]} `}>
-        <div className={`${styles["buttons"]} ${styles[""]} `}>
+      <div className={`${styles["episode"]} ${styles.controlPanel}`}>
+        <div className={`${styles["buttons"]} ${styles.selectControls}`}>
           <h3 className={styles["name"]}>Episode</h3>
-          <h3>:</h3>
+          <span className={styles.controlDivider}>:</span>
           <select
             aria-label="Episode"
             className={styles["select"]}
@@ -246,18 +271,22 @@ export default function SeasonEpisodeSelector({ id }) {
             ))}
           </select>
         </div>
-        <div className={styles["buttons"]}>
+        <div className={`${styles["buttons"]} ${styles.stepControls}`}>
           <button
+            aria-label="Previous episode"
+            className={`${styles.stepButton} ${styles.previousStepButton}`}
             disabled={selectedEpisode <= firstEpisode}
             onClick={() => stepEpisode(-1)}
           >
-            Prev
+            <StepIcon direction="previous" />
           </button>
           <button
+            aria-label="Next episode"
+            className={`${styles.stepButton} ${styles.nextStepButton}`}
             disabled={selectedEpisode >= lastEpisode}
             onClick={() => stepEpisode(1)}
           >
-            Next
+            <StepIcon direction="next" />
           </button>
         </div>
       </div>

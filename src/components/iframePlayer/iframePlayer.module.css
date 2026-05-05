@@ -43,22 +43,26 @@
 
 .buttons {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.45rem;
   width: 100%;
   align-items: center;
-  border-radius: 5px;
+  border-radius: 8px;
 }
 .select-wrapper {
-  width: 200px;
+  width: auto;
 }
 .select {
   width: 100%;
-  min-height: 35px;
-  padding: 0.5rem;
-  background-color: transparent;
-  border-radius: 5px;
+  height: 38px;
+  min-height: 38px;
+  padding: 0 0.75rem;
+  border: 1px solid rgba(var(--foreground-rgb), 0.1);
+  border-radius: 8px;
+  background: rgba(var(--foreground-rgb), 0.06);
+  color: var(--text-color);
   font-weight: bold;
-  font-size: 0.82rem;
+  font-size: 0.9rem;
+  line-height: 1;
 }
 .select > option {
   background-color: black;
@@ -67,16 +71,13 @@
 .buttons > input,
 .buttons > .select {
   font-weight: bold;
-  font-size: 0.82rem;
+  font-size: 0.9rem;
 }
 .season {
-  border: 2px solid var(--left-color);
-  padding: 0.5rem;
-  border-radius: 5px;
+  --control-accent: var(--left-color);
 }
 .season * {
   border-color: var(--left-color);
-  border-width: 2px;
 }
 .season .select {
   min-width: 64px;
@@ -84,33 +85,126 @@
 }
 .episode * {
   border-color: var(--right-color);
-  border-width: 2px;
 }
 .episode {
-  border: 2px solid var(--right-color);
-  padding: 0.5rem;
+  --control-accent: var(--right-color);
 }
 .buttons > .name {
-  min-width: 70px;
-}
-.buttons > button {
-  margin-top: 0px;
-  padding-inline: 0.55rem;
-  background-color: transparent;
+  min-width: auto;
   color: var(--text-color);
+  font-size: 1rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+.controlDivider {
+  color: color-mix(in srgb, var(--text-color) 68%, transparent);
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.controlPanel {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 0 0 auto;
+  width: auto;
+  margin-top: 0px;
+  padding: 0.28rem;
+  border: 1px solid rgba(var(--foreground-rgb), 0.14);
+  border-radius: 8px;
+  background:
+    linear-gradient(218.73deg, var(--left-color) 0%, transparent 58%),
+    linear-gradient(321.27deg, transparent 48%, var(--right-color) 100%),
+    color-mix(in srgb, var(--background-transparent) 82%, transparent);
+  color: var(--text-color);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(10px);
+}
+.selectControls {
+  flex: 0 1 auto;
+  height: 38px;
+  min-width: 0;
+  padding: 0 0.75rem;
+  border: 1px solid rgba(var(--foreground-rgb), 0.1);
+  border-radius: 8px;
+  background: rgba(var(--foreground-rgb), 0.06);
+}
+.selectControls .select {
+  width: auto;
+  border: 0;
+  background: transparent;
+  padding: 0 0.25rem;
+}
+.stepControls {
+  flex: 0 0 auto;
+  width: auto;
+}
+.buttons > .stepButton {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  margin-top: 0;
+  padding: 0;
+  border: 1px solid rgba(var(--foreground-rgb), 0.16);
+  border-radius: 8px;
+  background:
+    linear-gradient(218.73deg, var(--left-color) 0%, transparent 62%),
+    linear-gradient(321.27deg, transparent 44%, var(--right-color) 100%),
+    linear-gradient(
+      180deg,
+      rgba(var(--foreground-rgb), 0.1),
+      rgba(var(--foreground-rgb), 0.02)
+    ),
+    rgba(100, 91, 255, 0.1);
+  color: var(--text-color);
+  box-shadow: inset 0 1px 0 rgba(var(--foreground-rgb), 0.12);
+}
+.stepButtonIcon {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .buttons > button:disabled {
   cursor: not-allowed;
-  opacity: 0.45;
+  opacity: 0.5;
 }
-.season button:hover:not(:disabled) {
-  background-color: var(--left-color);
+.buttons > .stepButton:hover:not(:disabled) {
+  border-color: rgba(var(--foreground-rgb), 0.24);
+  color: #fff;
+  transform: translateY(-1px);
 }
-.episode button:hover:not(:disabled) {
-  background-color: var(--right-color);
+.buttons > .previousStepButton:hover:not(:disabled) {
+  background:
+    linear-gradient(180deg, rgba(var(--foreground-rgb), 0.08), transparent),
+    var(--left-color);
+}
+.buttons > .nextStepButton:hover:not(:disabled) {
+  background:
+    linear-gradient(180deg, rgba(var(--foreground-rgb), 0.08), transparent),
+    var(--right-color);
+}
+.buttons > .stepButton:focus-visible {
+  outline: 2px solid rgba(100, 91, 255, 0.9);
+  outline-offset: 2px;
+}
+.buttons > .stepButton:disabled:hover {
+  background:
+    linear-gradient(218.73deg, var(--left-color) 0%, transparent 62%),
+    linear-gradient(321.27deg, transparent 44%, var(--right-color) 100%),
+    linear-gradient(
+      180deg,
+      rgba(var(--foreground-rgb), 0.1),
+      rgba(var(--foreground-rgb), 0.02)
+    ),
+    rgba(100, 91, 255, 0.1);
+  transform: none;
 }
 .episode .select {
-  min-width: 260px;
+  min-width: min(260px, 42vw);
 }
 .hover-se-ep {
   position: fixed;
@@ -152,7 +246,7 @@
 .hover-se-ep .season-episode {
   width: max-content;
 }
-.hover-se-ep .season-episode > .buttons {
+.hover-se-ep .season-episode > .controlPanel {
   flex: 0 0 auto;
   width: auto;
 }
@@ -217,7 +311,7 @@
 }
 
 @media (max-width: 300px) {
-  .season-episode > .buttons {
+  .season-episode > .controlPanel {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
