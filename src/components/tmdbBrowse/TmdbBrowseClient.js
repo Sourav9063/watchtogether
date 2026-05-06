@@ -99,7 +99,10 @@ function TmdbMediaSection({
 
   useEffect(() => {
     setPage(1);
-  }, [endpoint, genreId, mediaType]);
+    if (cardsRef.current) {
+      cardsRef.current.scrollLeft = 0;
+    }
+  }, [cardsRef, endpoint, genreId, mediaType]);
 
   useEffect(() => {
     if (initialData) {
