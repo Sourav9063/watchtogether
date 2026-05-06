@@ -54,13 +54,13 @@ function getSectionState(data) {
   };
 }
 
-function PaginationIcon({ direction }) {
+function PageButtonIcon({ direction }) {
   return (
     <svg
       aria-hidden="true"
       focusable="false"
       viewBox="0 0 24 24"
-      className={styles.pageButtonIcon}
+      className={styles.loadMoreIcon}
     >
       <path
         d={
@@ -70,41 +70,6 @@ function PaginationIcon({ direction }) {
         }
       />
     </svg>
-  );
-}
-
-function Pagination({ page, totalPages, onPageChange, disabled }) {
-  const safeTotalPages = Math.max(totalPages || 1, 1);
-  const canGoPrevious = page > 1 && !disabled;
-  const canGoNext = page < safeTotalPages && !disabled;
-
-  return (
-    <nav className={styles.pagination} aria-label="Pagination">
-      <button
-        className={`${styles.pageButton} ${styles.previousPageButton}`}
-        disabled={!canGoPrevious}
-        onClick={() => onPageChange((currentPage) => currentPage - 1)}
-        aria-label="Previous page"
-        type="button"
-      >
-        <PaginationIcon direction="previous" />
-      </button>
-      <span className={styles.pageCount}>
-        <span className={styles.pageCountLabel}>Page</span>
-        <strong>{page}</strong>
-        <span>/</span>
-        <span>{safeTotalPages}</span>
-      </span>
-      <button
-        className={`${styles.pageButton} ${styles.nextPageButton}`}
-        disabled={!canGoNext}
-        onClick={() => onPageChange((currentPage) => currentPage + 1)}
-        aria-label="Next page"
-        type="button"
-      >
-        <PaginationIcon direction="next" />
-      </button>
-    </nav>
   );
 }
 
@@ -215,6 +180,29 @@ function TmdbMediaSection({
         ),
     [genresById, mediaType, rawItems],
   );
+  const canLoadPreviousPage = page > 1;
+  const canLoadNextPage = page < Math.max(totalPages || 1, 1);
+  const isLoading = status === "loading";
+
+  function handleLoadPreviousPage() {
+    if (!canLoadPreviousPage || isLoading) return;
+
+    setPage((currentPage) => currentPage - 1);
+    cardsRef.current?.scrollTo({
+      left: 0,
+      behavior: "smooth",
+    });
+  }
+
+  function handleLoadNextPage() {
+    if (!canLoadNextPage || isLoading) return;
+
+    setPage((currentPage) => currentPage + 1);
+    cardsRef.current?.scrollTo({
+      left: 0,
+      behavior: "smooth",
+    });
+  }
 
   return (
     <section
@@ -227,12 +215,6 @@ function TmdbMediaSection({
           <h2>{title}</h2>
         </div>
         {headerActions}
-        <Pagination
-          disabled={status === "loading"}
-          onPageChange={setPage}
-          page={page}
-          totalPages={totalPages}
-        />
       </div>
 
       {status === "error" && (
@@ -243,6 +225,21 @@ function TmdbMediaSection({
       )}
 
       <div className={styles.cards} ref={cardsRef}>
+        {canLoadPreviousPage && (
+          <button
+            aria-label={`Load page ${page - 1} of ${title}`}
+            className={styles.loadMoreCard}
+            disabled={isLoading}
+            onClick={handleLoadPreviousPage}
+            type="button"
+          >
+            <span>Previous</span>
+            <PageButtonIcon direction="previous" />
+            <small>
+              Page {page - 1} of {totalPages}
+            </small>
+          </button>
+        )}
         {items.map((item) => (
           <TmdbCard
             details={item}
@@ -252,6 +249,21 @@ function TmdbMediaSection({
             showType={false}
           />
         ))}
+        {canLoadNextPage && (
+          <button
+            aria-label={`Load page ${page + 1} of ${title}`}
+            className={styles.loadMoreCard}
+            disabled={isLoading}
+            onClick={handleLoadNextPage}
+            type="button"
+          >
+            <span>Next</span>
+            <PageButtonIcon direction="next" />
+            <small>
+              Page {page + 1} of {totalPages}
+            </small>
+          </button>
+        )}
       </div>
     </section>
   );

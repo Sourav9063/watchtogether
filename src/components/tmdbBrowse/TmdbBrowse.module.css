@@ -190,6 +190,59 @@
   display: none;
 }
 
+.loadMoreCard {
+  display: grid;
+  flex: 0 0 190px;
+  place-items: center;
+  align-self: stretch;
+  min-height: 285px;
+  margin-top: 0;
+  padding: 1.25rem;
+  border: 1px solid rgba(var(--foreground-rgb), 0.16);
+  border-radius: 8px;
+  background:
+    linear-gradient(218.73deg, var(--left-color) 0%, transparent 62%),
+    linear-gradient(321.27deg, transparent 44%, var(--right-color) 100%),
+    rgba(var(--foreground-rgb), 0.06);
+  color: var(--text-color);
+  box-shadow: inset 0 1px 0 rgba(var(--foreground-rgb), 0.12);
+}
+
+.loadMoreCard:hover:not(:disabled) {
+  border-color: rgba(var(--foreground-rgb), 0.28);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.loadMoreCard:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.loadMoreCard span {
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.loadMoreCard small {
+  color: color-mix(in srgb, var(--text-color) 68%, transparent);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.loadMoreIcon {
+  width: 2.25rem;
+  height: 2.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .genreBlock {
   display: grid;
   gap: 1rem;
