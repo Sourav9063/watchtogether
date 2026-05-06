@@ -186,10 +186,6 @@
   padding: 2rem 2rem 4rem;
 }
 
-.cards::-webkit-scrollbar {
-  display: none;
-}
-
 .loadMoreCard {
   display: grid;
   flex: 0 0 190px;

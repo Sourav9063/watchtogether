@@ -48,10 +48,6 @@
   padding: 6rem 2rem 5rem;
 }
 
-.cards::-webkit-scrollbar {
-  display: none;
-}
-
 @media (max-width: 768px) {
   .header {
     font-size: 2rem;

@@ -29,9 +29,6 @@
   overflow-y: visible;
 }
 
-.historyList::-webkit-scrollbar {
-  display: none;
-}
 .historyList > li {
   min-width: 200px;
 }

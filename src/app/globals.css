@@ -160,3 +160,39 @@ body::-webkit-scrollbar {
 .back-light {
   filter: url(#back-light);
 }
+
+.hoverScrollbarX {
+  scrollbar-color: transparent transparent;
+  scrollbar-width: thin;
+}
+
+.hoverScrollbarX:hover,
+.hoverScrollbarX:focus-within {
+  scrollbar-color: rgba(var(--foreground-rgb), 0.32) transparent;
+}
+
+.hoverScrollbarX::-webkit-scrollbar {
+  height: 8px;
+}
+
+.hoverScrollbarX::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.hoverScrollbarX::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  background-clip: content-box;
+}
+
+.hoverScrollbarX:hover::-webkit-scrollbar-thumb,
+.hoverScrollbarX:focus-within::-webkit-scrollbar-thumb {
+  background: rgba(var(--foreground-rgb), 0.32);
+  background-clip: content-box;
+}
+
+.hoverScrollbarX::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--foreground-rgb), 0.48);
+  background-clip: content-box;
+}

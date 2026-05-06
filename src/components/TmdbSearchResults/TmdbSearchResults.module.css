@@ -31,9 +31,6 @@
   bottom: 3rem;
 }
 
-.cards::-webkit-scrollbar {
-  display: none;
-}
 .card-wrapper {
   cursor: pointer;
 }

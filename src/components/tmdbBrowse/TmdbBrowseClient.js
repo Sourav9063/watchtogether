@@ -2,9 +2,8 @@
 
 import TmdbCard from "@/components/TmdbSearchResults/TmdbCard";
 import { Stores } from "@/helper/CONSTANTS";
-import { useHorizontalScroll } from "@/helper/hooks/useHorizontalScroll";
 import { useStore } from "@/helper/hooks/useStore";
-import { use, useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useRef, useState } from "react";
 import {
   BROWSE_PAGE_PREFETCH_BATCH_SIZE,
   createTmdbBrowseKey,
@@ -85,7 +84,7 @@ function TmdbMediaSection({
 }) {
   const [, setSearchResults] = useStore(Stores.searchResults);
   const [, setIframeUrl] = useStore(Stores.iframeUrl);
-  const cardsRef = useHorizontalScroll();
+  const cardsRef = useRef(null);
   const [page, setPage] = useState(1);
   const initialData =
     initialMediaByKey[
@@ -224,7 +223,7 @@ function TmdbMediaSection({
         <p className={styles.status}>No result found</p>
       )}
 
-      <div className={styles.cards} ref={cardsRef}>
+      <div className={`${styles.cards} hoverScrollbarX`} ref={cardsRef}>
         {canLoadPreviousPage && (
           <button
             aria-label={`Load page ${page - 1} of ${title}`}
