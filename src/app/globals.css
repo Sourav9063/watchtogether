@@ -196,3 +196,13 @@ body::-webkit-scrollbar {
   background: rgba(var(--foreground-rgb), 0.48);
   background-clip: content-box;
 }
+
+.dragScrollX {
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.dragScrollXActive {
+  cursor: grabbing;
+}

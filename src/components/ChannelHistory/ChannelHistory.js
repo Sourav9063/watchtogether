@@ -2,8 +2,11 @@ import React from "react";
 import { Constants } from "../../helper/CONSTANTS";
 import styles from "./ChannelHistory.module.css";
 import Channel from "@/components/Channel/Channel";
+import { useDragScroll } from "@/helper/hooks/useDragScroll";
 
 const ChannelHistory = ({ onChannelClick, history, handleClearHistory }) => {
+  const ref = useDragScroll();
+
   if (history?.length === 0) {
     return <></>;
   }
@@ -16,7 +19,10 @@ const ChannelHistory = ({ onChannelClick, history, handleClearHistory }) => {
           Clear History
         </button>
       </div>
-      <ul className={`${styles.historyList} hoverScrollbarX`}>
+      <ul
+        className={`${styles.historyList} hoverScrollbarX dragScrollX`}
+        ref={ref}
+      >
         {history.map((channel, index) => (
           <Channel
             key={channel.url + Constants.LocalStorageKey.CHANNEL_HISTORY + index}
