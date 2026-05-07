@@ -1,6 +1,9 @@
 import config from "@/config";
 import {
   createTmdbBrowseKey,
+  getDefaultDiscoveryFilters,
+  getTmdbBrowseFilterKey,
+  getTmdbDiscoveryParams,
   mediaSections,
   PREFETCH_TMDB_PAGE_COUNT,
   TMDB_REVALIDATE_SECONDS,
@@ -98,13 +101,23 @@ export async function getTmdbBrowseInitialData() {
   );
   const genreRequest = firstMovieGenreId
     ? prefetchPages.map(async (page) => {
+        const discoveryFilters = {
+          ...getDefaultDiscoveryFilters("movie"),
+          genreId: firstMovieGenreId,
+        };
         const data = await fetchTmdbBrowse("/discover/movie", {
           page,
-          with_genres: firstMovieGenreId,
+          ...getTmdbDiscoveryParams("movie", discoveryFilters),
         });
 
         return [
-          createTmdbBrowseKey("/discover/movie", "movie", firstMovieGenreId, page),
+          createTmdbBrowseKey(
+            "/discover/movie",
+            "movie",
+            firstMovieGenreId,
+            page,
+            getTmdbBrowseFilterKey(discoveryFilters),
+          ),
           data,
         ];
       })

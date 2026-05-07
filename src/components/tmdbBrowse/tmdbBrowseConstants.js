@@ -3,8 +3,43 @@ export const MAX_TMDB_PAGE = 500;
 export const PREFETCH_TMDB_PAGE_COUNT = 3;
 export const BROWSE_PAGE_PREFETCH_BATCH_SIZE = 3;
 export const TMDB_REVALIDATE_SECONDS = 60 * 60 * 24;
+export const DEFAULT_DISCOVERY_SORT_KEY = "popular";
+export const DEFAULT_DISCOVERY_VOTE_COUNT = "100";
+
+export const discoverySortOptions = [
+  {
+    key: "popular",
+    label: "Popular",
+    movieSortBy: "popularity.desc",
+    tvSortBy: "popularity.desc",
+  },
+  {
+    key: "latest",
+    label: "Latest",
+    movieSortBy: "primary_release_date.desc",
+    tvSortBy: "first_air_date.desc",
+  },
+  {
+    key: "rating",
+    label: "Rating",
+    movieSortBy: "vote_average.desc",
+    tvSortBy: "vote_average.desc",
+  },
+  {
+    key: "title",
+    label: "Title",
+    movieSortBy: "title.asc",
+    tvSortBy: "name.asc",
+  },
+];
 
 export const mediaSections = [
+  // {
+  //   key: "latest-movie-releases",
+  //   title: "Latest Movie Releases",
+  //   mediaType: "movie",
+  //   endpoint: "/movie/now_playing",
+  // },
   {
     key: "popular-movies",
     title: "Popular Movies",
@@ -17,6 +52,12 @@ export const mediaSections = [
     mediaType: "movie",
     endpoint: "/movie/top_rated",
   },
+  // {
+  //   key: "latest-tv-releases",
+  //   title: "Latest TV Releases",
+  //   mediaType: "tv",
+  //   endpoint: "/tv/on_the_air",
+  // },
   {
     key: "popular-tv",
     title: "Popular TV Shows",
@@ -55,11 +96,66 @@ export function normalizeTmdbItem(item, mediaType, genresById) {
   };
 }
 
+export function getDiscoverySortBy(mediaType, sortKey) {
+  const sortOption =
+    discoverySortOptions.find((option) => option.key === sortKey) ||
+    discoverySortOptions.find(
+      (option) => option.key === DEFAULT_DISCOVERY_SORT_KEY,
+    );
+
+  return mediaType === "tv" ? sortOption.tvSortBy : sortOption.movieSortBy;
+}
+
+export function getDefaultDiscoveryFilters(mediaType) {
+  return {
+    sortBy: getDiscoverySortBy(mediaType, DEFAULT_DISCOVERY_SORT_KEY),
+    voteCountGte: DEFAULT_DISCOVERY_VOTE_COUNT,
+  };
+}
+
+export function getTmdbBrowseFilterKey(filters = {}) {
+  return Object.entries(filters)
+    .filter(([, value]) => value !== undefined && value !== null && value !== "")
+    .sort(([firstKey], [secondKey]) => firstKey.localeCompare(secondKey))
+    .map(([key, value]) => `${key}-${value}`)
+    .join("_");
+}
+
+export function getTmdbDiscoveryParams(mediaType, filters = {}) {
+  const params = {};
+
+  if (filters.genreId) {
+    params.with_genres = filters.genreId;
+  }
+
+  if (filters.sortBy) {
+    params.sort_by = filters.sortBy;
+  }
+
+  if (filters.year) {
+    params[mediaType === "tv" ? "first_air_date_year" : "primary_release_year"] =
+      filters.year;
+  }
+
+  if (filters.voteAverageGte) {
+    params["vote_average.gte"] = filters.voteAverageGte;
+  }
+
+  if (filters.voteCountGte) {
+    params["vote_count.gte"] = filters.voteCountGte;
+  }
+
+  return params;
+}
+
 export function createTmdbBrowseKey(
   endpoint,
   mediaType,
   genreId = "",
   page = 1,
+  filterKey = "",
 ) {
-  return `${endpoint}:${mediaType}:${genreId || ""}:page-${page}`;
+  const filterSegment = filterKey ? `:${filterKey}` : "";
+
+  return `${endpoint}:${mediaType}:${genreId || ""}${filterSegment}:page-${page}`;
 }

@@ -14,14 +14,17 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
+  justify-items: center;
   gap: 1rem;
   width: min(100% - 2rem, 1080px);
   margin: 0 auto;
+  text-align: center;
 }
 
 .titleBlock {
   display: grid;
   gap: 0.25rem;
+  justify-items: center;
   min-width: 0;
 }
 
@@ -33,7 +36,8 @@
   text-transform: uppercase;
 }
 
-.sectionHeader h2 {
+.sectionHeader h2,
+.genreTitleHeader h2 {
   color: var(--header-color);
   font-size: 2.2rem;
   line-height: 1.15;
@@ -109,7 +113,8 @@
 }
 
 .pageButton:disabled,
-.genreSelect select:disabled {
+.genreSelect select:disabled,
+.discoverySelect select:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
@@ -248,8 +253,16 @@
   padding-top: 1rem;
 }
 
+.genreTitleHeader {
+  display: grid;
+  justify-items: center;
+  width: min(100% - 2rem, 1080px);
+  margin: 0 auto 1rem;
+  text-align: center;
+}
+
 .genreSection .sectionHeader {
-  grid-template-columns: minmax(220px, 1fr) minmax(420px, auto) auto;
+  grid-template-columns: 1fr;
   align-items: end;
   padding: 1rem;
   border: 1px solid rgba(var(--foreground-rgb), 0.12);
@@ -264,7 +277,8 @@
 .genreControls {
   display: flex;
   align-items: flex-end;
-  justify-content: flex-end;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 1rem;
 }
 
@@ -277,18 +291,28 @@
   background: var(--hover-color);
 }
 
-.genreSelect {
+.genreSelect,
+.discoverySelect {
   display: grid;
-  min-width: 220px;
   color: color-mix(in srgb, var(--text-color) 76%, transparent);
   font-size: 0.9rem;
 }
 
-.genreSelect span {
+.genreSelect {
+  min-width: 200px;
+}
+
+.discoverySelect {
+  min-width: 142px;
+}
+
+.genreSelect span,
+.discoverySelect span {
   display: none;
 }
 
-.genreSelect select {
+.genreSelect select,
+.discoverySelect select {
   width: 100%;
   height: 38px;
   padding: 0.65rem;
@@ -313,7 +337,13 @@
     flex-direction: column;
   }
 
-  .sectionHeader h2 {
+  .genreSelect,
+  .discoverySelect {
+    min-width: 0;
+  }
+
+  .sectionHeader h2,
+  .genreTitleHeader h2 {
     font-size: 1.7rem;
   }
 

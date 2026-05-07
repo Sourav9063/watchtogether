@@ -8,6 +8,10 @@ import { use, useEffect, useMemo, useState } from "react";
 import {
   BROWSE_PAGE_PREFETCH_BATCH_SIZE,
   createTmdbBrowseKey,
+  discoverySortOptions,
+  getDefaultDiscoveryFilters,
+  getDiscoverySortBy,
+  getTmdbBrowseFilterKey,
   MAX_TMDB_PAGE,
   mediaSections,
   normalizeTmdbItem,
@@ -15,9 +19,24 @@ import {
 import styles from "./TmdbBrowse.module.css";
 
 const browseMediaCache = new Map();
+const EMPTY_DISCOVERY_FILTERS = {};
+const ratingOptions = ["8", "7", "6", "5", "4", "3", "2", "1", "0"];
 
-async function fetchBrowseMedia(endpoint, page, genreId, signal) {
-  const cacheKey = createTmdbBrowseKey(endpoint, "request", genreId, page);
+async function fetchBrowseMedia(
+  endpoint,
+  page,
+  genreId,
+  discoveryFilters,
+  signal,
+) {
+  const filterKey = getTmdbBrowseFilterKey(discoveryFilters);
+  const cacheKey = createTmdbBrowseKey(
+    endpoint,
+    "request",
+    genreId,
+    page,
+    filterKey,
+  );
   const cachedData = browseMediaCache.get(cacheKey);
 
   if (cachedData) {
@@ -32,6 +51,11 @@ async function fetchBrowseMedia(endpoint, page, genreId, signal) {
   if (genreId) {
     searchParams.set("genreId", genreId);
   }
+
+  Object.entries(discoveryFilters).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === "") return;
+    searchParams.set(key, value);
+  });
 
   const response = await fetch(`/api/tmdb/browse?${searchParams}`, { signal });
 
@@ -82,14 +106,19 @@ function TmdbMediaSection({
   headerActions,
   initialMediaByKey,
   isGenreSection = false,
+  discoveryFilters = EMPTY_DISCOVERY_FILTERS,
 }) {
   const [, setSearchResults] = useStore(Stores.searchResults);
   const [, setIframeUrl] = useStore(Stores.iframeUrl);
   const cardsRef = useDragScroll();
   const [page, setPage] = useState(1);
+  const filterKey = useMemo(
+    () => getTmdbBrowseFilterKey(discoveryFilters),
+    [discoveryFilters],
+  );
   const initialData =
     initialMediaByKey[
-      createTmdbBrowseKey(endpoint, mediaType, genreId, page)
+      createTmdbBrowseKey(endpoint, mediaType, genreId, page, filterKey)
     ];
   const initialState = useMemo(() => getSectionState(initialData), [initialData]);
   const [rawItems, setRawItems] = useState(initialState.rawItems);
@@ -102,7 +131,7 @@ function TmdbMediaSection({
     if (cardsRef.current) {
       cardsRef.current.scrollLeft = 0;
     }
-  }, [cardsRef, endpoint, genreId, mediaType]);
+  }, [cardsRef, endpoint, filterKey, genreId, mediaType]);
 
   useEffect(() => {
     if (initialData) {
@@ -124,6 +153,7 @@ function TmdbMediaSection({
           endpoint,
           page,
           genreId,
+          discoveryFilters,
           controller.signal,
         );
         const nextState = getSectionState(data);
@@ -146,7 +176,7 @@ function TmdbMediaSection({
     return () => {
       controller.abort();
     };
-  }, [endpoint, genreId, initialData, initialState, page]);
+  }, [discoveryFilters, endpoint, genreId, initialData, initialState, page]);
 
   useEffect(() => {
     if (page % BROWSE_PAGE_PREFETCH_BATCH_SIZE !== 0) {
@@ -160,19 +190,23 @@ function TmdbMediaSection({
     const controller = new AbortController();
 
     nextPages.forEach((nextPage) => {
-      fetchBrowseMedia(endpoint, nextPage, genreId, controller.signal).catch(
-        (err) => {
-          if (err.name !== "AbortError") {
-            console.log(err);
-          }
-        },
-      );
+      fetchBrowseMedia(
+        endpoint,
+        nextPage,
+        genreId,
+        discoveryFilters,
+        controller.signal,
+      ).catch((err) => {
+        if (err.name !== "AbortError") {
+          console.log(err);
+        }
+      });
     });
 
     return () => {
       controller.abort();
     };
-  }, [endpoint, genreId, page, totalPages]);
+  }, [discoveryFilters, endpoint, genreId, page, totalPages]);
 
   const items = useMemo(
     () =>
@@ -213,10 +247,17 @@ function TmdbMediaSection({
         isGenreSection ? styles.genreSection : ""
       }`}
     >
-      <div className={styles.sectionHeader}>
-        <div className={styles.titleBlock}>
+      {isGenreSection && (
+        <div className={styles.genreTitleHeader}>
           <h2>{title}</h2>
         </div>
+      )}
+      <div className={styles.sectionHeader}>
+        {!isGenreSection && (
+          <div className={styles.titleBlock}>
+            <h2>{title}</h2>
+          </div>
+        )}
         {headerActions}
       </div>
 
@@ -277,15 +318,30 @@ function TmdbMediaSection({
 
 function GenreSection({ genres, genresByType, initialMediaByKey }) {
   const [mediaType, setMediaType] = useState("movie");
+  const currentYear = new Date().getFullYear();
+  const yearOptions = useMemo(
+    () => Array.from({ length: 31 }, (_, index) => String(currentYear - index)),
+    [currentYear],
+  );
   const activeGenres = useMemo(
     () => genres[mediaType] || [],
     [genres, mediaType],
   );
   const [genreId, setGenreId] = useState("");
-  const selectedGenre = activeGenres.find(
-    (genre) => String(genre.id) === genreId,
-  );
+  const [sortKey, setSortKey] = useState("popular");
+  const [year, setYear] = useState("");
+  const [rating, setRating] = useState("");
   const endpoint = `/discover/${mediaType}`;
+  const discoveryFilters = useMemo(
+    () => ({
+      ...getDefaultDiscoveryFilters(mediaType),
+      sortBy: getDiscoverySortBy(mediaType, sortKey),
+      voteAverageGte: rating,
+      year,
+    }),
+    [mediaType, rating, sortKey, year],
+  );
+
   useEffect(() => {
     setGenreId((currentGenreId) => {
       if (activeGenres.some((genre) => String(genre.id) === currentGenreId)) {
@@ -302,6 +358,7 @@ function GenreSection({ genres, genresByType, initialMediaByKey }) {
         <TmdbMediaSection
           endpoint={endpoint}
           genreId={genreId}
+          discoveryFilters={discoveryFilters}
           genresById={genresByType[mediaType]}
           headerActions={
             <div className={styles.genreControls}>
@@ -336,12 +393,56 @@ function GenreSection({ genres, genresByType, initialMediaByKey }) {
                   ))}
                 </select>
               </label>
+
+              <label className={styles.discoverySelect}>
+                <span>Sort</span>
+                <select
+                  onChange={(event) => setSortKey(event.target.value)}
+                  value={sortKey}
+                >
+                  {discoverySortOptions.map((sortOption) => (
+                    <option key={sortOption.key} value={sortOption.key}>
+                      {sortOption.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className={styles.discoverySelect}>
+                <span>Year</span>
+                <select
+                  onChange={(event) => setYear(event.target.value)}
+                  value={year}
+                >
+                  <option value="">Any year</option>
+                  {yearOptions.map((yearOption) => (
+                    <option key={yearOption} value={yearOption}>
+                      {yearOption}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className={styles.discoverySelect}>
+                <span>Rating</span>
+                <select
+                  onChange={(event) => setRating(event.target.value)}
+                  value={rating}
+                >
+                  <option value="">Any rating</option>
+                  {ratingOptions.map((ratingOption) => (
+                    <option key={ratingOption} value={ratingOption}>
+                      {ratingOption}+ rating
+                    </option>
+                  ))}
+                </select>
+              </label>
             </div>
           }
           initialMediaByKey={initialMediaByKey}
           isGenreSection
           mediaType={mediaType}
-          title={`${selectedGenre?.name || "Genre"}`}
+          title={`Discover ${mediaType === "movie" ? "Movies" : "TV Shows"}`}
         />
       )}
     </section>
