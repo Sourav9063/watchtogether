@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React from "react";
 import styles from "./Channel.module.css";
 
@@ -5,11 +6,14 @@ const Channel = ({ channel, onClick }) => {
   return (
     <li className={styles.channelItem} onClick={() => onClick(channel)}>
       {channel.logo && (
-        <img
+        <Image
           src={channel.logo}
           alt={`${channel.name} logo`}
           // className={styles.channelLogo}
           className={`${styles["channelLogo"]} back-light`}
+          width={160}
+          height={120}
+          unoptimized
         />
       )}
       <div className={styles.channelInfo}>

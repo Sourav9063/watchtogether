@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useReactive } from "@/helper/hooks/useReactive";
 import styles from "../page.module.css";
 import { CardData } from "@/components/big-two/data/data";
@@ -51,7 +52,7 @@ export default function Personal() {
                 }}
               >
                 {/* <p>{JSON.stringify(card)}</p> */}
-                <img src={card.image} alt="" />
+                <Image src={card.image} alt={card.name} width={167} height={243} />
               </button>
             );
           })}

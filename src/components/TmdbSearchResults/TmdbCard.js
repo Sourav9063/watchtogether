@@ -1,3 +1,4 @@
+import Image from "next/image";
 import styles from "./TmdbSearchResults.module.css";
 import { getSeasonAndEpisode } from "@/helper/iframeFunc";
 import {
@@ -26,6 +27,8 @@ export default function TmdbCard({
     genres,
   } = details;
   const genresStr = genres?.map((item) => item.name).join(", ");
+  const imageUrl = poster_image_url || backdrop_image_url;
+  const shouldOptimizeImage = imageUrl?.startsWith("https://image.tmdb.org/");
   const onClick = (e) => {
     e.stopPropagation();
     addValueLocalStorageArray({
@@ -116,7 +119,15 @@ export default function TmdbCard({
           </div>
         )}
         <div className={`${styles["img-title"]} ${styles[""]} `}>
-          <img src={poster_image_url || backdrop_image_url} alt={title} />
+          {imageUrl && (
+            <Image
+              src={imageUrl}
+              alt={title}
+              width={250}
+              height={370}
+              unoptimized={!shouldOptimizeImage}
+            />
+          )}
           <div className={`${styles["title"]} ${styles[""]} `}>
             <h2>{title}</h2>
             {genresStr && <p>{genresStr}</p>}

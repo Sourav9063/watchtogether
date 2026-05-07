@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect, useRef, useCallback } from "react";
 import Tesseract from "tesseract.js";
 import styles from "./PrizeBondOCR.module.css";
@@ -339,10 +340,13 @@ const PrizeBondOCR = ({ onNumberDetected }) => {
             />
           )}
           {canvasPreview && isScanning && (
-            <img
+            <Image
               src={canvasPreview}
               className={styles.canvasPreview}
               alt="OCR Processing Preview"
+              width={200}
+              height={50}
+              unoptimized
             />
           )}
           {isScanning && workerReady && (
