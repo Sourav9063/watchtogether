@@ -191,6 +191,15 @@
   padding: 2rem 2rem 4rem;
 }
 
+.discoveryCardsLoading > * {
+  opacity: 0.42;
+  filter: grayscale(1) saturate(0.45);
+  pointer-events: none;
+  transition:
+    filter 180ms ease,
+    opacity 180ms ease;
+}
+
 .loadMoreCard {
   display: grid;
   flex: 0 0 190px;

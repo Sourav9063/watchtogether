@@ -176,7 +176,15 @@ function TmdbMediaSection({
     return () => {
       controller.abort();
     };
-  }, [discoveryFilters, endpoint, genreId, initialData, initialState, page]);
+  }, [
+    discoveryFilters,
+    endpoint,
+    genreId,
+    initialData,
+    initialState,
+    isGenreSection,
+    page,
+  ]);
 
   useEffect(() => {
     if (page % BROWSE_PAGE_PREFETCH_BATCH_SIZE !== 0) {
@@ -269,7 +277,12 @@ function TmdbMediaSection({
       )}
 
       <div
-        className={`${styles.cards} hoverScrollbarX dragScrollX`}
+        aria-busy={isGenreSection && status === "loading"}
+        className={`${styles.cards} ${
+          isGenreSection && status === "loading"
+            ? styles.discoveryCardsLoading
+            : ""
+        } hoverScrollbarX dragScrollX`}
         ref={cardsRef}
       >
         {canLoadPreviousPage && (
@@ -316,16 +329,11 @@ function TmdbMediaSection({
   );
 }
 
-function GenreSection({ genres, genresByType, initialMediaByKey }) {
-  const [mediaType, setMediaType] = useState("movie");
+function DiscoverySection({ genres, genresById, initialMediaByKey, mediaType }) {
   const currentYear = new Date().getFullYear();
   const yearOptions = useMemo(
     () => Array.from({ length: 31 }, (_, index) => String(currentYear - index)),
     [currentYear],
-  );
-  const activeGenres = useMemo(
-    () => genres[mediaType] || [],
-    [genres, mediaType],
   );
   const [genreId, setGenreId] = useState("");
   const [sortKey, setSortKey] = useState("popular");
@@ -344,13 +352,13 @@ function GenreSection({ genres, genresByType, initialMediaByKey }) {
 
   useEffect(() => {
     setGenreId((currentGenreId) => {
-      if (activeGenres.some((genre) => String(genre.id) === currentGenreId)) {
+      if (genres.some((genre) => String(genre.id) === currentGenreId)) {
         return currentGenreId;
       }
 
-      return activeGenres[0]?.id ? String(activeGenres[0].id) : "";
+      return genres[0]?.id ? String(genres[0].id) : "";
     });
-  }, [activeGenres]);
+  }, [genres]);
 
   return (
     <section className={styles.genreBlock}>
@@ -359,34 +367,17 @@ function GenreSection({ genres, genresByType, initialMediaByKey }) {
           endpoint={endpoint}
           genreId={genreId}
           discoveryFilters={discoveryFilters}
-          genresById={genresByType[mediaType]}
+          genresById={genresById}
           headerActions={
             <div className={styles.genreControls}>
-              <div className={styles.mediaToggle} aria-label="Genre media type">
-                <button
-                  className={mediaType === "movie" ? styles.activeToggle : ""}
-                  onClick={() => setMediaType("movie")}
-                  type="button"
-                >
-                  Movies
-                </button>
-                <button
-                  className={mediaType === "tv" ? styles.activeToggle : ""}
-                  onClick={() => setMediaType("tv")}
-                  type="button"
-                >
-                  TV Shows
-                </button>
-              </div>
-
               <label className={styles.genreSelect}>
                 <span>Genre</span>
                 <select
-                  disabled={activeGenres.length === 0}
+                  disabled={genres.length === 0}
                   onChange={(event) => setGenreId(event.target.value)}
                   value={genreId}
                 >
-                  {activeGenres.map((genre) => (
+                  {genres.map((genre) => (
                     <option key={genre.id} value={genre.id}>
                       {genre.name}
                     </option>
@@ -463,6 +454,26 @@ export default function TmdbBrowseClient({ initialDataPromise }) {
 
   return (
     <div className={styles.browse}>
+      {genres.movie.length > 0 && (
+        <DiscoverySection
+          genres={genres.movie}
+          genresById={genresByType.movie}
+          initialMediaByKey={initialMediaByKey}
+          mediaType="movie"
+        />
+      )}
+      {genres.tv.length > 0 && (
+        <DiscoverySection
+          genres={genres.tv}
+          genresById={genresByType.tv}
+          initialMediaByKey={initialMediaByKey}
+          mediaType="tv"
+        />
+      )}
+      {genres.movie.length === 0 && genres.tv.length === 0 && (
+        <p className={styles.status}>Genre list failed to load</p>
+      )}
+
       {mediaSections.map((section) => (
         <TmdbMediaSection
           endpoint={section.endpoint}
@@ -473,17 +484,6 @@ export default function TmdbBrowseClient({ initialDataPromise }) {
           title={section.title}
         />
       ))}
-
-      {(genres.movie.length > 0 || genres.tv.length > 0) && (
-        <GenreSection
-          genres={genres}
-          genresByType={genresByType}
-          initialMediaByKey={initialMediaByKey}
-        />
-      )}
-      {genres.movie.length === 0 && genres.tv.length === 0 && (
-        <p className={styles.status}>Genre list failed to load</p>
-      )}
     </div>
   );
 }

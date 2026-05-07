@@ -46,12 +46,6 @@ export const mediaSections = [
     mediaType: "movie",
     endpoint: "/movie/popular",
   },
-  {
-    key: "top-rated-movies",
-    title: "Top Rated Movies",
-    mediaType: "movie",
-    endpoint: "/movie/top_rated",
-  },
   // {
   //   key: "latest-tv-releases",
   //   title: "Latest TV Releases",
@@ -63,6 +57,12 @@ export const mediaSections = [
     title: "Popular TV Shows",
     mediaType: "tv",
     endpoint: "/tv/popular",
+  },
+  {
+    key: "top-rated-movies",
+    title: "Top Rated Movies",
+    mediaType: "movie",
+    endpoint: "/movie/top_rated",
   },
   {
     key: "top-rated-tv",

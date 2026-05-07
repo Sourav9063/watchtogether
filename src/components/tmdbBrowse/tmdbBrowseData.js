@@ -85,7 +85,10 @@ export async function getTmdbBrowseInitialData() {
     movie: movieGenres.genres || [],
     tv: tvGenres.genres || [],
   };
-  const firstMovieGenreId = genres.movie[0]?.id ? String(genres.movie[0].id) : "";
+  const firstDiscoverGenreIds = {
+    movie: genres.movie[0]?.id ? String(genres.movie[0].id) : "",
+    tv: genres.tv[0]?.id ? String(genres.tv[0].id) : "",
+  };
   const prefetchPages = Array.from(
     { length: PREFETCH_TMDB_PAGE_COUNT },
     (_, index) => index + 1,
@@ -99,29 +102,33 @@ export async function getTmdbBrowseInitialData() {
       ];
     }),
   );
-  const genreRequest = firstMovieGenreId
-    ? prefetchPages.map(async (page) => {
-        const discoveryFilters = {
-          ...getDefaultDiscoveryFilters("movie"),
-          genreId: firstMovieGenreId,
-        };
-        const data = await fetchTmdbBrowse("/discover/movie", {
-          page,
-          ...getTmdbDiscoveryParams("movie", discoveryFilters),
-        });
+  const genreRequest = Object.entries(firstDiscoverGenreIds).flatMap(
+    ([mediaType, genreId]) =>
+      genreId
+        ? prefetchPages.map(async (page) => {
+            const discoveryFilters = {
+              ...getDefaultDiscoveryFilters(mediaType),
+              genreId,
+            };
+            const endpoint = `/discover/${mediaType}`;
+            const data = await fetchTmdbBrowse(endpoint, {
+              page,
+              ...getTmdbDiscoveryParams(mediaType, discoveryFilters),
+            });
 
-        return [
-          createTmdbBrowseKey(
-            "/discover/movie",
-            "movie",
-            firstMovieGenreId,
-            page,
-            getTmdbBrowseFilterKey(discoveryFilters),
-          ),
-          data,
-        ];
-      })
-    : [];
+            return [
+              createTmdbBrowseKey(
+                endpoint,
+                mediaType,
+                genreId,
+                page,
+                getTmdbBrowseFilterKey(discoveryFilters),
+              ),
+              data,
+            ];
+          })
+        : [],
+  );
   const initialMediaEntries = await Promise.all([
     ...mediaRequests,
     ...genreRequest,
