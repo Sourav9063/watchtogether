@@ -371,7 +371,8 @@ function DiscoverySection({ genres, genresById, initialMediaByKey, mediaType }) 
           headerActions={
             <div className={styles.genreControls}>
               <label className={styles.genreSelect}>
-                <span>Genre</span>
+                <span className={styles.discoveryControlName}>Genre</span>
+                <span className={styles.discoveryControlDivider}>:</span>
                 <select
                   disabled={genres.length === 0}
                   onChange={(event) => setGenreId(event.target.value)}
@@ -386,7 +387,8 @@ function DiscoverySection({ genres, genresById, initialMediaByKey, mediaType }) 
               </label>
 
               <label className={styles.discoverySelect}>
-                <span>Order By</span>
+                <span className={styles.discoveryControlName}>Order By</span>
+                <span className={styles.discoveryControlDivider}>:</span>
                 <select
                   onChange={(event) => setSortKey(event.target.value)}
                   value={sortKey}
@@ -401,7 +403,8 @@ function DiscoverySection({ genres, genresById, initialMediaByKey, mediaType }) 
               </label>
 
               <label className={styles.discoverySelect}>
-                <span>Year</span>
+                <span className={styles.discoveryControlName}>Year</span>
+                <span className={styles.discoveryControlDivider}>:</span>
                 <select
                   onChange={(event) => setYear(event.target.value)}
                   value={year}
@@ -416,7 +419,8 @@ function DiscoverySection({ genres, genresById, initialMediaByKey, mediaType }) 
               </label>
 
               <label className={styles.discoverySelect}>
-                <span>Rating</span>
+                <span className={styles.discoveryControlName}>Rating</span>
+                <span className={styles.discoveryControlDivider}>:</span>
                 <select
                   onChange={(event) => setRating(event.target.value)}
                   value={rating}

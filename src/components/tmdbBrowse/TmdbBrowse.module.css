@@ -285,10 +285,10 @@
 
 .genreControls {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .mediaToggle {
@@ -302,33 +302,76 @@
 
 .genreSelect,
 .discoverySelect {
-  display: grid;
-  color: color-mix(in srgb, var(--text-color) 76%, transparent);
-  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 0;
+  padding: 0.28rem 0.75rem;
+  border: 1px solid rgba(var(--foreground-rgb), 0.1);
+  border-radius: 8px;
+  background:
+    linear-gradient(
+      218.73deg,
+      color-mix(in srgb, var(--left-color) 52%, transparent) 0%,
+      transparent 58%
+    ),
+    linear-gradient(
+      321.27deg,
+      transparent 48%,
+      color-mix(in srgb, var(--right-color) 52%, transparent) 100%
+    ),
+    color-mix(in srgb, var(--background-transparent) 88%, transparent);
+  color: var(--text-color);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .genreSelect {
-  min-width: 200px;
+  min-width: 290px;
 }
 
 .discoverySelect {
-  min-width: 142px;
+  min-width: 220px;
 }
 
-.genreSelect span,
-.discoverySelect span {
-  display: none;
+.discoveryControlName {
+  color: var(--text-color);
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.discoveryControlDivider {
+  color: color-mix(in srgb, var(--text-color) 68%, transparent);
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .genreSelect select,
 .discoverySelect select {
-  width: 100%;
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
   height: 38px;
-  padding: 0.65rem;
-  border: 1px solid #9000ff65;
-  border-radius: 5px;
-  background-color: #ffffff15;
+  min-height: 38px;
+  padding: 0 0.25rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
   color: var(--text-color);
+  font-size: 0.9rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.genreSelect select > option,
+.discoverySelect select > option {
+  background-color: black;
+  font-weight: bold;
 }
 
 @media screen and (max-width: 700px) {
@@ -349,6 +392,7 @@
   .genreSelect,
   .discoverySelect {
     min-width: 0;
+    width: 100%;
   }
 
   .sectionHeader h2,
