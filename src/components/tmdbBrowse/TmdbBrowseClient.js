@@ -386,10 +386,11 @@ function DiscoverySection({ genres, genresById, initialMediaByKey, mediaType }) 
               </label>
 
               <label className={styles.discoverySelect}>
-                <span>Sort</span>
+                <span>Order By</span>
                 <select
                   onChange={(event) => setSortKey(event.target.value)}
                   value={sortKey}
+                  aria-label="Order By"
                 >
                   {discoverySortOptions.map((sortOption) => (
                     <option key={sortOption.key} value={sortOption.key}>

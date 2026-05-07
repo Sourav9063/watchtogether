@@ -9,9 +9,15 @@ export const DEFAULT_DISCOVERY_VOTE_COUNT = "100";
 export const discoverySortOptions = [
   {
     key: "popular",
-    label: "Popular",
+    label: "Most liked",
     movieSortBy: "popularity.desc",
     tvSortBy: "popularity.desc",
+  },
+  {
+    key: "least-popular",
+    label: "Least liked",
+    movieSortBy: "popularity.asc",
+    tvSortBy: "popularity.asc",
   },
   {
     key: "latest",
@@ -20,16 +26,40 @@ export const discoverySortOptions = [
     tvSortBy: "first_air_date.desc",
   },
   {
+    key: "oldest",
+    label: "Oldest",
+    movieSortBy: "primary_release_date.asc",
+    tvSortBy: "first_air_date.asc",
+  },
+  {
     key: "rating",
-    label: "Rating",
+    label: "Highest rating",
     movieSortBy: "vote_average.desc",
     tvSortBy: "vote_average.desc",
   },
   {
+    key: "lowest-rating",
+    label: "Lowest rating",
+    movieSortBy: "vote_average.asc",
+    tvSortBy: "vote_average.asc",
+  },
+  {
+    key: "most-voted",
+    label: "Most votes",
+    movieSortBy: "vote_count.desc",
+    tvSortBy: "vote_count.desc",
+  },
+  {
     key: "title",
-    label: "Title",
+    label: "Title A-Z",
     movieSortBy: "title.asc",
     tvSortBy: "name.asc",
+  },
+  {
+    key: "title-desc",
+    label: "Title Z-A",
+    movieSortBy: "title.desc",
+    tvSortBy: "name.desc",
   },
 ];
 
