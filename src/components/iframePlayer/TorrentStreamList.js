@@ -15,7 +15,7 @@ function removeTorrentioBrand(value) {
 
 export default function TorrentStreamList() {
   const cardsRef = useDragScroll();
-  const { resolvedId, selectedStream, setSelectedStream, streams } =
+  const { pageKey, selectedStream, setSelectedStream, streams } =
     useTorrent();
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function TorrentStreamList() {
       left: 0,
       behavior: "smooth",
     });
-  }, [cardsRef, resolvedId]);
+  }, [cardsRef, pageKey]);
 
   function handleSelectStream(stream) {
     setSelectedStream(stream);

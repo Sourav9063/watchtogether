@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import config from "@/config";
 import { createDataContext } from "@/helper/createContext";
 
 const DEFAULT_STREMIO_ADDON_URL =
   process.env.NEXT_PUBLIC_STREMIO_ADDON_URL || "";
 const tmdbExternalIdCache = new Map();
+const TORRENT_QUERY_KEYS = ["f", "m"];
 
 const [TorrentDataProvider, useTorrent] = createDataContext({
   name: "TorrentContext",
@@ -29,6 +30,15 @@ function getStremioType(type) {
   if (type === "movie") return "movie";
   if (type === "tv" || type === "anime") return "series";
   return "";
+}
+
+function getIframePageKey(iframeUrl) {
+  if (!iframeUrl?.type || !iframeUrl?.id) return "";
+  if (iframeUrl.type === "movie") return `movie:${iframeUrl.id}`;
+
+  return `${iframeUrl.type}:${iframeUrl.id}:${iframeUrl.season || 1}:${
+    iframeUrl.episode || 1
+  }`;
 }
 
 function createStremioStreamUrl(addonBaseUrl, iframeUrl, imdbId) {
@@ -88,6 +98,58 @@ function createMagnetFromInfoHash(infoHash, sources = []) {
     .join("")}`;
 }
 
+function getInitialSharedStream() {
+  if (typeof window === "undefined") return null;
+
+  const params = new URLSearchParams(window.location.search);
+  const magnetURI = params.get("m") || "";
+
+  if (!magnetURI) return null;
+
+  const filename = params.get("f") || "";
+  const title = filename || "Torrent stream";
+
+  return {
+    id: `shared-${magnetURI}-${filename}`,
+    name: title,
+    title,
+    displayTitle: title,
+    filename,
+    fileIdx: undefined,
+    magnetURI,
+    provider: "",
+    shouldShowFilename: false,
+    size: "",
+    titleLines: [title],
+    torrentUrl: "",
+  };
+}
+
+function writeTorrentQueryParams(stream) {
+  if (typeof window === "undefined") return;
+
+  const params = new URLSearchParams(window.location.search);
+
+  TORRENT_QUERY_KEYS.forEach((key) => params.delete(key));
+
+  if (stream) {
+    if (stream.filename) params.set("f", stream.filename);
+    if (stream.magnetURI) params.set("m", stream.magnetURI);
+  }
+
+  const queryString = params.toString();
+  const nextUrl = `${window.location.pathname}${
+    queryString ? `?${queryString}` : ""
+  }${window.location.hash}`;
+
+  window.history.replaceState(null, "", nextUrl);
+}
+
+function preservePlayableStream(current) {
+  if (current?.magnetURI || current?.torrentUrl) return current;
+  return null;
+}
+
 function normalizeTorrentStream(stream, index) {
   const infoHash = stream.infoHash || stream.infohash || "";
   const torrentUrl =
@@ -139,13 +201,28 @@ function normalizeTorrentStream(stream, index) {
 }
 
 export function TorrentProvider({ children, iframeUrl }) {
-  const [isTorrentEnabled, setIsTorrentEnabled] = useState(false);
+  const [isTorrentEnabled, setIsTorrentEnabled] = useState(true);
   const [streams, setStreams] = useState([]);
-  const [selectedStream, setSelectedStream] = useState(null);
+  const [selectedStream, setSelectedStreamState] =
+    useState(getInitialSharedStream);
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
-  const [resolvedId, setResolvedId] = useState("");
   const stremioType = getStremioType(iframeUrl?.type);
+  const pageKey = getIframePageKey(iframeUrl);
+
+  const setSelectedStream = useCallback(
+    (stream) => {
+      setSelectedStreamState(
+        stream
+          ? {
+              ...stream,
+              pageKey,
+            }
+          : null,
+      );
+    },
+    [pageKey],
+  );
 
   const selectedStreamTitle = useMemo(() => {
     if (!selectedStream) return "";
@@ -159,7 +236,6 @@ export function TorrentProvider({ children, iframeUrl }) {
     if (!isTorrentEnabled || !selectedStream) return null;
 
     return {
-      fileIdx: selectedStream.fileIdx,
       file: selectedStream.filename,
       magnetURI: selectedStream.magnetURI,
       title: selectedStreamTitle,
@@ -170,11 +246,15 @@ export function TorrentProvider({ children, iframeUrl }) {
   useEffect(() => {
     if (!isTorrentEnabled) return;
 
+    setSelectedStreamState((current) => {
+      if (!current?.pageKey || current.pageKey === pageKey) return current;
+      return null;
+    });
+
     if (!iframeUrl?.type || !iframeUrl?.id) {
       setStatus("idle");
       setStreams([]);
-      setSelectedStream(null);
-      setResolvedId("");
+      setSelectedStreamState(preservePlayableStream);
       setError("Choose movie or series first");
       return;
     }
@@ -182,8 +262,7 @@ export function TorrentProvider({ children, iframeUrl }) {
     if (!DEFAULT_STREMIO_ADDON_URL.trim()) {
       setStatus("idle");
       setStreams([]);
-      setSelectedStream(null);
-      setResolvedId("");
+      setSelectedStreamState(preservePlayableStream);
       setError("NEXT_PUBLIC_STREMIO_ADDON_URL missing");
       return;
     }
@@ -211,11 +290,12 @@ export function TorrentProvider({ children, iframeUrl }) {
           throw new Error("Stream URL could not be created");
         }
 
-        setResolvedId(
-          stremioType === "movie"
-            ? imdbId
-            : `${imdbId}:${iframeUrl.season || 1}:${iframeUrl.episode || 1}`,
-        );
+        setSelectedStreamState((current) => {
+          if (!current) return null;
+          if (current.pageKey && current.pageKey !== pageKey) return null;
+
+          return current;
+        });
 
         const response = await fetch(streamUrl, { signal: controller.signal });
 
@@ -235,14 +315,12 @@ export function TorrentProvider({ children, iframeUrl }) {
           .filter(Boolean);
 
         setStreams(nextStreams);
-        setSelectedStream(null);
         setStatus("success");
       } catch (err) {
         if (err.name === "AbortError") return;
 
         setStreams([]);
-        setSelectedStream(null);
-        setResolvedId("");
+        setSelectedStreamState(preservePlayableStream);
         setStatus("error");
         setError(err.message || "Stream request failed");
       }
@@ -260,15 +338,20 @@ export function TorrentProvider({ children, iframeUrl }) {
     iframeUrl?.season,
     iframeUrl?.type,
     isTorrentEnabled,
+    pageKey,
     stremioType,
   ]);
+
+  useEffect(() => {
+    writeTorrentQueryParams(selectedStream);
+  }, [selectedStream]);
 
   const value = useMemo(
     () => ({
       error,
       isTorrentEnabled,
+      pageKey,
       playerStream,
-      resolvedId,
       selectedStream,
       setIsTorrentEnabled,
       setSelectedStream,
@@ -278,9 +361,10 @@ export function TorrentProvider({ children, iframeUrl }) {
     [
       error,
       isTorrentEnabled,
+      pageKey,
       playerStream,
-      resolvedId,
       selectedStream,
+      setSelectedStream,
       status,
       streams,
     ],
