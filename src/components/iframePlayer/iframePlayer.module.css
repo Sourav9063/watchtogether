@@ -368,7 +368,8 @@
   max-width: calc(100vw - 0.5rem);
   overflow-x: hidden;
   border-radius: 5px;
-  background: linear-gradient(
+  background:
+    linear-gradient(
       218.73deg,
       rgba(255, 0, 0, 0.5) 0%,
       var(--left-color) 20%,
@@ -442,6 +443,9 @@
   }
 }
 @media (max-width: 800px) {
+  .webtorMain {
+    width: calc(100vw - 6px);
+  }
   .iframe {
     width: calc(100vw - 6px);
     max-height: calc(100vh - 6px);
