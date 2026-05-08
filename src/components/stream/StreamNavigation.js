@@ -6,7 +6,6 @@ export default function StreamNavigation() {
     <nav className={navStyles.nav}>
       <Link href="/stream">Home</Link>
       <Link href="/live">Live</Link>
-      <Link href="/torrent">Torrent</Link>
       <Link href="/stream/anime">Anime</Link>
       <Link href="/stream/livesports">Live Sports</Link>
       <Link href="/stream/iptv">IPTV</Link>
