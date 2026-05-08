@@ -116,10 +116,14 @@ function TmdbMediaSection({
     () => getTmdbBrowseFilterKey(discoveryFilters),
     [discoveryFilters],
   );
-  const initialData =
-    initialMediaByKey[
-      createTmdbBrowseKey(endpoint, mediaType, genreId, page, filterKey)
-    ];
+  const currentMediaKey = createTmdbBrowseKey(
+    endpoint,
+    mediaType,
+    genreId,
+    page,
+    filterKey,
+  );
+  const initialData = initialMediaByKey[currentMediaKey];
   const initialState = useMemo(() => getSectionState(initialData), [initialData]);
   const [rawItems, setRawItems] = useState(initialState.rawItems);
   const [totalPages, setTotalPages] = useState(initialState.totalPages);
@@ -187,14 +191,27 @@ function TmdbMediaSection({
   ]);
 
   useEffect(() => {
-    if (page % BROWSE_PAGE_PREFETCH_BATCH_SIZE !== 0) {
+    const nextPages = Array.from(
+      { length: BROWSE_PAGE_PREFETCH_BATCH_SIZE - 1 },
+      (_, index) => page + index + 1,
+    ).filter(
+      (nextPage) =>
+        nextPage <= totalPages &&
+        !initialMediaByKey[
+          createTmdbBrowseKey(
+            endpoint,
+            mediaType,
+            genreId,
+            nextPage,
+            filterKey,
+          )
+        ],
+    );
+
+    if (nextPages.length === 0) {
       return;
     }
 
-    const nextPages = Array.from(
-      { length: BROWSE_PAGE_PREFETCH_BATCH_SIZE },
-      (_, index) => page + index + 1,
-    ).filter((nextPage) => nextPage <= totalPages);
     const controller = new AbortController();
 
     nextPages.forEach((nextPage) => {
@@ -214,7 +231,16 @@ function TmdbMediaSection({
     return () => {
       controller.abort();
     };
-  }, [discoveryFilters, endpoint, genreId, page, totalPages]);
+  }, [
+    discoveryFilters,
+    endpoint,
+    filterKey,
+    genreId,
+    initialMediaByKey,
+    mediaType,
+    page,
+    totalPages,
+  ]);
 
   const items = useMemo(
     () =>

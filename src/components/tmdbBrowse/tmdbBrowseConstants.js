@@ -145,7 +145,13 @@ export function getDefaultDiscoveryFilters(mediaType) {
 
 export function getTmdbBrowseFilterKey(filters = {}) {
   return Object.entries(filters)
-    .filter(([, value]) => value !== undefined && value !== null && value !== "")
+    .filter(
+      ([key, value]) =>
+        key !== "genreId" &&
+        value !== undefined &&
+        value !== null &&
+        value !== "",
+    )
     .sort(([firstKey], [secondKey]) => firstKey.localeCompare(secondKey))
     .map(([key, value]) => `${key}-${value}`)
     .join("_");
