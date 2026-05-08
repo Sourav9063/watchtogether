@@ -11,6 +11,7 @@ export default function TmdbSearch() {
   const [query, setQuery] = useStore(Stores.query);
   const debounce = useDebounce(query, 2000);
   const isMounted = useRef(false);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -41,11 +42,42 @@ export default function TmdbSearch() {
       <PasteHistory />
       <div className={`${styles["search"]} ${styles[""]} `}>
         <h1>Search</h1>
-        <input
-          type="text"
-          value={query || ""}
-          onChange={(e) => setQuery(e.target.value)}
-        />
+        <div className={styles["search-input-wrapper"]}>
+          <input
+            ref={inputRef}
+            type="text"
+            value={query || ""}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          {!!query && (
+            <button
+              aria-label="Clear search"
+              className={styles["clear-search"]}
+              type="button"
+              onClick={() => {
+                setQuery("");
+                inputRef.current?.focus();
+              }}
+            >
+              <svg
+                aria-hidden="true"
+                fill="none"
+                height="18"
+                viewBox="0 0 24 24"
+                width="18"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M18 6 6 18M6 6l12 12"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
         <div>
           <label className={styles["anime"]} htmlFor="isAnime">
             <h1>Anime</h1>
