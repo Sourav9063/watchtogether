@@ -9,9 +9,5 @@ export const metadata = {
 export const revalidate = 21600;
 
 export default function StreamLayout({ children }) {
-  return (
-    <>
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }
