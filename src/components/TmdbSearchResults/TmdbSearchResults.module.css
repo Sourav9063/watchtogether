@@ -9,7 +9,7 @@
   --y: 1rem;
 }
 .search-result-wrapper h1 {
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--header-color);
   font-size: 2.5rem;
   font-weight: bold;
   background-clip: text;
