@@ -1,3 +1,11 @@
+.webtorContainer {
+  display: grid;
+  gap: 0.75rem;
+  width: 100%;
+}
+
 .playerContainer {
-  /* No specific styles here as width and height are passed as props */
+  overflow: hidden;
+  border-radius: 8px;
+  background: #000;
 }
