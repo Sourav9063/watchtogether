@@ -38,8 +38,12 @@ function IframePlayerContent({ iframeUrl }) {
           playerStream ? (
             <div className={styles.webtorMain}>
               <DynamicWebtorPlayer
+                file={playerStream.file}
                 fileIdx={playerStream.fileIdx}
                 height="100%"
+                key={`${playerStream.magnetURI || playerStream.torrentUrl}-${
+                  playerStream.fileIdx ?? playerStream.file
+                }`}
                 magnetURI={playerStream.magnetURI}
                 title={playerStream.title}
                 torrentUrl={playerStream.torrentUrl}

@@ -42,6 +42,7 @@ const WebtorPlayer = ({
   magnetURI,
   torrentUrl,
   fileIdx,
+  file,
   path,
   title,
   width = '100%',
@@ -81,16 +82,29 @@ const WebtorPlayer = ({
           config.torrentUrl = torrentUrl;
         }
 
-        if (fileIdx !== undefined && fileIdx !== null && fileIdx !== '') {
-          config.fileIdx = Number(fileIdx);
-        }
-
         if (path) {
           config.path = path;
         }
 
+        if (file) {
+          config.file = file;
+        }
+
         if (title) {
           config.title = title;
+        }
+
+        if (fileIdx !== undefined && fileIdx !== null && fileIdx !== '') {
+          config.on = (event) => {
+            if (event?.name !== 'TORRENT_FETCHED') return;
+
+            const selectedFile = event.data?.files?.[Number(fileIdx)];
+            const selectedPath = selectedFile?.path;
+
+            if (selectedPath) {
+              event.player?.open?.(selectedPath);
+            }
+          };
         }
 
         window.webtor.push(config);
@@ -105,7 +119,7 @@ const WebtorPlayer = ({
       isCancelled = true;
       playerElement.innerHTML = '';
     };
-  }, [fileIdx, height, magnetURI, path, title, torrentUrl, width]);
+  }, [file, fileIdx, height, magnetURI, path, title, torrentUrl, width]);
 
   return (
     <div className={styles.webtorContainer}>

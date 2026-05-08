@@ -160,6 +160,7 @@ export function TorrentProvider({ children, iframeUrl }) {
 
     return {
       fileIdx: selectedStream.fileIdx,
+      file: selectedStream.filename,
       magnetURI: selectedStream.magnetURI,
       title: selectedStreamTitle,
       torrentUrl: selectedStream.torrentUrl,
