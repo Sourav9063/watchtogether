@@ -13,12 +13,13 @@
 
 .streamCard {
   display: grid;
+  position: relative;
   flex: 0 0 250px;
   gap: 0.5rem;
   width: min(250px, 100%);
   height: 370px;
   margin-top: 0;
-  padding: 0.9rem;
+  padding: 3.1rem 0.9rem 0.9rem;
   border: 1px solid rgba(var(--foreground-rgb), 0.16);
   border-radius: 8px;
   background:
@@ -46,11 +47,26 @@
   outline: 1px solid rgba(100, 91, 255, 0.9);
 }
 
-.streamCard strong {
+.streamQuality {
+  position: absolute;
+  top: 0.9rem;
+  left: 0.9rem;
+  right: 0.9rem;
+  display: block;
+  color: var(--text-color);
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.streamNameLines {
   display: grid;
   gap: 0.12rem;
   font-size: 1rem;
+  font-weight: 800;
   line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
 .streamTitle,

@@ -5,6 +5,14 @@ import { useDragScroll } from "@/helper/hooks/useDragScroll";
 import styles from "./TorrentStreamList.module.css";
 import { useTorrent } from "./TorrentContext";
 
+function removeTorrentioBrand(value) {
+  return (value || "")
+    .replace(/\btorrentio\b/gi, "")
+    .replace(/[|:•-]\s*$/g, "")
+    .replace(/^\s*[|:•-]\s*/g, "")
+    .trim();
+}
+
 export default function TorrentStreamList() {
   const cardsRef = useDragScroll();
   const { resolvedId, selectedStream, setSelectedStream, streams } =
@@ -31,41 +39,56 @@ export default function TorrentStreamList() {
       className={`${styles.streamCards} hoverScrollbarX dragScrollX`}
       ref={cardsRef}
     >
-      {streams.map((stream) => (
-        <button
-          className={`${styles.streamCard} ${
-            selectedStream?.id === stream.id ? styles.streamCardActive : ""
-          }`}
-          draggable={false}
-          key={stream.id}
-          onClick={() => handleSelectStream(stream)}
-          onDragStart={(event) => event.preventDefault()}
-          type="button"
-        >
-          <strong>
-            {stream.name.split("\n").map((line) => (
-              <span key={line}>{line}</span>
-            ))}
-          </strong>
-          <span className={styles.streamTitle}>{stream.displayTitle}</span>
-          {stream.shouldShowFilename && (
-            <span className={styles.streamFilename}>{stream.filename}</span>
-          )}
-          {(stream.peerCount || stream.size || stream.provider) && (
-            <span className={styles.streamStats}>
-              <span className={styles.streamStatsPrimary}>
-                {stream.peerCount && <small>👤 {stream.peerCount}</small>}
-                {stream.size && <small>💾 {stream.size}</small>}
+      {streams.map((stream) => {
+        const nameLines = stream.name
+          .split("\n")
+          .map(removeTorrentioBrand)
+          .filter(Boolean);
+        const displayNameLines = nameLines.length > 0 ? nameLines : [stream.name];
+        const [qualityLabel, ...releaseLines] = displayNameLines;
+        const provider = removeTorrentioBrand(stream.provider);
+
+        return (
+          <button
+            className={`${styles.streamCard} ${
+              selectedStream?.id === stream.id ? styles.streamCardActive : ""
+            }`}
+            draggable={false}
+            key={stream.id}
+            onClick={() => handleSelectStream(stream)}
+            onDragStart={(event) => event.preventDefault()}
+            type="button"
+          >
+            <strong className={styles.streamQuality}>
+              {qualityLabel}
+            </strong>
+            {releaseLines.length > 0 && (
+              <span className={styles.streamNameLines}>
+                {releaseLines.map((line, lineIndex) => (
+                  <span key={`${line}-${lineIndex}`}>{line}</span>
+                ))}
               </span>
-              {stream.provider && (
-                <span className={styles.streamStatsSource}>
-                  <small>⚙️ {stream.provider}</small>
+            )}
+            <span className={styles.streamTitle}>{stream.displayTitle}</span>
+            {stream.shouldShowFilename && (
+              <span className={styles.streamFilename}>{stream.filename}</span>
+            )}
+            {(stream.peerCount || stream.size || provider) && (
+              <span className={styles.streamStats}>
+                <span className={styles.streamStatsPrimary}>
+                  {stream.peerCount && <small>👤 {stream.peerCount}</small>}
+                  {stream.size && <small>💾 {stream.size}</small>}
                 </span>
-              )}
-            </span>
-          )}
-        </button>
-      ))}
+                {provider && (
+                  <span className={styles.streamStatsSource}>
+                    <small>⚙️ {provider}</small>
+                  </span>
+                )}
+              </span>
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }
