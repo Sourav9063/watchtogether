@@ -125,6 +125,14 @@ function getInitialSharedStream() {
   };
 }
 
+function hasTorrentQueryParams() {
+  if (typeof window === "undefined") return false;
+
+  const params = new URLSearchParams(window.location.search);
+
+  return TORRENT_QUERY_KEYS.some((key) => params.has(key));
+}
+
 function writeTorrentQueryParams(stream) {
   if (typeof window === "undefined") return;
 
@@ -201,7 +209,8 @@ function normalizeTorrentStream(stream, index) {
 }
 
 export function TorrentProvider({ children, iframeUrl }) {
-  const [isTorrentEnabled, setIsTorrentEnabled] = useState(true);
+  const [isTorrentEnabled, setIsTorrentEnabled] =
+    useState(hasTorrentQueryParams);
   const [streams, setStreams] = useState([]);
   const [selectedStream, setSelectedStreamState] =
     useState(getInitialSharedStream);
@@ -343,8 +352,29 @@ export function TorrentProvider({ children, iframeUrl }) {
   ]);
 
   useEffect(() => {
+    if (isTorrentEnabled) return;
+
+    setSelectedStreamState(null);
+    writeTorrentQueryParams(null);
+  }, [isTorrentEnabled]);
+
+  useEffect(() => {
+    function syncTorrentToggleFromUrl() {
+      setIsTorrentEnabled(hasTorrentQueryParams());
+    }
+
+    window.addEventListener("popstate", syncTorrentToggleFromUrl);
+
+    return () => {
+      window.removeEventListener("popstate", syncTorrentToggleFromUrl);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isTorrentEnabled) return;
+
     writeTorrentQueryParams(selectedStream);
-  }, [selectedStream]);
+  }, [isTorrentEnabled, selectedStream]);
 
   const value = useMemo(
     () => ({
