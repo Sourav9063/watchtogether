@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useDragScroll } from "@/helper/hooks/useDragScroll";
-import styles from "./iframePlayer.module.css";
+import styles from "./TorrentStreamList.module.css";
 import { useTorrent } from "./TorrentContext";
 
 export default function TorrentStreamList() {
