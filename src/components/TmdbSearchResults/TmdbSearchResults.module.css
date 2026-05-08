@@ -26,9 +26,8 @@
   padding-top: 2.5rem;
   overflow-x: scroll;
   overflow-y: visible;
-  padding: 6rem 2rem 2rem;
-  position: relative;
-  bottom: 3rem;
+  padding: 6rem 2rem 0rem;
+  margin-top: -4rem;
 }
 
 .card-wrapper {
