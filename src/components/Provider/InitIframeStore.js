@@ -29,9 +29,6 @@ export default function InitIframeStore() {
       localStorage.setItem("iframeUrl", saveString);
       window.history.pushState(null, null, saveString);
       setSeasonAndEpisode({ ...iframeUrl });
-      document
-        .getElementById("iframe-player")
-        ?.scrollIntoView({ behavior: "smooth" });
     }
   };
   const [iframeUrl, setIframeUrl] = useStore(Stores.iframeUrl, {

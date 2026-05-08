@@ -1,4 +1,5 @@
 "use client";
+import { useLayoutEffect } from "react";
 import styles from "./iframePlayer.module.css";
 import config from "@/config";
 import { useStore } from "@/helper/hooks/useStore";
@@ -71,8 +72,28 @@ export default function VideoSrc() {
 
   const selectedSource = iframeUrl?.baseUrl || config.iframe.urls[0];
 
+  useLayoutEffect(() => {
+    if (!iframeUrl?.type || !iframeUrl?.id) return;
+
+    const scrollTargetId = isTorrentEnabled ? "source-panel" : "iframe-player";
+
+    document
+      .getElementById(scrollTargetId)
+      ?.scrollIntoView({ behavior: "smooth" });
+  }, [
+    iframeUrl?.episode,
+    iframeUrl?.id,
+    iframeUrl?.season,
+    iframeUrl?.type,
+    isTorrentEnabled,
+  ]);
+
   return (
-    <div className={styles["src"]}>
+    <div
+      className={styles["src"]}
+      id="source-panel"
+      style={{ scrollMarginTop: "4rem" }}
+    >
       <div className={`${styles.controlPanel} ${styles.sourcePanel}`}>
         <div className={styles.sourceActions}>
           <div className={`${styles["buttons"]} ${styles.selectControls}`}>
