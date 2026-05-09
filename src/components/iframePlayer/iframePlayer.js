@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import React from "react";
 import styles from "./iframePlayer.module.css";
 import { getIframeUrl } from "@/helper/iframeFunc";
+import config from "@/config";
 import SeasonEpisodeSelector from "./season-episode-selector";
 import VideoSrc from "./video-src";
 import { useStore } from "@/helper/hooks/useStore";
@@ -30,6 +31,10 @@ export default function IframePlayer() {
 
 function IframePlayerContent({ iframeUrl }) {
   const { isTorrentEnabled, playerStream } = useTorrent();
+  const playerUrl = getIframeUrl({ iframeUrl });
+  const isTabSource = config.tabs
+    .filter(Boolean)
+    .includes(iframeUrl.baseUrl);
 
   return (
     <>
@@ -53,12 +58,23 @@ function IframePlayerContent({ iframeUrl }) {
               <p className={styles.streamPlaceholder}>Choose stream source</p>
             </div>
           )
+        ) : isTabSource ? (
+          <div className={styles.tabPlayerMain}>
+            <a
+              className={styles.tabPlayerLink}
+              href={playerUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              Open in new tab
+            </a>
+          </div>
         ) : (
           <iframe
             allowFullScreen={true}
             // sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"
             className={`${styles["iframe"]} back-light `}
-            src={getIframeUrl({ iframeUrl: iframeUrl })}
+            src={playerUrl}
           />
         )}
       </div>

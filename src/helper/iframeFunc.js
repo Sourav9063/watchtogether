@@ -17,6 +17,10 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
     }
   }
   if (full) {
+    if (iframeUrl.baseUrl && iframeUrl.baseUrl === config.tabs[0]) {
+      return getCinetaroUrl({ iframeUrl });
+    }
+
     switch (iframeUrl.baseUrl) {
       case config.iframe.url3:
         return getUrl3({ iframeUrl });
@@ -147,6 +151,28 @@ const getUrl30 = ({ iframeUrl }) => {
   if (iframeUrl.type === "movie")
     return `${iframeUrl.baseUrl}/movie/?id=${iframeUrl.id}`;
   return `${iframeUrl.baseUrl}/tv/?id=${iframeUrl.id}&s=${iframeUrl.season}&e=${iframeUrl.episode}`;
+};
+
+const getCinetaroUrl = ({ iframeUrl }) => {
+  const params = new URLSearchParams({
+    server: "maple",
+    embed: "true",
+    ep: String(iframeUrl.episode || 1),
+    skip: "true",
+    autoPlay: "1",
+    asi: "1",
+  });
+
+  if (iframeUrl.type === "movie") {
+    params.set("id", `${iframeUrl.id}-movie`);
+  } else {
+    params.set(
+      "id",
+      `${iframeUrl.id}-${iframeUrl.season || 1}-${iframeUrl.episode || 1}`,
+    );
+  }
+
+  return `${iframeUrl.baseUrl}?${params.toString()}`;
 };
 
 export const getBaseUrlIndex = (src) => {

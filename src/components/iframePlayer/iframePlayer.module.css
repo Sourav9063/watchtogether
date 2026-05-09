@@ -23,6 +23,32 @@
   overflow: hidden;
   background: #000;
 }
+.tabPlayerMain {
+  display: grid;
+  place-items: center;
+  width: calc(100vw - 40px);
+  max-height: calc(100vh - 40px);
+  aspect-ratio: 16/9;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  background: #000;
+}
+.tabPlayerLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-weight: 800;
+  text-decoration: none;
+}
+.tabPlayerLink:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
 
 .season-episode {
   display: grid;
@@ -443,7 +469,8 @@
   }
 }
 @media (max-width: 800px) {
-  .webtorMain {
+  .webtorMain,
+  .tabPlayerMain {
     width: calc(100vw - 6px);
   }
   .iframe {
