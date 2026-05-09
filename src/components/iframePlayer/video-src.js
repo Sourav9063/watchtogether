@@ -64,6 +64,14 @@ export default function VideoSrc() {
       case config.iframe.url23:
         suffix = " (P)";
         break;
+      case config.iframe.url32:
+        prefix = "Rock";
+        suffix = "";
+        break;
+      case config.iframe.url35:
+        prefix = "Core";
+        suffix = "";
+        break;
       default:
         break;
     }
