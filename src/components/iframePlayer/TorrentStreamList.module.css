@@ -33,9 +33,76 @@
   user-select: none;
   -webkit-user-drag: none;
   box-shadow: inset 0 1px 0 rgba(var(--foreground-rgb), 0.12);
+  transition:
+    border-color 150ms ease,
+    color 150ms ease,
+    outline-color 150ms ease,
+    transform 150ms ease;
 }
 
-.streamCard * {
+.streamCardContent {
+  display: grid;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: inherit;
+  font: inherit;
+  text-align: left;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.streamCardContent * {
+  pointer-events: none;
+}
+
+.streamCardContent:hover,
+.streamCardContent:focus-visible {
+  background: transparent;
+  outline: none;
+  transform: none;
+}
+
+.copyMagnetButton {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid rgba(var(--foreground-rgb), 0.16);
+  border-radius: 6px;
+  background: rgba(var(--background-rgb), 0.52);
+  color: var(--text-color);
+  cursor: pointer;
+  pointer-events: auto;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.copyMagnetButton:hover,
+.copyMagnetButton:focus-visible {
+  border-color: rgba(var(--foreground-rgb), 0.36);
+  background: rgba(var(--foreground-rgb), 0.14);
+  color: #fff;
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.copyMagnetButton svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  fill: currentColor;
   pointer-events: none;
 }
 
@@ -51,7 +118,7 @@
   position: absolute;
   top: 0.9rem;
   left: 0.9rem;
-  right: 0.9rem;
+  right: 3rem;
   display: block;
   color: var(--text-color);
   font-size: 1rem;
