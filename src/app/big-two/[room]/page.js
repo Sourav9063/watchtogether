@@ -364,9 +364,7 @@ export default function BigTwoRoom() {
             <div className={styles.pileText}>
               {room.lastPlay
                 ? `${room.lastPlay.name}: ${room.lastPlay.hand?.label || "played"}`
-                : room.mustPlayThreeClubs
-                  ? "3 of clubs starts"
-                  : "Table clear"}
+                : "Table clear"}
             </div>
           </div>
 

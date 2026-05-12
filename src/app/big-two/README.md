@@ -31,7 +31,7 @@ Important fields:
   history,               // recent play/pass/callout entries
   winner,
   lastTwoCallout,        // pending Last Two/Last One window
-  mustPlayThreeClubs,    // first play must include 3 of clubs
+  mustPlayThreeClubs,    // legacy field; first play does not require 3 of clubs
   createdAt,
   updatedAt,
   expiresAt              // Firestore TTL field
@@ -66,7 +66,7 @@ flowchart TD
   G --> E
   E -- Yes --> H[Fill empty seats with bots]
   H --> I[Deal cards]
-  I --> J[Seat with 3 of clubs starts]
+  I --> J[Seat with 3 of clubs leads first]
   J --> K[status = playing]
 ```
 
@@ -128,7 +128,7 @@ Examples:
 - If table has single, only single can be selected.
 - If table has pair, only pair can be selected.
 - If table has five-card hand, only five-card hand can be selected.
-- First play of game must include `3 of clubs`.
+- First player is the seat holding `3 of clubs`, but first play can be any valid Big Two hand.
 
 Invalid selection hint comes from `getPlayBlockReason()`.
 
@@ -228,7 +228,7 @@ Bot leader strategy:
 3. Try weakest pair.
 4. Play weakest single.
 
-If first play must include `3 of clubs`, bot only considers hands containing `3 of clubs`.
+On lead, bot chooses the weakest largest valid hand it can make.
 
 Bot Last Two/One call:
 

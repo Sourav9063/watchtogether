@@ -47,7 +47,7 @@ export async function createBigTwoRoom(roomId, playerId, playerName, targetHuman
     history: [],
     winner: null,
     lastTwoCallout: null,
-    mustPlayThreeClubs: true,
+    mustPlayThreeClubs: false,
     createdAt: Date.now(),
     updatedAt: Date.now(),
     expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000),

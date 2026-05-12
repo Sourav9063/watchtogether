@@ -211,9 +211,6 @@ export function getPlayBlockReason(room, values) {
 
   const evaluated = evaluateHand(values);
   if (!evaluated) return getInvalidHandReason(values);
-  if (room.mustPlayThreeClubs && !values.includes(3)) {
-    return "First play must include 3 of clubs.";
-  }
   if (!room.lastPlay) return "";
 
   const lastHand = room.lastPlay.hand || evaluateHand(room.lastPlay.cards || []);
@@ -245,9 +242,6 @@ export function hasValidPlay(room, hand) {
   if (hasOpenLastTwoCallout(room)) return false;
 
   if (!room.lastPlay) {
-    if (room.mustPlayThreeClubs) {
-      return hand.includes(3);
-    }
     return true;
   }
 
@@ -301,7 +295,7 @@ export function startGameState(room) {
     history: [],
     winner: null,
     lastTwoCallout: null,
-    mustPlayThreeClubs: true,
+    mustPlayThreeClubs: false,
   });
 }
 
@@ -349,10 +343,6 @@ export function applyPlay(room, playerId, selectedCards) {
   if (!selected.every((card) => hand.includes(card))) {
     throw new Error("Selected card missing from hand.");
   }
-  if (room.mustPlayThreeClubs && !selected.includes(3)) {
-    throw new Error("First play must include 3 of clubs.");
-  }
-
   const evaluated = evaluateHand(selected);
   if (!evaluated) throw new Error("Invalid Big Two hand.");
   if (!canBeat(evaluated, room.lastPlay)) {
@@ -555,11 +545,8 @@ export function chooseBotMove(room, bot) {
 }
 
 function chooseBotLead(room, hand) {
-  const requiredCard = room.mustPlayThreeClubs ? 3 : null;
-
   for (const size of [5, 3, 2, 1]) {
     const candidates = getCandidateHands(hand, size)
-      .filter((cards) => !requiredCard || cards.includes(requiredCard))
       .map((cards) => evaluateHand(cards))
       .filter(Boolean)
       .sort((a, b) => compareHands(a, b));
@@ -567,7 +554,7 @@ function chooseBotLead(room, hand) {
     if (candidates.length) return candidates[0];
   }
 
-  return evaluateHand([requiredCard || hand[0]]);
+  return evaluateHand([hand[0]]);
 }
 
 export function hasOpenLastTwoCallout(room) {
