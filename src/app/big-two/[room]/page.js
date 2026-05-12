@@ -97,7 +97,7 @@ export default function BigTwoRoom() {
     window.clearTimeout(botTimerRef.current);
     botTimerRef.current = window.setTimeout(() => {
       runBotTurn(room.roomId, room.updatedAt).catch(() => {});
-    }, 700);
+    }, 2500);
 
     return () => window.clearTimeout(botTimerRef.current);
   }, [room]);
