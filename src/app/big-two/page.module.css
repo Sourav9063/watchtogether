@@ -435,6 +435,7 @@
 }
 
 .actionRow {
+  justify-content: flex-end;
   flex-wrap: wrap;
 }
 
@@ -617,13 +618,13 @@
 
   .actionRow {
     display: grid;
-    grid-template-columns: 1fr 4.5rem 4.5rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: stretch;
     gap: 0.45rem;
   }
 
   .actionRow .callButton {
-    grid-column: 2 / 4;
+    grid-column: 1 / 3;
   }
 
   .turnLine,

@@ -138,6 +138,17 @@ export default function BigTwoRoom() {
   const lastTwoSecondsLeft = lastTwoCallout
     ? Math.max(0, Math.ceil((lastTwoCallout.expiresAt - now) / 1000))
     : 0;
+  const playHint = selectedPlayReason
+    ? selectedPlayReason
+    : !hasPlayableCards && canPass
+      ? "No valid cards. Pass."
+      : selectedHand
+        ? selectedHand.label
+        : selectedCards.length
+          ? "Invalid hand"
+          : requiredSelectionSize
+            ? `Select ${requiredSelectionSize}`
+            : "Select cards";
 
   const joinRoom = async (event) => {
     event.preventDefault();
@@ -372,6 +383,8 @@ export default function BigTwoRoom() {
             <span>{currentHand.length} cards</span>
           </div>
 
+          <div className={styles.selectionText}>{playHint}</div>
+
           <div className={styles.handRail}>
             {currentHand.map((card) => (
               <button
@@ -398,19 +411,6 @@ export default function BigTwoRoom() {
           </div>
 
           <div className={styles.actionRow}>
-            <div className={styles.selectionText}>
-              {selectedPlayReason
-                ? selectedPlayReason
-                : !hasPlayableCards && canPass
-                ? "No valid cards. Pass."
-                : selectedHand
-                  ? selectedHand.label
-                  : selectedCards.length
-                    ? "Invalid hand"
-                    : requiredSelectionSize
-                      ? `Select ${requiredSelectionSize}`
-                      : "Select cards"}
-            </div>
             <button
               className={styles.primaryButton}
               disabled={!isMyTurn || !selectedCanPlay || !hasPlayableCards}
@@ -486,12 +486,14 @@ function CardImage({ card, compact = false }) {
 }
 
 function PlayedPile({ history, onClose }) {
+  const latestFirst = [...history].reverse();
+
   return (
     <div className={styles.pileOverlay} role="dialog" aria-modal="true">
       <section className={styles.pilePanel}>
         <header className={styles.pilePanelHeader}>
           <div>
-            <p className={styles.eyebrow}>Sequential order</p>
+            <p className={styles.eyebrow}>Latest first</p>
             <h2>Played cards</h2>
           </div>
           <button className={styles.secondaryButton} onClick={onClose} type="button">
@@ -500,15 +502,15 @@ function PlayedPile({ history, onClose }) {
         </header>
 
         <div className={styles.playedList}>
-          {history.length ? (
-            history.map((entry, index) => (
+          {latestFirst.length ? (
+            latestFirst.map((entry, index) => (
               <article className={styles.playedItem} key={`${entry.at}-${index}`}>
-                <div className={styles.playedMeta}>
-                  <strong>
-                    {index + 1}. {entry.name}
-                  </strong>
-                  <span>{entry.label}</span>
-                </div>
+                {index < 4 && (
+                  <div className={styles.playedMeta}>
+                    <strong>{entry.name}</strong>
+                    <span>{entry.label}</span>
+                  </div>
+                )}
                 <div className={styles.playedCards}>
                   {entry.cards.map((card) => (
                     <CardImage card={card} compact key={card} />
