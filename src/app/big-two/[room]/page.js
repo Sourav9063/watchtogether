@@ -590,10 +590,12 @@ export default function BigTwoRoom() {
             </button>
             <button
               className={styles.callButton}
-              onClick={submitCallOut}
+              onClick={isLastTwoOwner ? submitLastTwo : submitCallOut}
               type="button"
             >
-              Call {lastTwoCallout ? lastCardsLabel : "Last Two/One"}
+              {isLastTwoOwner
+                ? `Call ${lastCardsLabel}`
+                : `Call ${lastTwoCallout ? lastCardsLabel : "Last Two/One"}`}
             </button>
           </div>
 
