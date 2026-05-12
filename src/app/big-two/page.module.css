@@ -359,6 +359,41 @@
   box-shadow: 0 0.4rem 0.9rem rgba(0, 0, 0, 0.24);
 }
 
+.playAnimation {
+  position: fixed;
+  z-index: 99998;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  transform: translate(-50%, -50%) translate(var(--play-from-x), var(--play-from-y))
+    scale(1.25);
+  transform-origin: center;
+  animation: cardPlayToPile 720ms cubic-bezier(0.2, 0.75, 0.2, 1) forwards;
+}
+
+.playAnimation .compactCardImage {
+  width: clamp(2.4rem, 7vw, 4.4rem);
+  filter: drop-shadow(0 1.1rem 1.4rem rgba(0, 0, 0, 0.35));
+}
+
+@keyframes cardPlayToPile {
+  0% {
+    opacity: 0.95;
+    transform: translate(-50%, -50%) translate(var(--play-from-x), var(--play-from-y))
+      scale(1.25);
+  }
+
+  72% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translate(0, 0) scale(0.92);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate(0, 0) scale(0.68);
+  }
+}
+
 .emptyPile,
 .pileText {
   color: rgba(255, 248, 232, 0.78);

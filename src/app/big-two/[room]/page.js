@@ -52,8 +52,16 @@ export default function BigTwoRoom() {
   const [joining, setJoining] = useState(false);
   const [now, setNow] = useState(Date.now());
   const [hiddenNoticeAt, setHiddenNoticeAt] = useState(null);
+  const [playAnimation, setPlayAnimation] = useState(null);
   const botTimerRef = useRef(null);
   const botLastCardsTimerRef = useRef(null);
+  const animationReadyRef = useRef(false);
+  const seenLastPlayAtRef = useRef(null);
+  const pendingPlayOriginRef = useRef(null);
+  const seatRefs = useRef({});
+  const cardButtonRefs = useRef({});
+  const centerPileRef = useRef(null);
+  const handDockRef = useRef(null);
 
   useEffect(() => {
     const id = getCustomLink();
@@ -182,6 +190,53 @@ export default function BigTwoRoom() {
     return () => window.clearTimeout(timer);
   }, [lastCallNotification.at]);
 
+  useEffect(() => {
+    if (!room) return undefined;
+    const lastPlay = room?.lastPlay;
+    if (!lastPlay?.playedAt) {
+      animationReadyRef.current = true;
+      return undefined;
+    }
+
+    if (!animationReadyRef.current) {
+      animationReadyRef.current = true;
+      seenLastPlayAtRef.current = lastPlay.playedAt;
+      return undefined;
+    }
+    if (seenLastPlayAtRef.current === lastPlay.playedAt) return undefined;
+
+    seenLastPlayAtRef.current = lastPlay.playedAt;
+
+    const target = getElementCenter(centerPileRef.current);
+    const ownPlay = currentPlayer && lastPlay.seat === currentPlayer.seat;
+    const pendingOrigin = pendingPlayOriginRef.current;
+    const from = ownPlay && pendingOrigin ? pendingOrigin : getPlayOrigin({
+      currentPlayer,
+      handDock: handDockRef.current,
+      lastPlay,
+      seatRefs: seatRefs.current,
+    });
+
+    pendingPlayOriginRef.current = null;
+    if (!target || !from) return undefined;
+
+    const animationId = `${lastPlay.playedAt}-${lastPlay.seat}`;
+    setPlayAnimation({
+      id: animationId,
+      cards: lastPlay.cards || [],
+      from,
+      to: target,
+    });
+
+    const timer = window.setTimeout(() => {
+      setPlayAnimation((animation) =>
+        animation?.id === animationId ? null : animation
+      );
+    }, 760);
+
+    return () => window.clearTimeout(timer);
+  }, [room, currentPlayer]);
+
   const joinRoom = async (event) => {
     event.preventDefault();
     const playerName = normalizeName(name);
@@ -207,9 +262,13 @@ export default function BigTwoRoom() {
 
   const submitPlay = async () => {
     setError("");
+    pendingPlayOriginRef.current =
+      getCardsOrigin(selectedCards, cardButtonRefs.current) ||
+      getElementCenter(handDockRef.current);
     try {
       await playCards(roomId, playerId, selectedCards);
     } catch (err) {
+      pendingPlayOriginRef.current = null;
       setError(err.message || "Could not play cards.");
     }
   };
@@ -346,10 +405,11 @@ export default function BigTwoRoom() {
               player={player}
               position={position}
               room={room}
+              seatRefs={seatRefs}
             />
           ))}
 
-          <div className={styles.centerPile}>
+          <div className={styles.centerPile} ref={centerPileRef}>
             <div className={styles.pileCards}>
               {room.lastPlay?.cards?.length ? (
                 room.lastPlay.cards.map((card) => (
@@ -403,8 +463,10 @@ export default function BigTwoRoom() {
         </section>
       )}
 
+      {playAnimation && <PlayedCardAnimation animation={playAnimation} />}
+
       {currentPlayer ? (
-        <section className={styles.handDock}>
+        <section className={styles.handDock} ref={handDockRef}>
           <div className={styles.turnLine}>
             <span>
               {isMyTurn
@@ -433,6 +495,13 @@ export default function BigTwoRoom() {
                 }
                 key={card}
                 onClick={() => toggleCard(card)}
+                ref={(element) => {
+                  if (element) {
+                    cardButtonRefs.current[card] = element;
+                  } else {
+                    delete cardButtonRefs.current[card];
+                  }
+                }}
                 type="button"
                 title={getCardLabel(card)}
               >
@@ -478,7 +547,7 @@ export default function BigTwoRoom() {
   );
 }
 
-function PlayerSeat({ player, position, room }) {
+function PlayerSeat({ player, position, room, seatRefs }) {
   const isTurn = player && room.turnSeat === player.seat && room.status === "playing";
   const count = player ? room.hands?.[player.seat]?.length || 0 : 0;
 
@@ -487,6 +556,14 @@ function PlayerSeat({ player, position, room }) {
       className={`${styles.seat} ${styles[POSITION_CLASS[position]]} ${
         isTurn ? styles.seatTurn : ""
       }`}
+      ref={(element) => {
+        if (!player) return;
+        if (element) {
+          seatRefs.current[player.seat] = element;
+        } else {
+          delete seatRefs.current[player.seat];
+        }
+      }}
     >
       <div className={styles.seatName}>{player?.name || "Open seat"}</div>
       <div className={styles.seatCards}>
@@ -499,6 +576,27 @@ function PlayerSeat({ player, position, room }) {
           <span>0</span>
         )}
       </div>
+    </div>
+  );
+}
+
+function PlayedCardAnimation({ animation }) {
+  const dx = animation.from.x - animation.to.x;
+  const dy = animation.from.y - animation.to.y;
+
+  return (
+    <div
+      className={styles.playAnimation}
+      style={{
+        "--play-from-x": `${dx}px`,
+        "--play-from-y": `${dy}px`,
+        left: `${animation.to.x}px`,
+        top: `${animation.to.y}px`,
+      }}
+    >
+      {animation.cards.map((card) => (
+        <CardImage card={card} key={card} compact />
+      ))}
     </div>
   );
 }
@@ -605,6 +703,35 @@ function getLeadText(room, currentPlayer) {
   if (currentPlayer && room.turnSeat === currentPlayer.seat) return "Lead is Yours";
   const leader = getSeatPlayer(room, room.turnSeat);
   return `Leader is ${leader?.name || "Waiting"}`;
+}
+
+function getElementCenter(element) {
+  if (!element) return null;
+  const rect = element.getBoundingClientRect();
+  return {
+    x: rect.left + rect.width / 2,
+    y: rect.top + rect.height / 2,
+  };
+}
+
+function getCardsOrigin(cards, cardElements) {
+  const centers = cards
+    .map((card) => getElementCenter(cardElements[card]))
+    .filter(Boolean);
+
+  if (!centers.length) return null;
+
+  return {
+    x: centers.reduce((sum, center) => sum + center.x, 0) / centers.length,
+    y: centers.reduce((sum, center) => sum + center.y, 0) / centers.length,
+  };
+}
+
+function getPlayOrigin({ currentPlayer, handDock, lastPlay, seatRefs }) {
+  if (currentPlayer && lastPlay.seat === currentPlayer.seat) {
+    return getElementCenter(handDock);
+  }
+  return getElementCenter(seatRefs[lastPlay.seat]);
 }
 
 function getNextSelection(cards, card, requiredSelectionSize) {
