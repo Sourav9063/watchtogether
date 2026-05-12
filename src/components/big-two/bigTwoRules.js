@@ -3,6 +3,7 @@ import { CardData } from "./data/data";
 export const CARD_BACK = "/assets/card-svg/blue_back.png";
 export const ROOM_COLLECTION = "bigTwoRooms";
 export const ROOM_TTL_MS = 48 * 60 * 60 * 1000;
+export const LAST_TWO_CALL_MS = 5 * 1000;
 
 const FIVE_CARD_RANK = {
   straight: 1,
@@ -199,6 +200,7 @@ export function canBeat(candidate, lastPlay) {
 }
 
 export function canPlayCards(room, values) {
+  if (hasOpenLastTwoCallout(room)) return false;
   const evaluated = evaluateHand(values);
   if (!evaluated) return false;
   if (room.mustPlayThreeClubs && !values.includes(3)) return false;
@@ -207,6 +209,7 @@ export function canPlayCards(room, values) {
 
 export function hasValidPlay(room, hand) {
   if (!hand?.length) return false;
+  if (hasOpenLastTwoCallout(room)) return false;
 
   if (!room.lastPlay) {
     if (room.mustPlayThreeClubs) {
@@ -264,6 +267,7 @@ export function startGameState(room) {
     passes: [],
     history: [],
     winner: null,
+    lastTwoCallout: null,
     mustPlayThreeClubs: true,
   });
 }
@@ -303,6 +307,7 @@ export function applyPlay(room, playerId, selectedCards) {
   const player = getPlayer(room, playerId);
   if (!player) throw new Error("Player not in room.");
   if (room.status !== "playing") throw new Error("Game not active.");
+  if (hasOpenLastTwoCallout(room)) throw new Error("Last Two call pending.");
   if (room.turnSeat !== player.seat) throw new Error("Not your turn.");
 
   const hand = room.hands?.[player.seat] || [];
@@ -328,6 +333,23 @@ export function applyPlay(room, playerId, selectedCards) {
   };
   const winner = nextHand.length === 0 ? player : null;
   const nextSeat = winner ? player.seat : getNextSeat(room, player.seat);
+  const playedAt = Date.now();
+  const lastTwoCallout =
+    !winner && nextHand.length === 2
+      ? {
+          seat: player.seat,
+          playerId: player.id,
+          name: player.name,
+          cards: selected,
+          hand: evaluated,
+          previousLastPlay: room.lastPlay || null,
+          previousPasses: room.passes || [],
+          previousTurnSeat: room.turnSeat,
+          previousMustPlayThreeClubs: room.mustPlayThreeClubs,
+          openedAt: playedAt,
+          expiresAt: playedAt + LAST_TWO_CALL_MS,
+        }
+      : null;
 
   return withRoomExpiry({
     ...room,
@@ -339,7 +361,7 @@ export function applyPlay(room, playerId, selectedCards) {
       name: player.name,
       cards: selected,
       hand: evaluated,
-      playedAt: Date.now(),
+      playedAt,
     },
     passes: [],
     history: [
@@ -350,10 +372,11 @@ export function applyPlay(room, playerId, selectedCards) {
         name: player.name,
         cards: selected,
         label: evaluated.label,
-        at: Date.now(),
+        at: playedAt,
       },
     ],
     winner,
+    lastTwoCallout,
     mustPlayThreeClubs: false,
   });
 }
@@ -362,6 +385,7 @@ export function applyPass(room, playerId) {
   const player = getPlayer(room, playerId);
   if (!player) throw new Error("Player not in room.");
   if (room.status !== "playing") throw new Error("Game not active.");
+  if (hasOpenLastTwoCallout(room)) throw new Error("Last Two call pending.");
   if (room.turnSeat !== player.seat) throw new Error("Not your turn.");
   if (!room.lastPlay) throw new Error("Cannot pass while leading.");
 
@@ -387,6 +411,73 @@ export function applyPass(room, playerId) {
   });
 }
 
+export function applyLastTwoCall(room, playerId) {
+  const player = getPlayer(room, playerId);
+  if (!player) throw new Error("Player not in room.");
+  const callout = room.lastTwoCallout;
+  if (!callout) throw new Error("No Last Two call pending.");
+  if (callout.playerId !== playerId) throw new Error("Only that player can call Last Two.");
+  if (Date.now() > callout.expiresAt) throw new Error("Last Two window expired.");
+
+  return withRoomExpiry({
+    ...room,
+    lastTwoCallout: null,
+  });
+}
+
+export function applyMissedLastTwoCallout(room, playerId, force = false) {
+  const caller = getPlayer(room, playerId);
+  if (!caller && !force) throw new Error("Player not in room.");
+
+  const callout = room.lastTwoCallout;
+  if (!callout) throw new Error("No Last Two call pending.");
+  if (!force && callout.playerId === playerId) {
+    throw new Error("You cannot call out yourself.");
+  }
+
+  const hand = room.hands?.[callout.seat] || [];
+  const restoredHand = getSortedCards([...hand, ...(callout.cards || [])]);
+  const nextHistory = [...(room.history || [])];
+  const lastIndex = nextHistory.findLastIndex(
+    (entry) =>
+      entry.type === "play" &&
+      entry.seat === callout.seat &&
+      sameCards(entry.cards || [], callout.cards || [])
+  );
+
+  if (lastIndex >= 0) {
+    nextHistory.splice(lastIndex, 1);
+  }
+
+  const callerBecomesLeader = Boolean(caller && !force);
+
+  return withRoomExpiry({
+    ...room,
+    status: "playing",
+    turnSeat: callerBecomesLeader ? caller.seat : callout.previousTurnSeat,
+    hands: {
+      ...room.hands,
+      [callout.seat]: restoredHand,
+    },
+    lastPlay: callerBecomesLeader ? null : callout.previousLastPlay || null,
+    passes: callerBecomesLeader ? [] : callout.previousPasses || [],
+    history: [
+      ...nextHistory.slice(-24),
+      {
+        type: "callout",
+        seat: caller?.seat ?? null,
+        name: caller?.name || "Timer",
+        targetSeat: callout.seat,
+        targetName: callout.name,
+        at: Date.now(),
+      },
+    ],
+    winner: null,
+    lastTwoCallout: null,
+    mustPlayThreeClubs: callerBecomesLeader ? false : callout.previousMustPlayThreeClubs,
+  });
+}
+
 export function getNextSeat(room, fromSeat) {
   const seats = (room.players || []).map((player) => player.seat).sort((a, b) => a - b);
   const index = seats.indexOf(fromSeat);
@@ -395,6 +486,10 @@ export function getNextSeat(room, fromSeat) {
 
 export function chooseBotMove(room, bot) {
   const hand = room.hands?.[bot.seat] || [];
+  if (hasOpenLastTwoCallout(room)) {
+    return { action: "wait", cards: [] };
+  }
+
   if (!room.lastPlay) {
     const leadCard = room.mustPlayThreeClubs && hand.includes(3) ? 3 : hand[0];
     return { action: "play", cards: [leadCard] };
@@ -410,6 +505,17 @@ export function chooseBotMove(room, bot) {
   }
 
   return { action: "play", cards: candidates[0].values };
+}
+
+export function hasOpenLastTwoCallout(room) {
+  return Boolean(room?.lastTwoCallout);
+}
+
+function sameCards(left, right) {
+  if (left.length !== right.length) return false;
+  const sortedLeft = getSortedCards(left);
+  const sortedRight = getSortedCards(right);
+  return sortedLeft.every((card, index) => card === sortedRight[index]);
 }
 
 function getCandidateHands(hand, size) {

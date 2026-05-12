@@ -1,6 +1,8 @@
 import { db } from "@/db/dbConnection";
 import {
   ROOM_COLLECTION,
+  applyLastTwoCall,
+  applyMissedLastTwoCallout,
   applyPass,
   applyPlay,
   chooseBotMove,
@@ -44,6 +46,7 @@ export async function createBigTwoRoom(roomId, playerId, playerName, targetHuman
     passes: [],
     history: [],
     winner: null,
+    lastTwoCallout: null,
     mustPlayThreeClubs: true,
     createdAt: Date.now(),
     updatedAt: Date.now(),
@@ -104,6 +107,40 @@ export async function passTurn(roomId, playerId) {
   });
 }
 
+export async function callLastTwo(roomId, playerId) {
+  const roomRef = getRoomRef(roomId);
+
+  await runTransaction(db, async (transaction) => {
+    const snapshot = await transaction.get(roomRef);
+    if (!snapshot.exists()) throw new Error("Room not found.");
+    transaction.set(roomRef, applyLastTwoCall(snapshot.data(), playerId));
+  });
+}
+
+export async function callOutMissedLastTwo(roomId, playerId) {
+  const roomRef = getRoomRef(roomId);
+
+  await runTransaction(db, async (transaction) => {
+    const snapshot = await transaction.get(roomRef);
+    if (!snapshot.exists()) throw new Error("Room not found.");
+    transaction.set(roomRef, applyMissedLastTwoCallout(snapshot.data(), playerId));
+  });
+}
+
+export async function expireLastTwoCallout(roomId, expectedUpdatedAt) {
+  const roomRef = getRoomRef(roomId);
+
+  await runTransaction(db, async (transaction) => {
+    const snapshot = await transaction.get(roomRef);
+    if (!snapshot.exists()) throw new Error("Room not found.");
+    const room = snapshot.data();
+    if (room.updatedAt !== expectedUpdatedAt) return;
+    if (!room.lastTwoCallout || Date.now() < room.lastTwoCallout.expiresAt) return;
+
+    transaction.set(roomRef, applyMissedLastTwoCallout(room, null, true));
+  });
+}
+
 export async function restartRoom(roomId, playerId) {
   const roomRef = getRoomRef(roomId);
 
@@ -138,6 +175,8 @@ export async function runBotTurn(roomId, expectedUpdatedAt) {
     if (!bot?.isBot) return;
 
     const move = chooseBotMove(room, bot);
+    if (move.action === "wait") return;
+
     const nextRoom =
       move.action === "pass"
         ? applyPass(room, bot.id)

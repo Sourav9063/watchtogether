@@ -17,6 +17,9 @@ import {
   normalizeName,
 } from "@/components/big-two/bigTwoRules";
 import {
+  callLastTwo,
+  callOutMissedLastTwo,
+  expireLastTwoCallout,
   joinBigTwoRoom,
   listenToBigTwoRoom,
   passTurn,
@@ -44,6 +47,7 @@ export default function BigTwoRoom() {
   const [showPlayedPile, setShowPlayedPile] = useState(false);
   const [error, setError] = useState("");
   const [joining, setJoining] = useState(false);
+  const [now, setNow] = useState(Date.now());
   const botTimerRef = useRef(null);
 
   useEffect(() => {
@@ -80,7 +84,7 @@ export default function BigTwoRoom() {
   }, [room?.updatedAt, room?.turnSeat]);
 
   useEffect(() => {
-    if (!room || room.status !== "playing") return undefined;
+    if (!room || room.status !== "playing" || room.lastTwoCallout) return undefined;
 
     const turnPlayer = getSeatPlayer(room, room.turnSeat);
     if (!turnPlayer?.isBot) return undefined;
@@ -93,15 +97,41 @@ export default function BigTwoRoom() {
     return () => window.clearTimeout(botTimerRef.current);
   }, [room]);
 
+  useEffect(() => {
+    if (!room?.lastTwoCallout) return undefined;
+
+    setNow(Date.now());
+    const tick = window.setInterval(() => setNow(Date.now()), 250);
+    const delay = Math.max(0, room.lastTwoCallout.expiresAt - Date.now());
+    const expiry = window.setTimeout(() => {
+      expireLastTwoCallout(room.roomId, room.updatedAt).catch(() => {});
+    }, delay);
+
+    return () => {
+      window.clearInterval(tick);
+      window.clearTimeout(expiry);
+    };
+  }, [room?.lastTwoCallout, room?.roomId, room?.updatedAt]);
+
   const currentHand = currentPlayer ? room?.hands?.[currentPlayer.seat] || [] : [];
   const selectedHand = evaluateHand(selectedCards);
   const selectedCanPlay = Boolean(room && selectedHand && canPlayCards(room, selectedCards));
   const isMyTurn =
     room?.status === "playing" && currentPlayer && room.turnSeat === currentPlayer.seat;
   const hasPlayableCards = Boolean(isMyTurn && hasValidPlay(room, currentHand));
-  const canPass = Boolean(isMyTurn && room?.lastPlay);
   const requiredSelectionSize = room?.lastPlay?.cards?.length || null;
   const playedHistory = (room?.history || []).filter((entry) => entry.type === "play");
+  const lastTwoCallout = room?.lastTwoCallout || null;
+  const canPass = Boolean(isMyTurn && room?.lastPlay && !lastTwoCallout);
+  const isLastTwoOwner = Boolean(lastTwoCallout?.playerId === playerId);
+  const canCallLastTwo = Boolean(
+    lastTwoCallout &&
+      isLastTwoOwner &&
+      now <= lastTwoCallout.expiresAt
+  );
+  const lastTwoSecondsLeft = lastTwoCallout
+    ? Math.max(0, Math.ceil((lastTwoCallout.expiresAt - now) / 1000))
+    : 0;
 
   const joinRoom = async (event) => {
     event.preventDefault();
@@ -141,6 +171,24 @@ export default function BigTwoRoom() {
       await passTurn(roomId, playerId);
     } catch (err) {
       setError(err.message || "Could not pass.");
+    }
+  };
+
+  const submitLastTwo = async () => {
+    setError("");
+    try {
+      await callLastTwo(roomId, playerId);
+    } catch (err) {
+      setError(err.message || "Could not call Last Two.");
+    }
+  };
+
+  const submitCallOut = async () => {
+    setError("");
+    try {
+      await callOutMissedLastTwo(roomId, playerId);
+    } catch (err) {
+      setError(err.message || "Could not call out Last Two.");
     }
   };
 
@@ -279,6 +327,13 @@ export default function BigTwoRoom() {
             <span>Played pile</span>
             <strong>{playedHistory.length}</strong>
           </button>
+
+          {lastTwoCallout && (
+            <div className={styles.lastTwoBanner}>
+              <strong>{lastTwoCallout.name} has 2 cards</strong>
+              <span>{lastTwoSecondsLeft}s</span>
+            </div>
+          )}
         </div>
       </section>
 
@@ -357,12 +412,19 @@ export default function BigTwoRoom() {
               Play
             </button>
             <button
-              className={styles.secondaryButton}
-              disabled={!canPass}
-              onClick={submitPass}
+              className={canCallLastTwo ? styles.dangerButton : styles.secondaryButton}
+              disabled={canCallLastTwo ? false : !canPass}
+              onClick={canCallLastTwo ? submitLastTwo : submitPass}
               type="button"
             >
-              Pass
+              {canCallLastTwo ? "Last Two" : "Pass"}
+            </button>
+            <button
+              className={styles.callButton}
+              onClick={submitCallOut}
+              type="button"
+            >
+              Call Last Two
             </button>
           </div>
 

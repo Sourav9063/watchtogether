@@ -86,6 +86,8 @@
 .countButton,
 .primaryButton,
 .secondaryButton,
+.dangerButton,
+.callButton,
 .linkButton,
 .smallLink {
   width: auto;
@@ -114,7 +116,9 @@
 }
 
 .primaryButton:disabled,
-.secondaryButton:disabled {
+.secondaryButton:disabled,
+.dangerButton:disabled,
+.callButton:disabled {
   opacity: 0.45;
   cursor: not-allowed;
   transform: none;
@@ -122,6 +126,18 @@
 
 .secondaryButton {
   background: rgba(20, 106, 75, 0.8);
+}
+
+.dangerButton {
+  color: #fff8e8;
+  border-color: rgba(255, 183, 183, 0.58);
+  background: linear-gradient(180deg, #c93636, #7a1717);
+}
+
+.callButton {
+  color: #fff8e8;
+  border-color: rgba(255, 183, 183, 0.48);
+  background: rgba(122, 23, 23, 0.84);
 }
 
 .linkButton,
@@ -312,6 +328,26 @@
   font-size: 1.15rem;
 }
 
+.lastTwoBanner {
+  position: absolute;
+  left: 50%;
+  bottom: 13%;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid rgba(255, 183, 183, 0.5);
+  border-radius: 8px;
+  color: #fff8e8;
+  background: rgba(109, 20, 20, 0.84);
+  transform: translateX(-50%);
+}
+
+.lastTwoBanner span {
+  color: #ffe397;
+  font-weight: 900;
+}
+
 .pileCards {
   display: flex;
   justify-content: center;
@@ -403,7 +439,9 @@
 }
 
 .actionRow .primaryButton,
-.actionRow .secondaryButton {
+.actionRow .secondaryButton,
+.actionRow .dangerButton,
+.actionRow .callButton {
   min-width: 6.5rem;
 }
 
@@ -549,6 +587,13 @@
     transform: translateX(50%);
   }
 
+  .lastTwoBanner {
+    bottom: 3rem;
+    max-width: min(14rem, 72vw);
+    padding: 0.42rem 0.55rem;
+    font-size: 0.72rem;
+  }
+
   .playedPileButton strong {
     font-size: 0.92rem;
   }
@@ -572,9 +617,13 @@
 
   .actionRow {
     display: grid;
-    grid-template-columns: 1fr 4.7rem 4.7rem;
+    grid-template-columns: 1fr 4.5rem 4.5rem;
     align-items: stretch;
     gap: 0.45rem;
+  }
+
+  .actionRow .callButton {
+    grid-column: 2 / 4;
   }
 
   .turnLine,
@@ -583,7 +632,9 @@
   }
 
   .primaryButton,
-  .secondaryButton {
+  .secondaryButton,
+  .dangerButton,
+  .callButton {
     min-height: 2.25rem;
     padding: 0.35rem 0.45rem;
   }
@@ -598,7 +649,9 @@
   }
 
   .actionRow .primaryButton,
-  .actionRow .secondaryButton {
+  .actionRow .secondaryButton,
+  .actionRow .dangerButton,
+  .actionRow .callButton {
     min-width: 0;
   }
 }
