@@ -19,6 +19,7 @@ import {
   normalizeName,
 } from "@/components/big-two/bigTwoRules";
 import {
+  autoPassTurn,
   callLastTwo,
   callOutMissedLastTwo,
   expireLastTwoCallout,
@@ -38,6 +39,8 @@ const POSITION_CLASS = {
   top: "seatTop",
   left: "seatLeft",
 };
+const HUMAN_AUTO_PASS_MS = 60 * 1000;
+const HUMAN_AUTO_PASS_WARNING_MS = 40 * 1000;
 
 export default function BigTwoRoom() {
   const params = useParams();
@@ -52,9 +55,12 @@ export default function BigTwoRoom() {
   const [joining, setJoining] = useState(false);
   const [now, setNow] = useState(Date.now());
   const [hiddenNoticeAt, setHiddenNoticeAt] = useState(null);
+  const [autoPassWarningKey, setAutoPassWarningKey] = useState(null);
   const [playAnimation, setPlayAnimation] = useState(null);
   const botTimerRef = useRef(null);
   const botLastCardsTimerRef = useRef(null);
+  const humanAutoPassTimerRef = useRef(null);
+  const humanAutoPassWarningTimerRef = useRef(null);
   const animationReadyRef = useRef(false);
   const seenLastPlayAtRef = useRef(null);
   const pendingPlayOriginRef = useRef(null);
@@ -111,6 +117,39 @@ export default function BigTwoRoom() {
   }, [room]);
 
   useEffect(() => {
+    window.clearTimeout(humanAutoPassTimerRef.current);
+    window.clearTimeout(humanAutoPassWarningTimerRef.current);
+    setAutoPassWarningKey(null);
+    if (!room || room.status !== "playing" || room.lastTwoCallout || !room.lastPlay) {
+      return undefined;
+    }
+
+    const turnPlayer = getSeatPlayer(room, room.turnSeat);
+    if (!turnPlayer || turnPlayer.isBot) return undefined;
+
+    const delay = Math.max(0, room.updatedAt + HUMAN_AUTO_PASS_MS - Date.now());
+    humanAutoPassTimerRef.current = window.setTimeout(() => {
+      autoPassTurn(room.roomId, room.updatedAt).catch(() => {});
+    }, delay);
+
+    if (currentPlayer && turnPlayer.id === currentPlayer.id) {
+      const warningDelay = Math.max(
+        0,
+        room.updatedAt + HUMAN_AUTO_PASS_WARNING_MS - Date.now()
+      );
+      const warningKey = `${room.updatedAt}-${room.turnSeat}`;
+      humanAutoPassWarningTimerRef.current = window.setTimeout(() => {
+        setAutoPassWarningKey(warningKey);
+      }, warningDelay);
+    }
+
+    return () => {
+      window.clearTimeout(humanAutoPassTimerRef.current);
+      window.clearTimeout(humanAutoPassWarningTimerRef.current);
+    };
+  }, [room, currentPlayer]);
+
+  useEffect(() => {
     if (!room?.lastTwoCallout) return undefined;
 
     setNow(Date.now());
@@ -160,6 +199,11 @@ export default function BigTwoRoom() {
   const lastCallNotification = getLastCallNotification(room?.history || []);
   const showCallNotification = Boolean(
     lastCallNotification.message && lastCallNotification.at !== hiddenNoticeAt
+  );
+  const showAutoPassWarning = Boolean(
+    isMyTurn &&
+      canPass &&
+      autoPassWarningKey === `${room?.updatedAt}-${room?.turnSeat}`
   );
   const isLastTwoOwner = Boolean(lastTwoCallout?.playerId === playerId);
   const canCallLastTwo = Boolean(
@@ -463,6 +507,12 @@ export default function BigTwoRoom() {
         </section>
       )}
 
+      {!showCallNotification && showAutoPassWarning && room.status === "playing" && (
+        <section className={styles.callNotice}>
+          Your turn will be auto passed in 20s.
+        </section>
+      )}
+
       {playAnimation && <PlayedCardAnimation animation={playAnimation} />}
 
       {currentPlayer ? (
@@ -476,7 +526,20 @@ export default function BigTwoRoom() {
             <span>{currentHand.length} cards</span>
           </div>
 
-          <div className={styles.selectionText}>{playHint}</div>
+          <div className={styles.selectionRow}>
+            <div className={styles.selectionText}>{playHint}</div>
+            {selectedCards.length > 1 && (
+              <button
+                aria-label="Clear selected cards"
+                className={styles.clearSelectionButton}
+                onClick={() => setSelectedCards([])}
+                title="Clear selected cards"
+                type="button"
+              >
+                ×
+              </button>
+            )}
+          </div>
 
           <div className={styles.handRail}>
             {currentHand.map((card) => (

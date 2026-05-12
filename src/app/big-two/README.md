@@ -94,6 +94,9 @@ flowchart TD
   F --> I[Attacker becomes leader]
   G --> J[Previous turn state restored]
   B -- No --> K{Current player has valid play?}
+  K --> Y[60s human turn timer starts if pass is legal]
+  Y --> AA[Show 20s warning after 40s]
+  Y --> Z[Auto-pass if no move before timeout]
   K -- No --> L[Only Pass enabled]
   K -- Yes --> M[Select valid card count]
   M --> N{Play beats table?}
@@ -106,9 +109,12 @@ flowchart TD
   T -- Yes --> U[Open Last One/Last Two window]
   T -- No --> V[Next seat turn]
   Q --> W{All others passed?}
+  Z --> W
   W -- Yes --> X[Clear table, last player leads]
   W -- No --> V
 ```
+
+Human turns auto-pass after `60s` when table has an active `lastPlay`. Current player sees a warning after `40s`: `Your turn will be auto passed in 20s.` Leader turns do not auto-pass because Big Two does not allow passing while leading.
 
 ## Play Validation
 

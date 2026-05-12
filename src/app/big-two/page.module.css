@@ -442,6 +442,30 @@
   font-weight: 900;
 }
 
+.selectionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.clearSelectionButton {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(255, 232, 180, 0.28);
+  border-radius: 999px;
+  color: #fff8e8;
+  font-size: 1.3rem;
+  font-weight: 900;
+  line-height: 1;
+  background: rgba(74, 37, 18, 0.84);
+}
+
 .handRail {
   display: flex;
   min-height: 8.75rem;
@@ -672,8 +696,14 @@
   }
 
   .turnLine,
-  .selectionText {
+  .selectionText,
+  .clearSelectionButton {
     font-size: 0.88rem;
+  }
+
+  .clearSelectionButton {
+    width: 1.8rem;
+    height: 1.8rem;
   }
 
   .primaryButton,

@@ -107,6 +107,23 @@ export async function passTurn(roomId, playerId) {
   });
 }
 
+export async function autoPassTurn(roomId, expectedUpdatedAt) {
+  const roomRef = getRoomRef(roomId);
+
+  await runTransaction(db, async (transaction) => {
+    const snapshot = await transaction.get(roomRef);
+    if (!snapshot.exists()) throw new Error("Room not found.");
+    const room = snapshot.data();
+    if (room.status !== "playing" || room.updatedAt !== expectedUpdatedAt) return;
+    if (room.lastTwoCallout || !room.lastPlay) return;
+
+    const player = getSeatPlayer(room, room.turnSeat);
+    if (!player || player.isBot) return;
+
+    transaction.set(roomRef, applyPass(room, player.id));
+  });
+}
+
 export async function callLastTwo(roomId, playerId) {
   const roomRef = getRoomRef(roomId);
 
