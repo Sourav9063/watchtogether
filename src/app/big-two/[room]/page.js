@@ -563,9 +563,17 @@ function PlayedPile({ history, onClose }) {
 function getLastCallNotification(history) {
   const latest = [...history]
     .reverse()
-    .find((entry) => entry.type === "lastCardsCall" || entry.type === "callout");
+    .find((entry) =>
+      ["lastCardsCall", "callout", "pass"].includes(entry.type)
+    );
 
   if (!latest) return { message: "", at: null };
+  if (latest.type === "pass") {
+    return {
+      message: `${latest.name} passed.`,
+      at: latest.at,
+    };
+  }
   if (latest.type === "lastCardsCall") {
     return {
       message: `${latest.name} called his ${latest.label}.`,
