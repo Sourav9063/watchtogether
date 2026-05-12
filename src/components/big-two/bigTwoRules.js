@@ -2,6 +2,7 @@ import { CardData } from "./data/data";
 
 export const CARD_BACK = "/assets/card-svg/blue_back.png";
 export const ROOM_COLLECTION = "bigTwoRooms";
+export const ROOM_TTL_MS = 48 * 60 * 60 * 1000;
 
 const FIVE_CARD_RANK = {
   straight: 1,
@@ -19,6 +20,15 @@ export const cardsByValue = CardData.reduce((map, card) => {
 
 export function normalizeName(name) {
   return name.trim().replace(/\s+/g, " ");
+}
+
+export function withRoomExpiry(room) {
+  const updatedAt = Date.now();
+  return {
+    ...room,
+    updatedAt,
+    expiresAt: new Date(updatedAt + ROOM_TTL_MS),
+  };
 }
 
 export function makePlayer(playerId, name, seat) {
@@ -188,6 +198,28 @@ export function canBeat(candidate, lastPlay) {
   return comparison !== null && comparison > 0;
 }
 
+export function canPlayCards(room, values) {
+  const evaluated = evaluateHand(values);
+  if (!evaluated) return false;
+  if (room.mustPlayThreeClubs && !values.includes(3)) return false;
+  return canBeat(evaluated, room.lastPlay);
+}
+
+export function hasValidPlay(room, hand) {
+  if (!hand?.length) return false;
+
+  if (!room.lastPlay) {
+    if (room.mustPlayThreeClubs) {
+      return hand.includes(3);
+    }
+    return true;
+  }
+
+  return getCandidateHands(hand, room.lastPlay.cards.length).some((cards) =>
+    canPlayCards(room, cards)
+  );
+}
+
 export function createInitialHands(players) {
   const deck = shuffle(CardData.map((card) => card.value));
   const hands = {};
@@ -222,7 +254,7 @@ export function startGameState(room) {
   const hands = createInitialHands(seats);
   const starter = seats.find((player) => hands[player.seat]?.includes(3));
 
-  return {
+  return withRoomExpiry({
     ...room,
     players: seats,
     status: "playing",
@@ -233,8 +265,7 @@ export function startGameState(room) {
     history: [],
     winner: null,
     mustPlayThreeClubs: true,
-    updatedAt: Date.now(),
-  };
+  });
 }
 
 export function fillBotSeats(players, targetHumans) {
@@ -298,7 +329,7 @@ export function applyPlay(room, playerId, selectedCards) {
   const winner = nextHand.length === 0 ? player : null;
   const nextSeat = winner ? player.seat : getNextSeat(room, player.seat);
 
-  return {
+  return withRoomExpiry({
     ...room,
     status: winner ? "finished" : "playing",
     turnSeat: nextSeat,
@@ -324,8 +355,7 @@ export function applyPlay(room, playerId, selectedCards) {
     ],
     winner,
     mustPlayThreeClubs: false,
-    updatedAt: Date.now(),
-  };
+  });
 }
 
 export function applyPass(room, playerId) {
@@ -340,7 +370,7 @@ export function applyPass(room, playerId) {
   const trickDone = passes.length >= activeSeats.length - 1;
   const turnSeat = trickDone ? room.lastPlay.seat : getNextSeat(room, player.seat);
 
-  return {
+  return withRoomExpiry({
     ...room,
     turnSeat,
     lastPlay: trickDone ? null : room.lastPlay,
@@ -354,8 +384,7 @@ export function applyPass(room, playerId) {
         at: Date.now(),
       },
     ],
-    updatedAt: Date.now(),
-  };
+  });
 }
 
 export function getNextSeat(room, fromSeat) {

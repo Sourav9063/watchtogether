@@ -12,6 +12,10 @@ Build `src/app/big-two` into realtime Big Two card room using Firestore snapshot
 - Store room state in Firestore `bigTwoRooms/{roomId}`:
   - `players`, `bots`, `status`, `turnSeat`, `hands`, `lastPlay`, `passes`, `history`, `winner`, `createdAt`, `updatedAt`
 - Use `onSnapshot` for realtime state updates and `runTransaction` for create/join/start/play/pass/new-game.
+- Add Firebase-managed cleanup:
+  - every room stores Firestore timestamp field `expiresAt`
+  - every room action extends expiration 48 hours from last update
+  - Firestore TTL policy deletes expired `bigTwoRooms` documents
 - Replace current demo UI with real card table UI:
   - green felt table surface
   - 4 seats around table
@@ -62,8 +66,11 @@ Build `src/app/big-two` into realtime Big Two card room using Firestore snapshot
   - invalid plays rejected
   - stale tab or out-of-turn move rejected by transaction
   - mobile viewport shows usable table, hand, and play/pass controls without overlap
+  - `expiresAt` updates after create/join/play/pass/restart
+  - Firestore TTL policy is enabled for collection group `bigTwoRooms` on field `expiresAt`
 
 ## Assumptions
 - Firestore env config already works through existing Firebase setup.
+- Firebase console has Firestore TTL enabled for `bigTwoRooms.expiresAt`; TTL deletion is asynchronous and can lag after expiration.
 - Production Firestore security rules hardening stays separate task.
 - UI should feel like real card table, not dashboard.

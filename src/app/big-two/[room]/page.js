@@ -8,10 +8,12 @@ import styles from "../page.module.css";
 import {
   CARD_BACK,
   cardsByValue,
+  canPlayCards,
   evaluateHand,
   getCardLabel,
   getPlayer,
   getSeatPlayer,
+  hasValidPlay,
   normalizeName,
 } from "@/components/big-two/bigTwoRules";
 import {
@@ -39,6 +41,7 @@ export default function BigTwoRoom() {
   const [playerId, setPlayerId] = useState("");
   const [name, setName] = useState("");
   const [selectedCards, setSelectedCards] = useState([]);
+  const [showPlayedPile, setShowPlayedPile] = useState(false);
   const [error, setError] = useState("");
   const [joining, setJoining] = useState(false);
   const botTimerRef = useRef(null);
@@ -92,9 +95,13 @@ export default function BigTwoRoom() {
 
   const currentHand = currentPlayer ? room?.hands?.[currentPlayer.seat] || [] : [];
   const selectedHand = evaluateHand(selectedCards);
+  const selectedCanPlay = Boolean(room && selectedHand && canPlayCards(room, selectedCards));
   const isMyTurn =
     room?.status === "playing" && currentPlayer && room.turnSeat === currentPlayer.seat;
+  const hasPlayableCards = Boolean(isMyTurn && hasValidPlay(room, currentHand));
   const canPass = Boolean(isMyTurn && room?.lastPlay);
+  const requiredSelectionSize = room?.lastPlay?.cards?.length || null;
+  const playedHistory = (room?.history || []).filter((entry) => entry.type === "play");
 
   const joinRoom = async (event) => {
     event.preventDefault();
@@ -147,11 +154,11 @@ export default function BigTwoRoom() {
   };
 
   const toggleCard = (card) => {
-    if (!isMyTurn) return;
+    if (!isMyTurn || !hasPlayableCards) return;
     setSelectedCards((cards) =>
       cards.includes(card)
         ? cards.filter((selected) => selected !== card)
-        : [...cards, card].sort((a, b) => a - b)
+        : getNextSelection(cards, card, requiredSelectionSize)
     );
   };
 
@@ -263,8 +270,24 @@ export default function BigTwoRoom() {
                   : "Table clear"}
             </div>
           </div>
+
+          <button
+            className={styles.playedPileButton}
+            onClick={() => setShowPlayedPile(true)}
+            type="button"
+          >
+            <span>Played pile</span>
+            <strong>{playedHistory.length}</strong>
+          </button>
         </div>
       </section>
+
+      {showPlayedPile && (
+        <PlayedPile
+          history={playedHistory}
+          onClose={() => setShowPlayedPile(false)}
+        />
+      )}
 
       {room.winner && (
         <section className={styles.resultBar}>
@@ -293,8 +316,16 @@ export default function BigTwoRoom() {
               <button
                 className={`${styles.cardButton} ${
                   selectedCards.includes(card) ? styles.cardSelected : ""
+                } ${!hasPlayableCards ? styles.cardUnavailable : ""} ${
+                  isSelectionLimitReached(selectedCards, card, requiredSelectionSize)
+                    ? styles.cardUnavailable
+                    : ""
                 }`}
-                disabled={!isMyTurn}
+                disabled={
+                  !isMyTurn ||
+                  !hasPlayableCards ||
+                  isSelectionLimitReached(selectedCards, card, requiredSelectionSize)
+                }
                 key={card}
                 onClick={() => toggleCard(card)}
                 type="button"
@@ -307,11 +338,19 @@ export default function BigTwoRoom() {
 
           <div className={styles.actionRow}>
             <div className={styles.selectionText}>
-              {selectedHand ? selectedHand.label : selectedCards.length ? "Invalid hand" : "Select cards"}
+              {!hasPlayableCards && canPass
+                ? "No valid cards. Pass."
+                : selectedHand
+                  ? selectedHand.label
+                  : selectedCards.length
+                    ? "Invalid hand"
+                    : requiredSelectionSize
+                      ? `Select ${requiredSelectionSize}`
+                      : "Select cards"}
             </div>
             <button
               className={styles.primaryButton}
-              disabled={!isMyTurn || !selectedHand}
+              disabled={!isMyTurn || !selectedCanPlay || !hasPlayableCards}
               onClick={submitPlay}
               type="button"
             >
@@ -376,6 +415,46 @@ function CardImage({ card, compact = false }) {
   );
 }
 
+function PlayedPile({ history, onClose }) {
+  return (
+    <div className={styles.pileOverlay} role="dialog" aria-modal="true">
+      <section className={styles.pilePanel}>
+        <header className={styles.pilePanelHeader}>
+          <div>
+            <p className={styles.eyebrow}>Sequential order</p>
+            <h2>Played cards</h2>
+          </div>
+          <button className={styles.secondaryButton} onClick={onClose} type="button">
+            Close
+          </button>
+        </header>
+
+        <div className={styles.playedList}>
+          {history.length ? (
+            history.map((entry, index) => (
+              <article className={styles.playedItem} key={`${entry.at}-${index}`}>
+                <div className={styles.playedMeta}>
+                  <strong>
+                    {index + 1}. {entry.name}
+                  </strong>
+                  <span>{entry.label}</span>
+                </div>
+                <div className={styles.playedCards}>
+                  {entry.cards.map((card) => (
+                    <CardImage card={card} compact key={card} />
+                  ))}
+                </div>
+              </article>
+            ))
+          ) : (
+            <p className={styles.copy}>No cards played yet.</p>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function getVisualSeats(room, currentPlayer) {
   const baseSeat = currentPlayer?.seat ?? 0;
   const seats = [
@@ -389,4 +468,20 @@ function getVisualSeats(room, currentPlayer) {
     position,
     player: getSeatPlayer(room, seat),
   }));
+}
+
+function getNextSelection(cards, card, requiredSelectionSize) {
+  if (requiredSelectionSize === 1) return [card];
+  if (requiredSelectionSize && cards.length >= requiredSelectionSize) {
+    return cards;
+  }
+  return [...cards, card].sort((a, b) => a - b);
+}
+
+function isSelectionLimitReached(cards, card, requiredSelectionSize) {
+  return Boolean(
+    requiredSelectionSize &&
+      !cards.includes(card) &&
+      cards.length >= requiredSelectionSize
+  );
 }

@@ -291,6 +291,27 @@
   background: rgba(7, 47, 34, 0.54);
 }
 
+.playedPileButton {
+  position: absolute;
+  right: 18%;
+  bottom: 23%;
+  width: auto;
+  min-width: 8rem;
+  min-height: 3rem;
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  border: 1px solid rgba(255, 232, 180, 0.36);
+  border-radius: 8px;
+  color: #fff8e8;
+  background: rgba(37, 30, 20, 0.78);
+}
+
+.playedPileButton strong {
+  color: #f3c86a;
+  font-size: 1.15rem;
+}
+
 .pileCards {
   display: flex;
   justify-content: center;
@@ -386,6 +407,83 @@
   min-width: 6.5rem;
 }
 
+.cardUnavailable {
+  filter: grayscale(1);
+}
+
+.cardUnavailable:hover {
+  transform: none;
+}
+
+.pileOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.62);
+}
+
+.pilePanel {
+  width: min(100%, 44rem);
+  max-height: min(82vh, 42rem);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(255, 232, 180, 0.26);
+  border-radius: 8px;
+  background: #12221c;
+  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.5);
+}
+
+.pilePanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.pilePanelHeader h2 {
+  color: #fff8e8;
+}
+
+.playedList {
+  display: grid;
+  gap: 0.75rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.playedItem {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(255, 232, 180, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.playedMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: #fff8e8;
+}
+
+.playedMeta span {
+  color: #f3c86a;
+  font-weight: 800;
+}
+
+.playedCards {
+  display: flex;
+  min-height: 4rem;
+  padding-left: 0.25rem;
+}
+
 @media (max-width: 700px) {
   .tablePage {
     grid-template-rows: auto auto minmax(18rem, 1fr) auto auto;
@@ -402,7 +500,7 @@
   }
 
   .feltTable {
-    min-height: 52vh;
+    min-height: 48vh;
     border-width: 0.45rem;
     border-radius: 34vw;
   }
@@ -437,28 +535,66 @@
 
   .centerPile {
     width: min(15.5rem, 60vw);
-    min-height: 7.25rem;
+    min-height: 6.75rem;
     padding: 0.65rem;
+  }
+
+  .playedPileButton {
+    /* right: 50%; */
+    bottom: 0rem;
+    min-width: 5.75rem;
+    min-height: 2.2rem;
+    padding: 0.3rem 0.5rem;
+    font-size: 0.72rem;
+    transform: translateX(50%);
+  }
+
+  .playedPileButton strong {
+    font-size: 0.92rem;
   }
 
   .handDock {
     position: sticky;
     bottom: 0.5rem;
+    padding: 0.55rem;
+    gap: 0.45rem;
   }
 
   .handRail {
-    min-height: 7rem;
+    min-height: 6.25rem;
+    padding-top: 0.55rem;
   }
 
   .cardButton {
-    width: 4.1rem;
-    margin-left: -1.05rem;
+    width: 3.65rem;
+    margin-left: -0.9rem;
   }
 
   .actionRow {
     display: grid;
-    grid-template-columns: 1fr 5.2rem 5.2rem;
+    grid-template-columns: 1fr 4.7rem 4.7rem;
     align-items: stretch;
+    gap: 0.45rem;
+  }
+
+  .turnLine,
+  .selectionText {
+    font-size: 0.88rem;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    min-height: 2.25rem;
+    padding: 0.35rem 0.45rem;
+  }
+
+  .pilePanel {
+    max-height: 86vh;
+  }
+
+  .playedMeta {
+    display: grid;
+    gap: 0.2rem;
   }
 
   .actionRow .primaryButton,

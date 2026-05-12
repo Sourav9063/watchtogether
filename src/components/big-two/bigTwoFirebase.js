@@ -11,6 +11,7 @@ import {
   normalizeName,
   roomHasPlayerName,
   startGameState,
+  withRoomExpiry,
 } from "./bigTwoRules";
 import {
   doc,
@@ -46,6 +47,7 @@ export async function createBigTwoRoom(roomId, playerId, playerName, targetHuman
     mustPlayThreeClubs: true,
     createdAt: Date.now(),
     updatedAt: Date.now(),
+    expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000),
   };
 
   await setDoc(roomRef, targetHumans === 1 ? startGameState(room) : room);
@@ -69,11 +71,10 @@ export async function joinBigTwoRoom(roomId, playerId, playerName) {
     const nextSeat = getNextHumanSeat(room);
     if (nextSeat === null) throw new Error("Room is full.");
 
-    const nextRoom = {
+    const nextRoom = withRoomExpiry({
       ...room,
       players: [...(room.players || []), makePlayer(playerId, normalizedName, nextSeat)],
-      updatedAt: Date.now(),
-    };
+    });
     const humanCount = nextRoom.players.filter((player) => !player.isBot).length;
 
     transaction.set(
@@ -119,7 +120,6 @@ export async function restartRoom(roomId, playerId) {
         ...room,
         players: humans,
         status: "waiting",
-        updatedAt: Date.now(),
       })
     );
   });
