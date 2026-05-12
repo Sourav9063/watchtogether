@@ -51,6 +51,7 @@ export default function BigTwoRoom() {
   const [error, setError] = useState("");
   const [joining, setJoining] = useState(false);
   const [now, setNow] = useState(Date.now());
+  const [hiddenNoticeAt, setHiddenNoticeAt] = useState(null);
   const botTimerRef = useRef(null);
   const botLastCardsTimerRef = useRef(null);
 
@@ -148,6 +149,10 @@ export default function BigTwoRoom() {
   const playedHistory = (room?.history || []).filter((entry) => entry.type === "play");
   const lastTwoCallout = room?.lastTwoCallout || null;
   const canPass = Boolean(isMyTurn && room?.lastPlay && !lastTwoCallout);
+  const lastCallNotification = getLastCallNotification(room?.history || []);
+  const showCallNotification = Boolean(
+    lastCallNotification.message && lastCallNotification.at !== hiddenNoticeAt
+  );
   const isLastTwoOwner = Boolean(lastTwoCallout?.playerId === playerId);
   const canCallLastTwo = Boolean(
     lastTwoCallout &&
@@ -166,6 +171,16 @@ export default function BigTwoRoom() {
           : requiredSelectionSize
             ? `Select ${requiredSelectionSize}`
             : "Select cards";
+
+  useEffect(() => {
+    if (!lastCallNotification.at) return undefined;
+    setHiddenNoticeAt(null);
+    const timer = window.setTimeout(() => {
+      setHiddenNoticeAt(lastCallNotification.at);
+    }, 2000);
+
+    return () => window.clearTimeout(timer);
+  }, [lastCallNotification.at]);
 
   const joinRoom = async (event) => {
     event.preventDefault();
@@ -341,7 +356,9 @@ export default function BigTwoRoom() {
                   <CardImage card={card} key={card} compact />
                 ))
               ) : (
-                <div className={styles.emptyPile}>Lead trick</div>
+                <div className={styles.emptyPile}>
+                  {getLeadText(room, currentPlayer)}
+                </div>
               )}
             </div>
             <div className={styles.pileText}>
@@ -379,6 +396,12 @@ export default function BigTwoRoom() {
               New game
             </button>
           )}
+        </section>
+      )}
+
+      {showCallNotification && room.status === "playing" && (
+        <section className={styles.callNotice}>
+          {lastCallNotification.message}
         </section>
       )}
 
@@ -537,6 +560,25 @@ function PlayedPile({ history, onClose }) {
   );
 }
 
+function getLastCallNotification(history) {
+  const latest = [...history]
+    .reverse()
+    .find((entry) => entry.type === "lastCardsCall" || entry.type === "callout");
+
+  if (!latest) return { message: "", at: null };
+  if (latest.type === "lastCardsCall") {
+    return {
+      message: `${latest.name} called his ${latest.label}.`,
+      at: latest.at,
+    };
+  }
+  if (latest.name === "Timer") return { message: "", at: latest.at };
+  return {
+    message: `${latest.name} caught ${latest.targetName}'s ${latest.label}.`,
+    at: latest.at,
+  };
+}
+
 function getVisualSeats(room, currentPlayer) {
   const baseSeat = currentPlayer?.seat ?? 0;
   const seats = [
@@ -550,6 +592,13 @@ function getVisualSeats(room, currentPlayer) {
     position,
     player: getSeatPlayer(room, seat),
   }));
+}
+
+function getLeadText(room, currentPlayer) {
+  if (room.status !== "playing") return "Lead trick";
+  if (currentPlayer && room.turnSeat === currentPlayer.seat) return "Lead is Yours";
+  const leader = getSeatPlayer(room, room.turnSeat);
+  return `Leader is ${leader?.name || "Waiting"}`;
 }
 
 function getNextSelection(cards, card, requiredSelectionSize) {

@@ -456,6 +456,17 @@ export function applyLastTwoCall(room, playerId) {
 
   return withRoomExpiry({
     ...room,
+    history: [
+      ...(room.history || []).slice(-24),
+      {
+        type: "lastCardsCall",
+        seat: player.seat,
+        name: player.name,
+        label,
+        remainingCount: callout.remainingCount,
+        at: Date.now(),
+      },
+    ],
     lastTwoCallout: null,
   });
 }
@@ -504,6 +515,8 @@ export function applyMissedLastTwoCallout(room, playerId, force = false) {
         name: caller?.name || "Timer",
         targetSeat: callout.seat,
         targetName: callout.name,
+        label: getLastCardsLabel(callout),
+        remainingCount: callout.remainingCount,
         at: Date.now(),
       },
     ],
