@@ -204,7 +204,9 @@ export function canPlayCards(room, values) {
 }
 
 export function getPlayBlockReason(room, values) {
-  if (hasOpenLastTwoCallout(room)) return "Last Two call pending.";
+  if (hasOpenLastTwoCallout(room)) {
+    return `${getLastCardsLabel(room.lastTwoCallout)} call pending.`;
+  }
   if (!values?.length) return "Select cards.";
 
   const evaluated = evaluateHand(values);
@@ -366,11 +368,12 @@ export function applyPlay(room, playerId, selectedCards) {
   const nextSeat = winner ? player.seat : getNextSeat(room, player.seat);
   const playedAt = Date.now();
   const lastTwoCallout =
-    !winner && nextHand.length === 2
+    !winner && nextHand.length <= 2
       ? {
           seat: player.seat,
           playerId: player.id,
           name: player.name,
+          remainingCount: nextHand.length,
           cards: selected,
           hand: evaluated,
           previousLastPlay: room.lastPlay || null,
@@ -446,9 +449,10 @@ export function applyLastTwoCall(room, playerId) {
   const player = getPlayer(room, playerId);
   if (!player) throw new Error("Player not in room.");
   const callout = room.lastTwoCallout;
-  if (!callout) throw new Error("No Last Two call pending.");
-  if (callout.playerId !== playerId) throw new Error("Only that player can call Last Two.");
-  if (Date.now() > callout.expiresAt) throw new Error("Last Two window expired.");
+  const label = getLastCardsLabel(callout);
+  if (!callout) throw new Error("No last cards call pending.");
+  if (callout.playerId !== playerId) throw new Error(`Only that player can call ${label}.`);
+  if (Date.now() > callout.expiresAt) throw new Error(`${label} window expired.`);
 
   return withRoomExpiry({
     ...room,
@@ -461,7 +465,7 @@ export function applyMissedLastTwoCallout(room, playerId, force = false) {
   if (!caller && !force) throw new Error("Player not in room.");
 
   const callout = room.lastTwoCallout;
-  if (!callout) throw new Error("No Last Two call pending.");
+  if (!callout) throw new Error("No last cards call pending.");
   if (!force && callout.playerId === playerId) {
     throw new Error("You cannot call out yourself.");
   }
@@ -555,6 +559,10 @@ function chooseBotLead(room, hand) {
 
 export function hasOpenLastTwoCallout(room) {
   return Boolean(room?.lastTwoCallout);
+}
+
+export function getLastCardsLabel(callout) {
+  return callout?.remainingCount === 1 ? "Last One" : "Last Two";
 }
 
 function sameCards(left, right) {

@@ -328,26 +328,6 @@
   font-size: 1.15rem;
 }
 
-.lastTwoBanner {
-  position: absolute;
-  left: 50%;
-  bottom: 13%;
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  padding: 0.55rem 0.75rem;
-  border: 1px solid rgba(255, 183, 183, 0.5);
-  border-radius: 8px;
-  color: #fff8e8;
-  background: rgba(109, 20, 20, 0.84);
-  transform: translateX(-50%);
-}
-
-.lastTwoBanner span {
-  color: #ffe397;
-  font-weight: 900;
-}
-
 .pileCards {
   display: flex;
   justify-content: center;
@@ -586,13 +566,6 @@
     padding: 0.3rem 0.5rem;
     font-size: 0.72rem;
     transform: translateX(50%);
-  }
-
-  .lastTwoBanner {
-    bottom: 3rem;
-    max-width: min(14rem, 72vw);
-    padding: 0.42rem 0.55rem;
-    font-size: 0.72rem;
   }
 
   .playedPileButton strong {

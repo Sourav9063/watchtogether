@@ -11,6 +11,7 @@ import {
   canPlayCards,
   evaluateHand,
   getCardLabel,
+  getLastCardsLabel,
   getPlayer,
   getPlayBlockReason,
   getSeatPlayer,
@@ -26,6 +27,7 @@ import {
   passTurn,
   playCards,
   restartRoom,
+  runBotLastCardsCall,
   runBotTurn,
 } from "@/components/big-two/bigTwoFirebase";
 import { getCustomLink } from "@/helper/customFunc";
@@ -50,6 +52,7 @@ export default function BigTwoRoom() {
   const [joining, setJoining] = useState(false);
   const [now, setNow] = useState(Date.now());
   const botTimerRef = useRef(null);
+  const botLastCardsTimerRef = useRef(null);
 
   useEffect(() => {
     const id = getCustomLink();
@@ -114,6 +117,22 @@ export default function BigTwoRoom() {
     };
   }, [room?.lastTwoCallout, room?.roomId, room?.updatedAt]);
 
+  useEffect(() => {
+    window.clearTimeout(botLastCardsTimerRef.current);
+    if (!room?.lastTwoCallout || room.botDriverId !== playerId) return undefined;
+
+    const owner = getSeatPlayer(room, room.lastTwoCallout.seat);
+    if (!owner?.isBot) return undefined;
+
+    const remainingMs = Math.max(0, room.lastTwoCallout.expiresAt - Date.now() - 50);
+    const delay = Math.min(Math.random() * 5000, remainingMs);
+    botLastCardsTimerRef.current = window.setTimeout(() => {
+      runBotLastCardsCall(room.roomId, room.updatedAt).catch(() => {});
+    }, delay);
+
+    return () => window.clearTimeout(botLastCardsTimerRef.current);
+  }, [room?.lastTwoCallout, room?.roomId, room?.updatedAt, room?.botDriverId, playerId, room]);
+
   const currentHand = currentPlayer ? room?.hands?.[currentPlayer.seat] || [] : [];
   const selectedHand = evaluateHand(selectedCards);
   const selectedPlayReason = room && selectedCards.length
@@ -135,9 +154,7 @@ export default function BigTwoRoom() {
       isLastTwoOwner &&
       now <= lastTwoCallout.expiresAt
   );
-  const lastTwoSecondsLeft = lastTwoCallout
-    ? Math.max(0, Math.ceil((lastTwoCallout.expiresAt - now) / 1000))
-    : 0;
+  const lastCardsLabel = getLastCardsLabel(lastTwoCallout);
   const playHint = selectedPlayReason
     ? selectedPlayReason
     : !hasPlayableCards && canPass
@@ -196,7 +213,7 @@ export default function BigTwoRoom() {
     try {
       await callLastTwo(roomId, playerId);
     } catch (err) {
-      setError(err.message || "Could not call Last Two.");
+      setError(err.message || `Could not call ${lastCardsLabel}.`);
     }
   };
 
@@ -205,7 +222,7 @@ export default function BigTwoRoom() {
     try {
       await callOutMissedLastTwo(roomId, playerId);
     } catch (err) {
-      setError(err.message || "Could not call out Last Two.");
+      setError(err.message || `Could not call out ${lastCardsLabel}.`);
     }
   };
 
@@ -344,13 +361,6 @@ export default function BigTwoRoom() {
             <span>Played pile</span>
             <strong>{playedHistory.length}</strong>
           </button>
-
-          {lastTwoCallout && (
-            <div className={styles.lastTwoBanner}>
-              <strong>{lastTwoCallout.name} has 2 cards</strong>
-              <span>{lastTwoSecondsLeft}s</span>
-            </div>
-          )}
         </div>
       </section>
 
@@ -425,14 +435,14 @@ export default function BigTwoRoom() {
               onClick={canCallLastTwo ? submitLastTwo : submitPass}
               type="button"
             >
-              {canCallLastTwo ? "Last Two" : "Pass"}
+              {canCallLastTwo ? lastCardsLabel : "Pass"}
             </button>
             <button
               className={styles.callButton}
               onClick={submitCallOut}
               type="button"
             >
-              Call Last Two
+              Call {lastTwoCallout ? lastCardsLabel : "Last Two/One"}
             </button>
           </div>
 
