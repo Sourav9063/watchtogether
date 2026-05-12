@@ -428,6 +428,7 @@ export default function BigTwoRoom() {
         <div>
           <p className={styles.eyebrow}>Room {roomId}</p>
           <h1 className={styles.tableTitle}>Big Two</h1>
+          <p className={styles.scoreLimit}>Max point {room.maxPoint || 50}</p>
         </div>
         <Link className={styles.smallLink} href="/big-two">
           New room
@@ -491,14 +492,11 @@ export default function BigTwoRoom() {
       )}
 
       {room.winner && (
-        <section className={styles.resultBar}>
-          <span>{room.winner.name} won.</span>
-          {room.botDriverId === playerId && (
-            <button className={styles.secondaryButton} onClick={submitRestart} type="button">
-              New game
-            </button>
-          )}
-        </section>
+        <MatchResult
+          canRestart={room.botDriverId === playerId}
+          onRestart={submitRestart}
+          room={room}
+        />
       )}
 
       {showCallNotification && room.status === "playing" && (
@@ -613,6 +611,7 @@ export default function BigTwoRoom() {
 function PlayerSeat({ player, position, room, seatRefs }) {
   const isTurn = player && room.turnSeat === player.seat && room.status === "playing";
   const count = player ? room.hands?.[player.seat]?.length || 0 : 0;
+  const points = player ? Number(room.points?.[player.seat] || 0) : 0;
 
   return (
     <div
@@ -639,8 +638,83 @@ function PlayerSeat({ player, position, room, seatRefs }) {
           <span>0</span>
         )}
       </div>
+      {player && <div className={styles.seatPoints}>{points} pts</div>}
     </div>
   );
+}
+
+function MatchResult({ canRestart, onRestart, room }) {
+  const matchEnded = room.status === "ended";
+  const roundScores = getRoundScores(room);
+  const finalRanks = getFinalRanks(room);
+
+  return (
+    <section className={matchEnded ? styles.finalCard : styles.resultBar}>
+      <div className={styles.resultHeader}>
+        <div>
+          <p className={styles.eyebrow}>
+            {matchEnded ? "Game over" : "Round complete"}
+          </p>
+          <h2>{room.winner.name} won round.</h2>
+        </div>
+        {canRestart && (
+          <button className={styles.secondaryButton} onClick={onRestart} type="button">
+            {matchEnded ? "New match" : "Next round"}
+          </button>
+        )}
+      </div>
+
+      <div className={styles.scoreGrid}>
+        {(matchEnded ? finalRanks : roundScores).map((score) => (
+          <article className={styles.scoreItem} key={score.seat}>
+            <span>{matchEnded ? `Rank ${score.rank} - ${score.name}` : score.name}</span>
+            <strong>{score.points} pts</strong>
+            {!matchEnded && (
+              <small>
+                +{score.pointsThisRound} from {score.cardCount} cards
+              </small>
+            )}
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function getRoundScores(room) {
+  if (room.roundScores?.length) {
+    return room.roundScores.map((score) => ({
+      ...score,
+      points: score.total,
+      pointsThisRound: score.points,
+    }));
+  }
+
+  return (room.players || []).map((player) => {
+    const cardCount = room.hands?.[player.seat]?.length || 0;
+    const total = Number(room.points?.[player.seat] || cardCount);
+    return {
+      seat: player.seat,
+      name: player.name,
+      cardCount,
+      points: total,
+      pointsThisRound: cardCount,
+      total,
+    };
+  });
+}
+
+function getFinalRanks(room) {
+  if (room.finalRanks?.length) return room.finalRanks;
+
+  return (room.players || [])
+    .map((player) => ({
+      seat: player.seat,
+      name: player.name,
+      points: Number(room.points?.[player.seat] || 0),
+    }))
+    .sort((a, b) => a.points - b.points || a.seat - b.seat)
+    .map((score, index) => ({ ...score, rank: index + 1 }));
 }
 
 function PlayedCardAnimation({ animation }) {

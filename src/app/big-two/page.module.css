@@ -47,6 +47,7 @@
 
 .copy,
 .modeNote,
+.scoreLimit,
 .selectionText {
   color: rgba(255, 248, 232, 0.76);
   line-height: 1.45;
@@ -181,6 +182,7 @@
 .tableHeader,
 .waitingBar,
 .resultBar,
+.finalCard,
 .handDock {
   width: min(100%, 76rem);
   margin-inline: auto;
@@ -195,6 +197,7 @@
 
 .waitingBar,
 .resultBar,
+.finalCard,
 .callNotice {
   display: flex;
   align-items: center;
@@ -204,6 +207,61 @@
   border: 1px solid rgba(255, 232, 180, 0.22);
   border-radius: 8px;
   background: rgba(17, 25, 22, 0.78);
+}
+
+.resultBar,
+.finalCard {
+  display: grid;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+.finalCard {
+  border-color: rgba(255, 220, 122, 0.42);
+  background:
+    linear-gradient(180deg, rgba(44, 35, 22, 0.96), rgba(15, 30, 24, 0.96));
+  box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.32);
+}
+
+.resultHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.resultHeader h2 {
+  color: #fff8e8;
+  font-size: 1.2rem;
+}
+
+.scoreGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.scoreItem {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.65rem;
+  border: 1px solid rgba(255, 232, 180, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.scoreItem span,
+.scoreItem small {
+  overflow: hidden;
+  color: rgba(255, 248, 232, 0.76);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scoreItem strong {
+  color: #ffe397;
+  font-size: 1.2rem;
 }
 
 .callNotice {
@@ -319,6 +377,12 @@
   gap: 0.45rem;
   color: #f3c86a;
   font-weight: 900;
+}
+
+.seatPoints {
+  color: rgba(255, 248, 232, 0.7);
+  font-size: 0.75rem;
+  font-weight: 800;
 }
 
 .seatCards img {
@@ -611,6 +675,15 @@
 
   .tableHeader {
     align-items: flex-start;
+  }
+
+  .scoreGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .resultHeader {
+    align-items: flex-start;
+    display: grid;
   }
 
   .feltTable {

@@ -31,12 +31,19 @@ export function listenToBigTwoRoom(roomId, callback, onError) {
   return onSnapshot(getRoomRef(roomId), callback, onError);
 }
 
-export async function createBigTwoRoom(roomId, playerId, playerName, targetHumans) {
+export async function createBigTwoRoom(
+  roomId,
+  playerId,
+  playerName,
+  targetHumans,
+  maxPoint = 50
+) {
   const roomRef = getRoomRef(roomId);
   const normalizedName = normalizeName(playerName);
   const room = {
     roomId,
     targetHumans,
+    maxPoint,
     status: "waiting",
     players: [makePlayer(playerId, normalizedName, 0)],
     botDriverId: playerId,
@@ -46,6 +53,9 @@ export async function createBigTwoRoom(roomId, playerId, playerName, targetHuman
     passes: [],
     history: [],
     winner: null,
+    points: {},
+    roundScores: [],
+    finalRanks: [],
     lastTwoCallout: null,
     mustPlayThreeClubs: false,
     createdAt: Date.now(),
@@ -184,12 +194,17 @@ export async function restartRoom(roomId, playerId) {
     if (room.botDriverId !== playerId) throw new Error("Only room creator can restart.");
 
     const humans = (room.players || []).filter((player) => !player.isBot);
+    const resetMatch = room.status === "ended";
     transaction.set(
       roomRef,
       startGameState({
         ...room,
         players: humans,
         status: "waiting",
+        points: resetMatch ? {} : room.points || {},
+        roundScores: [],
+        finalRanks: resetMatch ? [] : room.finalRanks || [],
+        winner: null,
       })
     );
   });

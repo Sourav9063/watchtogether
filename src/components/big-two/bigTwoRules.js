@@ -290,6 +290,7 @@ export function startGameState(room) {
   const seats = fillBotSeats(room.players || [], room.targetHumans);
   const hands = createInitialHands(seats);
   const starter = seats.find((player) => hands[player.seat]?.includes(3));
+  const points = buildPoints(room.points || {}, seats);
 
   return withRoomExpiry({
     ...room,
@@ -301,9 +302,18 @@ export function startGameState(room) {
     passes: [],
     history: [],
     winner: null,
+    points,
+    roundScores: [],
     lastTwoCallout: null,
     mustPlayThreeClubs: false,
   });
+}
+
+function buildPoints(points, players) {
+  return players.reduce((map, player) => {
+    map[player.seat] = Number(points?.[player.seat] || 0);
+    return map;
+  }, {});
 }
 
 export function fillBotSeats(players, targetHumans) {
@@ -384,9 +394,9 @@ export function applyPlay(room, playerId, selectedCards) {
         }
       : null;
 
-  return withRoomExpiry({
+  const playedRoom = {
     ...room,
-    status: winner ? "finished" : "playing",
+    status: "playing",
     turnSeat: nextSeat,
     hands: nextHands,
     lastPlay: {
@@ -411,7 +421,57 @@ export function applyPlay(room, playerId, selectedCards) {
     winner,
     lastTwoCallout,
     mustPlayThreeClubs: false,
-  });
+  };
+
+  return withRoomExpiry(winner ? finishRound(playedRoom, winner) : playedRoom);
+}
+
+function finishRound(room, winner) {
+  const currentPoints = buildPoints(room.points || {}, room.players || []);
+  const roundScores = (room.players || [])
+    .map((player) => {
+      const cardCount = room.hands?.[player.seat]?.length || 0;
+      const previous = Number(currentPoints[player.seat] || 0);
+      const total = previous + cardCount;
+
+      return {
+        seat: player.seat,
+        name: player.name,
+        cardCount,
+        points: cardCount,
+        total,
+      };
+    })
+    .sort((a, b) => a.seat - b.seat);
+
+  const nextPoints = roundScores.reduce((map, score) => {
+    map[score.seat] = score.total;
+    return map;
+  }, {});
+  const maxPoint = Number(room.maxPoint || 50);
+  const matchEnded = roundScores.some((score) => score.total >= maxPoint);
+  const finalRanks = matchEnded
+    ? [...roundScores]
+        .sort((a, b) => a.total - b.total || a.cardCount - b.cardCount || a.seat - b.seat)
+        .map((score, index) => ({
+          rank: index + 1,
+          seat: score.seat,
+          name: score.name,
+          points: score.total,
+        }))
+    : [];
+
+  return {
+    ...room,
+    status: matchEnded ? "ended" : "finished",
+    turnSeat: winner.seat,
+    passes: [],
+    winner,
+    points: nextPoints,
+    roundScores,
+    finalRanks,
+    lastTwoCallout: null,
+  };
 }
 
 export function applyPass(room, playerId) {

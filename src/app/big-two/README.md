@@ -21,7 +21,8 @@ Important fields:
 {
   roomId,
   targetHumans,          // 1, 2, 3, or 4
-  status,                // "waiting" | "playing" | "finished"
+  maxPoint,              // point limit, default 50
+  status,                // "waiting" | "playing" | "finished" | "ended"
   players,               // humans + bots after start
   botDriverId,           // creator client drives bot timers
   turnSeat,              // active seat number
@@ -30,6 +31,9 @@ Important fields:
   passes,                // seats that passed against current lastPlay
   history,               // recent play/pass/callout entries
   winner,
+  points,                // { [seat]: totalPoints }
+  roundScores,           // latest round card counts and totals
+  finalRanks,            // match-end ranking, lowest points first
   lastTwoCallout,        // pending Last Two/Last One window
   mustPlayThreeClubs,    // legacy field; first play does not require 3 of clubs
   createdAt,
@@ -59,15 +63,16 @@ clubs < diamonds < hearts < spades
 flowchart TD
   A[Open /big-two] --> B[Enter unique name]
   B --> C[Choose human count: 1, 2, 3, or 4]
-  C --> D[Create room document]
-  D --> E{Enough humans joined?}
-  E -- No --> F[Waiting room]
-  F --> G[Player joins with unique name]
-  G --> E
-  E -- Yes --> H[Fill empty seats with bots]
-  H --> I[Deal cards]
-  I --> J[Seat with 3 of clubs leads first]
-  J --> K[status = playing]
+  C --> D[Set max point, default 50]
+  D --> E[Create room document]
+  E --> F{Enough humans joined?}
+  F -- No --> G[Waiting room]
+  G --> H[Player joins with unique name]
+  H --> F
+  F -- Yes --> I[Fill empty seats with bots]
+  I --> J[Deal cards]
+  J --> K[Seat with 3 of clubs leads first]
+  K --> L[status = playing]
 ```
 
 For `1` human, game starts immediately with `3` bots.
@@ -104,7 +109,10 @@ flowchart TD
   N -- Yes --> P[Commit play]
   L --> Q[Commit pass]
   P --> R{Hand empty?}
-  R -- Yes --> S[status = finished]
+  R -- Yes --> S[Score round]
+  S --> AB{Any total >= max point?}
+  AB -- Yes --> AC[status = ended, rank by lowest points]
+  AB -- No --> AD[status = finished, creator starts next round]
   R -- No --> T{Hand has 1 or 2 cards?}
   T -- Yes --> U[Open Last One/Last Two window]
   T -- No --> V[Next seat turn]
@@ -137,6 +145,49 @@ Examples:
 - First player is the seat holding `3 of clubs`, but first play can be any valid Big Two hand.
 
 Invalid selection hint comes from `getPlayBlockReason()`.
+
+## Scoring And Game End
+
+Room creator chooses `maxPoint` when creating room. Default is `50`.
+
+When a player empties hand:
+
+1. Round ends.
+2. Each player's remaining card count is added to their total points.
+3. Winner adds `0` because winner has no cards.
+4. If any total reaches or crosses `maxPoint`, match ends.
+5. Final ranking sorts players by lowest total points.
+
+Room fields:
+
+```js
+points = {
+  [seat]: totalPoints
+}
+
+roundScores = [
+  {
+    seat,
+    name,
+    cardCount, // remaining cards after round
+    points,    // points gained this round
+    total      // total points after round
+  }
+]
+
+finalRanks = [
+  {
+    rank,
+    seat,
+    name,
+    points
+  }
+]
+```
+
+When `status === "finished"`, creator sees `Next round`. This deals fresh cards and keeps `points`.
+
+When `status === "ended"`, final card shows ranks and totals. Creator sees `New match`, which resets `points` and deals again.
 
 ## Last Two / Last One Rule
 

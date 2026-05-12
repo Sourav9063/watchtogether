@@ -8,11 +8,13 @@ import { getCustomLink, randomIdWithTimeStamp } from "@/helper/customFunc";
 import { normalizeName } from "@/components/big-two/bigTwoRules";
 
 const PLAYER_COUNTS = [1, 2, 3, 4];
+const DEFAULT_MAX_POINT = 50;
 
 export default function BigTwoHome() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [targetHumans, setTargetHumans] = useState(4);
+  const [maxPoint, setMaxPoint] = useState(DEFAULT_MAX_POINT);
   const [error, setError] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
@@ -28,6 +30,11 @@ export default function BigTwoHome() {
       setError("Name required.");
       return;
     }
+    const pointLimit = Number(maxPoint);
+    if (!Number.isFinite(pointLimit) || pointLimit < 1) {
+      setError("Max point must be at least 1.");
+      return;
+    }
 
     setIsCreating(true);
     setError("");
@@ -36,7 +43,7 @@ export default function BigTwoHome() {
       const playerId = getCustomLink();
       const roomId = randomIdWithTimeStamp(5);
       localStorage.setItem("bigTwoPlayerName", playerName);
-      await createBigTwoRoom(roomId, playerId, playerName, targetHumans);
+      await createBigTwoRoom(roomId, playerId, playerName, targetHumans, pointLimit);
       router.push(`/big-two/${roomId}`);
     } catch (err) {
       setError(err.message || "Could not create room.");
@@ -83,6 +90,17 @@ export default function BigTwoHome() {
               ))}
             </div>
           </fieldset>
+
+          <label className={styles.field}>
+            <span>Max point</span>
+            <input
+              value={maxPoint}
+              min={1}
+              onChange={(event) => setMaxPoint(event.target.value)}
+              step={1}
+              type="number"
+            />
+          </label>
 
           <div className={styles.modeNote}>
             {4 - targetHumans} bot{4 - targetHumans === 1 ? "" : "s"} fill empty seats.
