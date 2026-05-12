@@ -5,6 +5,13 @@ export const ROOM_COLLECTION = "bigTwoRooms";
 export const ROOM_TTL_MS = 48 * 60 * 60 * 1000;
 export const LAST_TWO_CALL_MS = 5 * 1000;
 
+const HUMAN_SEAT_ORDER = {
+  1: [0],
+  2: [0, 2],
+  3: [0, 1, 2],
+  4: [0, 1, 2, 3],
+};
+
 const FIVE_CARD_RANK = {
   straight: 1,
   flush: 2,
@@ -316,7 +323,9 @@ export function roomHasPlayerName(room, name) {
 
 export function getNextHumanSeat(room) {
   const taken = new Set((room.players || []).map((player) => player.seat));
-  for (let seat = 0; seat < room.targetHumans; seat += 1) {
+  const humanSeats = HUMAN_SEAT_ORDER[room.targetHumans] || HUMAN_SEAT_ORDER[4];
+
+  for (const seat of humanSeats) {
     if (!taken.has(seat)) return seat;
   }
   return null;

@@ -72,7 +72,7 @@ flowchart TD
 
 For `1` human, game starts immediately with `3` bots.
 
-For `2` humans, game starts with `2` bots.
+For `2` humans, seats alternate as human, bot, human, bot.
 
 For `3` humans, game starts with `1` bot.
 
