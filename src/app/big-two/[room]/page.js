@@ -12,6 +12,7 @@ import {
   evaluateHand,
   getCardLabel,
   getPlayer,
+  getPlayBlockReason,
   getSeatPlayer,
   hasValidPlay,
   normalizeName,
@@ -115,7 +116,12 @@ export default function BigTwoRoom() {
 
   const currentHand = currentPlayer ? room?.hands?.[currentPlayer.seat] || [] : [];
   const selectedHand = evaluateHand(selectedCards);
-  const selectedCanPlay = Boolean(room && selectedHand && canPlayCards(room, selectedCards));
+  const selectedPlayReason = room && selectedCards.length
+    ? getPlayBlockReason(room, selectedCards)
+    : "";
+  const selectedCanPlay = Boolean(
+    room && selectedCards.length && selectedHand && canPlayCards(room, selectedCards)
+  );
   const isMyTurn =
     room?.status === "playing" && currentPlayer && room.turnSeat === currentPlayer.seat;
   const hasPlayableCards = Boolean(isMyTurn && hasValidPlay(room, currentHand));
@@ -393,7 +399,9 @@ export default function BigTwoRoom() {
 
           <div className={styles.actionRow}>
             <div className={styles.selectionText}>
-              {!hasPlayableCards && canPass
+              {selectedPlayReason
+                ? selectedPlayReason
+                : !hasPlayableCards && canPass
                 ? "No valid cards. Pass."
                 : selectedHand
                   ? selectedHand.label

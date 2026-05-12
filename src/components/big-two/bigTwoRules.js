@@ -200,11 +200,42 @@ export function canBeat(candidate, lastPlay) {
 }
 
 export function canPlayCards(room, values) {
-  if (hasOpenLastTwoCallout(room)) return false;
+  return !getPlayBlockReason(room, values);
+}
+
+export function getPlayBlockReason(room, values) {
+  if (hasOpenLastTwoCallout(room)) return "Last Two call pending.";
+  if (!values?.length) return "Select cards.";
+
   const evaluated = evaluateHand(values);
-  if (!evaluated) return false;
-  if (room.mustPlayThreeClubs && !values.includes(3)) return false;
-  return canBeat(evaluated, room.lastPlay);
+  if (!evaluated) return getInvalidHandReason(values);
+  if (room.mustPlayThreeClubs && !values.includes(3)) {
+    return "First play must include 3 of clubs.";
+  }
+  if (!room.lastPlay) return "";
+
+  const lastHand = room.lastPlay.hand || evaluateHand(room.lastPlay.cards || []);
+  if (evaluated.size !== lastHand?.size) {
+    return `Play ${lastHand?.size || room.lastPlay.cards.length} cards to match table.`;
+  }
+
+  const comparison = compareHands(evaluated, lastHand);
+  if (comparison === null) {
+    return `Play same kind as ${room.lastPlay.name}'s ${lastHand.label}.`;
+  }
+  if (comparison <= 0) {
+    return `Must beat ${room.lastPlay.name}'s ${lastHand.label}.`;
+  }
+
+  return "";
+}
+
+function getInvalidHandReason(values) {
+  if (values.length === 2) return "Selected cards are not a pair.";
+  if (values.length === 3) return "Selected cards are not three of a kind.";
+  if (values.length === 4) return "Big Two only allows 1, 2, 3, or 5 cards.";
+  if (values.length === 5) return "Five cards must be straight, flush, full house, four of kind, or straight flush.";
+  return "Invalid Big Two hand.";
 }
 
 export function hasValidPlay(room, hand) {
@@ -491,8 +522,7 @@ export function chooseBotMove(room, bot) {
   }
 
   if (!room.lastPlay) {
-    const leadCard = room.mustPlayThreeClubs && hand.includes(3) ? 3 : hand[0];
-    return { action: "play", cards: [leadCard] };
+    return { action: "play", cards: chooseBotLead(room, hand).values };
   }
 
   const candidates = getCandidateHands(hand, room.lastPlay.cards.length)
@@ -505,6 +535,22 @@ export function chooseBotMove(room, bot) {
   }
 
   return { action: "play", cards: candidates[0].values };
+}
+
+function chooseBotLead(room, hand) {
+  const requiredCard = room.mustPlayThreeClubs ? 3 : null;
+
+  for (const size of [5, 3, 2, 1]) {
+    const candidates = getCandidateHands(hand, size)
+      .filter((cards) => !requiredCard || cards.includes(requiredCard))
+      .map((cards) => evaluateHand(cards))
+      .filter(Boolean)
+      .sort((a, b) => compareHands(a, b));
+
+    if (candidates.length) return candidates[0];
+  }
+
+  return evaluateHand([requiredCard || hand[0]]);
 }
 
 export function hasOpenLastTwoCallout(room) {
