@@ -221,14 +221,14 @@ flowchart TD
   K -- No --> L[Transaction pass]
 ```
 
-Bot leader strategy:
+Bot play strategy:
 
-1. Try weakest valid 5-card hand.
-2. Try weakest three of a kind.
-3. Try weakest pair.
-4. Play weakest single.
+1. When leading, bot builds valid single, pair, three-card, and five-card options.
+2. Bot randomly chooses one available option group.
+3. Bot randomly chooses one play from that group.
+4. When answering table, bot randomly chooses one valid beating play of the required size.
 
-On lead, bot chooses the weakest largest valid hand it can make.
+If no beating play exists, bot passes.
 
 Bot Last Two/One call:
 

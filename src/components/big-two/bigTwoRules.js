@@ -541,20 +541,28 @@ export function chooseBotMove(room, bot) {
     return { action: "pass", cards: [] };
   }
 
-  return { action: "play", cards: candidates[0].values };
+  return { action: "play", cards: pickRandom(candidates).values };
 }
 
 function chooseBotLead(room, hand) {
-  for (const size of [5, 3, 2, 1]) {
-    const candidates = getCandidateHands(hand, size)
-      .map((cards) => evaluateHand(cards))
-      .filter(Boolean)
-      .sort((a, b) => compareHands(a, b));
+  const candidateGroups = [1, 2, 3, 5]
+    .map((size) =>
+      getCandidateHands(hand, size)
+        .map((cards) => evaluateHand(cards))
+        .filter(Boolean)
+        .sort((a, b) => compareHands(a, b))
+    )
+    .filter((candidates) => candidates.length);
 
-    if (candidates.length) return candidates[0];
+  if (candidateGroups.length) {
+    return pickRandom(pickRandom(candidateGroups));
   }
 
   return evaluateHand([hand[0]]);
+}
+
+function pickRandom(items) {
+  return items[Math.floor(Math.random() * items.length)];
 }
 
 export function hasOpenLastTwoCallout(room) {
