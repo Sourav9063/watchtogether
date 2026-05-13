@@ -8,6 +8,7 @@ import styles from "../page.module.css";
 import {
   CARD_BACK,
   LAST_TWO_BOT_ATTACK_MS,
+  LAST_TWO_BOT_CALL_MS,
   PLAYER_NAME_MAX_LENGTH,
   cardsByValue,
   canPlayCards,
@@ -195,7 +196,7 @@ export default function BigTwoRoom() {
     if (!owner?.isBot) return undefined;
 
     const remainingMs = Math.max(0, room.lastTwoCallout.expiresAt - Date.now() - 50);
-    const delay = Math.min(Math.random() * 5000, remainingMs);
+    const delay = Math.min(Math.random() * LAST_TWO_BOT_CALL_MS, remainingMs);
     botLastCardsTimerRef.current = window.setTimeout(() => {
       runBotLastCardsCall(room.roomId, room.updatedAt).catch(() => {});
     }, delay);
