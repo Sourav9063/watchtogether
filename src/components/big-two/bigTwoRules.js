@@ -198,6 +198,9 @@ export function compareHands(left, right) {
     if (left.rank !== right.rank) {
       return left.rank - right.rank;
     }
+    if (["straight", "full house", "four of kind"].includes(left.type)) {
+      return 0;
+    }
     return compareValueLists(left.values, right.values);
   }
 
