@@ -1,5 +1,6 @@
 import { db } from "@/db/dbConnection";
 import {
+  LAST_TWO_BOT_ATTACK_MS,
   ROOM_COLLECTION,
   applyLastTwoCall,
   applyMissedLastTwoCallout,
@@ -178,7 +179,11 @@ export async function runRandomBotLastCardsAttack(roomId, expectedUpdatedAt) {
     if (!snapshot.exists()) throw new Error("Room not found.");
     const room = snapshot.data();
     if (room.updatedAt !== expectedUpdatedAt || !room.lastTwoCallout) return;
-    if (Date.now() < room.lastTwoCallout.expiresAt) return;
+    const attackAt = room.lastTwoCallout.openedAt + LAST_TWO_BOT_ATTACK_MS;
+    if (Date.now() < attackAt) return;
+
+    const owner = getSeatPlayer(room, room.lastTwoCallout.seat);
+    if (owner?.isBot) return;
 
     const attackers = (room.players || []).filter(
       (player) => player.isBot && player.seat !== room.lastTwoCallout.seat

@@ -223,7 +223,7 @@ Owner must click:
 
 Other players always see `Call Last Two/One` button. No public notification or banner is shown. Players must watch visible card counts.
 
-If owner has not called after `2s`, creator client picks a random bot attacker, if available. That bot attacks and becomes leader.
+If human owner has not called after `3s`, creator client picks a random bot attacker, if available. That bot attacks and becomes leader. Bots cannot attack bot-owned callouts.
 
 Successful attack:
 
@@ -256,7 +256,7 @@ sequenceDiagram
     R->>R: return last played cards
     R->>R: clear table
     R->>R: attacker becomes leader
-  else random bot attacks after 2s
+  else random bot attacks after 3s
     B->>R: runRandomBotLastCardsAttack()
     R->>R: return last played cards
     R->>R: clear table
@@ -317,7 +317,7 @@ Bot Last Two/One attack:
 ```mermaid
 flowchart TD
   A[Any player play leaves 1 or 2 cards] --> B[lastTwoCallout opens]
-  B --> C[botDriverId client waits 2s]
+  B --> C[botDriverId client waits 3s]
   C --> D{Callout still open?}
   D -- No --> E[No-op]
   D -- Yes --> F[Pick random bot except missed player]

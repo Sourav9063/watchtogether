@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import styles from "../page.module.css";
 import {
   CARD_BACK,
+  LAST_TWO_BOT_ATTACK_MS,
   cardsByValue,
   canPlayCards,
   evaluateHand,
@@ -157,7 +158,8 @@ export default function BigTwoRoom() {
 
     setNow(Date.now());
     const tick = window.setInterval(() => setNow(Date.now()), 250);
-    const delay = Math.max(0, room.lastTwoCallout.expiresAt - Date.now() + 500);
+    const fallbackAt = room.lastTwoCallout.openedAt + LAST_TWO_BOT_ATTACK_MS + 500;
+    const delay = Math.max(0, fallbackAt - Date.now());
     const expiry = window.setTimeout(() => {
       expireLastTwoCallout(room.roomId, room.updatedAt).catch(() => {});
     }, delay);
@@ -172,12 +174,16 @@ export default function BigTwoRoom() {
     window.clearTimeout(botLastCardsAttackTimerRef.current);
     if (!room?.lastTwoCallout || room.botDriverId !== playerId) return undefined;
 
+    const owner = getSeatPlayer(room, room.lastTwoCallout.seat);
+    if (owner?.isBot) return undefined;
+
     const attackers = (room.players || []).filter(
       (player) => player.isBot && player.seat !== room.lastTwoCallout.seat
     );
     if (!attackers.length) return undefined;
 
-    const delay = Math.max(0, room.lastTwoCallout.expiresAt - Date.now() + 25);
+    const attackAt = room.lastTwoCallout.openedAt + LAST_TWO_BOT_ATTACK_MS;
+    const delay = Math.max(0, attackAt - Date.now() + 25);
     botLastCardsAttackTimerRef.current = window.setTimeout(() => {
       runRandomBotLastCardsAttack(room.roomId, room.updatedAt).catch(() => {});
     }, delay);
