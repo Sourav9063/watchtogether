@@ -326,6 +326,7 @@
   --seat-scale: 1;
   width: min(10.5rem, 36vw);
   display: grid;
+  grid-template-columns: minmax(2.25rem, 1fr) auto minmax(2.25rem, 1fr);
   gap: 0.35rem;
   justify-items: center;
   padding: 0.55rem;
@@ -374,6 +375,7 @@
 }
 
 .seatName {
+  grid-column: 1 / -1;
   max-width: 100%;
   overflow: hidden;
   color: #fff8e8;
@@ -383,22 +385,41 @@
 }
 
 .seatCards {
-  display: inline-flex;
+  grid-column: 1 / -1;
+  grid-row: 2;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  gap: 0.45rem;
+  column-gap: 0.45rem;
   color: #f3c86a;
   font-weight: 900;
 }
 
 .seatPoints {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: center;
+  justify-self: center;
   color: rgba(255, 248, 232, 0.7);
   font-size: 0.75rem;
   font-weight: 800;
 }
 
 .seatCards img {
-  width: 2.1rem;
+  grid-column: 2;
+  width: 2.7rem;
   height: auto;
+}
+
+.seatCards span {
+  grid-column: 3;
+  justify-self: start;
+}
+
+.seatCards span:only-child {
+  grid-column: 2;
+  justify-self: center;
 }
 
 .centerPile {
@@ -479,12 +500,12 @@
 
   72% {
     opacity: 1;
-    transform: translate(-50%, -50%) translate(0, 0) scale(0.92);
+    transform: translate(-50%, -50%) translate(0, 0) scale(1);
   }
 
   100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) translate(0, 0) scale(0.68);
+    opacity: 1;
+    transform: translate(-50%, -50%) translate(0, 0) scale(1);
   }
 }
 
@@ -574,6 +595,10 @@
 }
 
 .cardSelected {
+  transform: translateY(-0.85rem);
+}
+
+.cardSelected:hover {
   transform: translateY(-0.85rem);
 }
 

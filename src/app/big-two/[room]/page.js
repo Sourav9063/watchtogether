@@ -8,11 +8,11 @@ import styles from "../page.module.css";
 import {
   CARD_BACK,
   LAST_TWO_BOT_ATTACK_MS,
+  PLAYER_NAME_MAX_LENGTH,
   cardsByValue,
   canPlayCards,
   evaluateHand,
   getCardLabel,
-  getLastCardsLabel,
   getPlayer,
   getPlayBlockReason,
   getSeatPlayer,
@@ -55,7 +55,6 @@ export default function BigTwoRoom() {
   const [showPlayedPile, setShowPlayedPile] = useState(false);
   const [error, setError] = useState("");
   const [joining, setJoining] = useState(false);
-  const [now, setNow] = useState(Date.now());
   const [hiddenNoticeAt, setHiddenNoticeAt] = useState(null);
   const [autoPassWarningKey, setAutoPassWarningKey] = useState(null);
   const [playAnimation, setPlayAnimation] = useState(null);
@@ -76,7 +75,7 @@ export default function BigTwoRoom() {
   useEffect(() => {
     const id = getCustomLink();
     setPlayerId(id);
-    setName(localStorage.getItem("bigTwoPlayerName") || "");
+    setName(normalizeName(localStorage.getItem("bigTwoPlayerName") || ""));
   }, []);
 
   useEffect(() => {
@@ -156,8 +155,6 @@ export default function BigTwoRoom() {
   useEffect(() => {
     if (!room?.lastTwoCallout) return undefined;
 
-    setNow(Date.now());
-    const tick = window.setInterval(() => setNow(Date.now()), 250);
     const fallbackAt = room.lastTwoCallout.openedAt + LAST_TWO_BOT_ATTACK_MS + 500;
     const delay = Math.max(0, fallbackAt - Date.now());
     const expiry = window.setTimeout(() => {
@@ -165,7 +162,6 @@ export default function BigTwoRoom() {
     }, delay);
 
     return () => {
-      window.clearInterval(tick);
       window.clearTimeout(expiry);
     };
   }, [room?.lastTwoCallout, room?.roomId, room?.updatedAt]);
@@ -232,12 +228,6 @@ export default function BigTwoRoom() {
       autoPassWarningKey === `${room?.updatedAt}-${room?.turnSeat}`
   );
   const isLastTwoOwner = Boolean(lastTwoCallout?.playerId === playerId);
-  const canCallLastTwo = Boolean(
-    lastTwoCallout &&
-      isLastTwoOwner &&
-      now <= lastTwoCallout.expiresAt
-  );
-  const lastCardsLabel = getLastCardsLabel(lastTwoCallout);
   const playHint = selectedPlayReason
     ? selectedPlayReason
     : !hasPlayableCards && canPass
@@ -358,7 +348,7 @@ export default function BigTwoRoom() {
     try {
       await callLastTwo(roomId, playerId);
     } catch (err) {
-      setError(err.message || `Could not call ${lastCardsLabel}.`);
+      setError(err.message || "Could not call last cards.");
     }
   };
 
@@ -367,7 +357,7 @@ export default function BigTwoRoom() {
     try {
       await callOutMissedLastTwo(roomId, playerId);
     } catch (err) {
-      setError(err.message || `Could not call out ${lastCardsLabel}.`);
+      setError(err.message || "Could not call out last cards.");
     }
   };
 
@@ -429,7 +419,7 @@ export default function BigTwoRoom() {
               <input
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                maxLength={18}
+                maxLength={PLAYER_NAME_MAX_LENGTH}
                 placeholder="Player name"
               />
             </label>
@@ -620,9 +610,7 @@ export default function BigTwoRoom() {
               onClick={isLastTwoOwner ? submitLastTwo : submitCallOut}
               type="button"
             >
-              {isLastTwoOwner
-                ? `Call ${lastCardsLabel}`
-                : `Call ${lastTwoCallout ? lastCardsLabel : "Last Two/One"}`}
+              Call Last Two/One
             </button>
           </div>
 

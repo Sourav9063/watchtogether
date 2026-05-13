@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 import { createBigTwoRoom } from "@/components/big-two/bigTwoFirebase";
 import { getCustomLink, randomIdWithTimeStamp } from "@/helper/customFunc";
-import { normalizeName } from "@/components/big-two/bigTwoRules";
+import {
+  PLAYER_NAME_MAX_LENGTH,
+  normalizeName,
+} from "@/components/big-two/bigTwoRules";
 
 const PLAYER_COUNTS = [1, 2, 3, 4];
 const DEFAULT_MAX_POINT = 50;
@@ -19,7 +22,7 @@ export default function BigTwoHome() {
   const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
-    setName(localStorage.getItem("bigTwoPlayerName") || "");
+    setName(normalizeName(localStorage.getItem("bigTwoPlayerName") || ""));
   }, []);
 
   const createRoom = async (event) => {
@@ -68,7 +71,7 @@ export default function BigTwoHome() {
             <input
               value={name}
               onChange={(event) => setName(event.target.value)}
-              maxLength={18}
+              maxLength={PLAYER_NAME_MAX_LENGTH}
               placeholder="Player name"
             />
           </label>

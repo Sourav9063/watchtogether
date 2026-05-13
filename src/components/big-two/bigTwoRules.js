@@ -5,6 +5,7 @@ export const ROOM_COLLECTION = "bigTwoRooms";
 export const ROOM_TTL_MS = 48 * 60 * 60 * 1000;
 export const LAST_TWO_CALL_MS = 2 * 1000;
 export const LAST_TWO_BOT_ATTACK_MS = 3 * 1000;
+export const PLAYER_NAME_MAX_LENGTH = 16;
 
 const HUMAN_SEAT_ORDER = {
   1: [0],
@@ -29,7 +30,7 @@ export const cardsByValue = CardData.reduce((map, card) => {
 }, {});
 
 export function normalizeName(name) {
-  return name.trim().replace(/\s+/g, " ");
+  return name.trim().replace(/\s+/g, " ").slice(0, PLAYER_NAME_MAX_LENGTH);
 }
 
 export function withRoomExpiry(room) {
