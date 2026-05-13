@@ -69,6 +69,7 @@ export default function BigTwoRoom() {
   const seatRefs = useRef({});
   const cardButtonRefs = useRef({});
   const centerPileRef = useRef(null);
+  const pileCardsRef = useRef(null);
   const handDockRef = useRef(null);
 
   useEffect(() => {
@@ -270,7 +271,8 @@ export default function BigTwoRoom() {
 
     seenLastPlayAtRef.current = lastPlay.playedAt;
 
-    const target = getElementCenter(centerPileRef.current);
+    const target =
+      getElementCenter(pileCardsRef.current) || getElementCenter(centerPileRef.current);
     const ownPlay = currentPlayer && lastPlay.seat === currentPlayer.seat;
     const pendingOrigin = pendingPlayOriginRef.current;
     const from = ownPlay && pendingOrigin ? pendingOrigin : getPlayOrigin({
@@ -474,7 +476,7 @@ export default function BigTwoRoom() {
           ))}
 
           <div className={styles.centerPile} ref={centerPileRef}>
-            <div className={styles.pileCards}>
+            <div className={styles.pileCards} ref={pileCardsRef}>
               {room.lastPlay?.cards?.length ? (
                 room.lastPlay.cards.map((card) => (
                   <CardImage card={card} key={card} compact />
