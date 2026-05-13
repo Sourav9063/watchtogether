@@ -600,12 +600,12 @@ export default function BigTwoRoom() {
               Play
             </button>
             <button
-              className={canCallLastTwo ? styles.dangerButton : styles.secondaryButton}
-              disabled={canCallLastTwo ? false : !canPass}
-              onClick={canCallLastTwo ? submitLastTwo : submitPass}
+              className={styles.secondaryButton}
+              disabled={!canPass}
+              onClick={submitPass}
               type="button"
             >
-              {canCallLastTwo ? lastCardsLabel : "Pass"}
+              Pass
             </button>
             <button
               className={styles.callButton}
