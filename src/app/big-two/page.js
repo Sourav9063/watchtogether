@@ -63,6 +63,9 @@ export default function BigTwoHome() {
           <p className={styles.copy}>
             Create room, share link, fill empty seats with bots.
           </p>
+          <p className={styles.redNote}>
+            Last Two/One: when you have 2 or 1 cards after playing, press Call Last Two/One before others catch you. You will be penalized for a wrong accusation.
+          </p>
         </div>
 
         <form className={styles.form} onSubmit={createRoom}>
