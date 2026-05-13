@@ -6,6 +6,7 @@ import {
   applyMissedLastTwoCallout,
   applyPass,
   applyPlay,
+  applyWrongLastTwoCall,
   chooseBotMove,
   getNextHumanSeat,
   getPlayer,
@@ -167,7 +168,13 @@ export async function callOutMissedLastTwo(roomId, playerId) {
   await runTransaction(db, async (transaction) => {
     const snapshot = await transaction.get(roomRef);
     if (!snapshot.exists()) throw new Error("Room not found.");
-    transaction.set(roomRef, applyMissedLastTwoCallout(snapshot.data(), playerId));
+    const room = snapshot.data();
+    transaction.set(
+      roomRef,
+      room.lastTwoCallout
+        ? applyMissedLastTwoCallout(room, playerId)
+        : applyWrongLastTwoCall(room, playerId)
+    );
   });
 }
 

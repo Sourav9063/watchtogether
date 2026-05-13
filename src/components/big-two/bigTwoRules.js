@@ -6,6 +6,7 @@ export const ROOM_TTL_MS = 48 * 60 * 60 * 1000;
 export const LAST_TWO_CALL_MS = 2 * 1000;
 export const LAST_TWO_BOT_CALL_MS = 500;
 export const LAST_TWO_BOT_ATTACK_MS = 3 * 1000;
+export const WRONG_LAST_TWO_LOCK_TURNS = 4;
 export const PLAYER_NAME_MAX_LENGTH = 16;
 
 const HUMAN_SEAT_ORDER = {
@@ -355,6 +356,8 @@ export function startGameState(room) {
     points,
     roundScores: [],
     lastTwoCallout: null,
+    lastTwoCallLocks: {},
+    turnNumber: 0,
     mustPlayThreeClubs: false,
   });
 }
@@ -426,6 +429,7 @@ export function applyPlay(room, playerId, selectedCards) {
   const winner = nextHand.length === 0 ? player : null;
   const nextSeat = winner ? player.seat : getNextSeat(room, player.seat);
   const playedAt = Date.now();
+  const turnNumber = Number(room.turnNumber || 0) + 1;
   const lastTwoCallout =
     !winner && nextHand.length <= 2
       ? {
@@ -448,6 +452,7 @@ export function applyPlay(room, playerId, selectedCards) {
     ...room,
     status: "playing",
     turnSeat: nextSeat,
+    turnNumber,
     hands: nextHands,
     lastPlay: {
       seat: player.seat,
@@ -536,10 +541,12 @@ export function applyPass(room, playerId) {
   const passes = [...new Set([...(room.passes || []), player.seat])];
   const trickDone = passes.length >= activeSeats.length - 1;
   const turnSeat = trickDone ? room.lastPlay.seat : getNextSeat(room, player.seat);
+  const turnNumber = Number(room.turnNumber || 0) + 1;
 
   return withRoomExpiry({
     ...room,
     turnSeat,
+    turnNumber,
     lastPlay: trickDone ? null : room.lastPlay,
     passes: trickDone ? [] : passes,
     history: [
@@ -583,6 +590,9 @@ export function applyLastTwoCall(room, playerId) {
 export function applyMissedLastTwoCallout(room, playerId, force = false) {
   const caller = getPlayer(room, playerId);
   if (!caller && !force) throw new Error("Player not in room.");
+  if (caller && isLastTwoCallLocked(room, caller.seat)) {
+    throw new Error("Wrong call. Wait 4 Turn");
+  }
 
   const callout = room.lastTwoCallout;
   if (!callout) throw new Error("No last cards call pending.");
@@ -633,6 +643,42 @@ export function applyMissedLastTwoCallout(room, playerId, force = false) {
     lastTwoCallout: null,
     mustPlayThreeClubs: callerBecomesLeader ? false : callout.previousMustPlayThreeClubs,
   });
+}
+
+export function applyWrongLastTwoCall(room, playerId) {
+  const caller = getPlayer(room, playerId);
+  if (!caller) throw new Error("Player not in room.");
+  if (room.status !== "playing") throw new Error("Game not active.");
+  if (isLastTwoCallLocked(room, caller.seat)) throw new Error("Wrong call. Wait 4 Turn");
+
+  const turnNumber = Number(room.turnNumber || 0);
+
+  return withRoomExpiry({
+    ...room,
+    lastTwoCallLocks: {
+      ...(room.lastTwoCallLocks || {}),
+      [caller.seat]: turnNumber + WRONG_LAST_TWO_LOCK_TURNS,
+    },
+    history: [
+      ...(room.history || []).slice(-24),
+      {
+        type: "wrongLastCardsCall",
+        seat: caller.seat,
+        name: caller.name,
+        lockedTurns: WRONG_LAST_TWO_LOCK_TURNS,
+        at: Date.now(),
+      },
+    ],
+  });
+}
+
+export function isLastTwoCallLocked(room, seat) {
+  return getLastTwoCallLockTurns(room, seat) > 0;
+}
+
+export function getLastTwoCallLockTurns(room, seat) {
+  const unlockTurn = Number(room?.lastTwoCallLocks?.[seat] || 0);
+  return Math.max(0, unlockTurn - Number(room?.turnNumber || 0));
 }
 
 export function getNextSeat(room, fromSeat) {

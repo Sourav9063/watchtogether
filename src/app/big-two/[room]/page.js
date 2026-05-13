@@ -17,6 +17,7 @@ import {
   getPlayer,
   getPlayBlockReason,
   getSeatPlayer,
+  getLastTwoCallLockTurns,
   hasValidPlay,
   normalizeName,
 } from "@/components/big-two/bigTwoRules";
@@ -229,6 +230,13 @@ export default function BigTwoRoom() {
       autoPassWarningKey === `${room?.updatedAt}-${room?.turnSeat}`
   );
   const isLastTwoOwner = Boolean(lastTwoCallout?.playerId === playerId);
+  const lastTwoCallLockTurns = currentPlayer
+    ? getLastTwoCallLockTurns(room, currentPlayer.seat)
+    : 0;
+  const isLastTwoCallLockedForMe = Boolean(!isLastTwoOwner && lastTwoCallLockTurns > 0);
+  const lastTwoCallButtonText = isLastTwoCallLockedForMe
+    ? `Wrong call. Wait ${lastTwoCallLockTurns} Turn`
+    : "Call Last Two/One";
   const playHint = selectedPlayReason
     ? selectedPlayReason
     : !hasPlayableCards && canPass
@@ -608,10 +616,11 @@ export default function BigTwoRoom() {
             </button>
             <button
               className={styles.callButton}
+              disabled={isLastTwoCallLockedForMe}
               onClick={isLastTwoOwner ? submitLastTwo : submitCallOut}
               type="button"
             >
-              Call Last Two/One
+              {lastTwoCallButtonText}
             </button>
           </div>
 
