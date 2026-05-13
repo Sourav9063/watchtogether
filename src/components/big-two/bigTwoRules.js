@@ -20,6 +20,7 @@ const FIVE_CARD_RANK = {
   "straight flush": 5,
   "royal flush": 6,
 };
+const MAX_DEAL_ATTEMPTS = 200;
 
 export const cardsByValue = CardData.reduce((map, card) => {
   map[card.value] = card;
@@ -258,6 +259,18 @@ export function hasValidPlay(room, hand) {
 }
 
 export function createInitialHands(players) {
+  let hands = dealHands(players);
+  let attempts = 1;
+
+  while (isRoundDisqualified(hands) && attempts < MAX_DEAL_ATTEMPTS) {
+    hands = dealHands(players);
+    attempts += 1;
+  }
+
+  return hands;
+}
+
+function dealHands(players) {
   const deck = shuffle(CardData.map((card) => card.value));
   const hands = {};
 
@@ -275,6 +288,24 @@ export function createInitialHands(players) {
   });
 
   return hands;
+}
+
+export function isRoundDisqualified(hands) {
+  return Object.values(hands || {}).some((hand) => hasAllTwos(hand) || countPairs(hand) >= 6);
+}
+
+function hasAllTwos(hand) {
+  return hand.filter((card) => cardsByValue[card]?.number === 15).length === 4;
+}
+
+function countPairs(hand) {
+  const counts = (hand || []).reduce((map, card) => {
+    const number = cardsByValue[card]?.number;
+    if (number) map[number] = (map[number] || 0) + 1;
+    return map;
+  }, {});
+
+  return Object.values(counts).reduce((total, count) => total + Math.floor(count / 2), 0);
 }
 
 function shuffle(cards) {
@@ -601,37 +632,138 @@ export function chooseBotMove(room, bot) {
     return { action: "play", cards: chooseBotLead(room, hand).values };
   }
 
-  const candidates = getCandidateHands(hand, room.lastPlay.cards.length)
-    .map((cards) => evaluateHand(cards))
-    .filter((candidate) => canBeat(candidate, room.lastPlay))
-    .sort((a, b) => compareHands(a, b));
+  const candidates = getEvaluatedCandidates(hand, room.lastPlay.cards.length)
+    .filter((candidate) => canBeat(candidate, room.lastPlay));
 
   if (!candidates.length) {
     return { action: "pass", cards: [] };
   }
 
-  return { action: "play", cards: pickRandom(candidates).values };
+  return { action: "play", cards: chooseBotResponse(room, bot, candidates).values };
 }
 
 function chooseBotLead(room, hand) {
-  const candidateGroups = [1, 2, 3, 5]
-    .map((size) =>
-      getCandidateHands(hand, size)
-        .map((cards) => evaluateHand(cards))
-        .filter(Boolean)
-        .sort((a, b) => compareHands(a, b))
-    )
-    .filter((candidates) => candidates.length);
+  const candidates = [1, 2, 3, 5].flatMap((size) => getEvaluatedCandidates(hand, size));
+  const winningPlay = candidates.find((candidate) => candidate.size === hand.length);
 
-  if (candidateGroups.length) {
-    return pickRandom(pickRandom(candidateGroups));
+  if (winningPlay) {
+    return winningPlay;
   }
 
-  return evaluateHand([hand[0]]);
+  const ranked = candidates
+    .map((candidate) => ({
+      candidate,
+      score: scoreBotLead(candidate, hand),
+    }))
+    .sort((a, b) => b.score - a.score || compareHands(a.candidate, b.candidate));
+
+  return ranked[0]?.candidate || evaluateHand([hand[0]]);
 }
 
-function pickRandom(items) {
-  return items[Math.floor(Math.random() * items.length)];
+function chooseBotResponse(room, bot, candidates) {
+  const hand = room.hands?.[bot.seat] || [];
+  const winningPlay = candidates.find((candidate) => candidate.size === hand.length);
+
+  if (winningPlay) {
+    return winningPlay;
+  }
+
+  const urgent = isBotUnderPressure(room, bot);
+  const ranked = candidates
+    .map((candidate) => ({
+      candidate,
+      score: scoreBotResponse(candidate, hand, urgent),
+    }))
+    .sort((a, b) => b.score - a.score || compareHands(a.candidate, b.candidate));
+
+  return ranked[0].candidate;
+}
+
+function scoreBotLead(candidate, hand) {
+  const remainingCards = hand.length - candidate.size;
+  const comboPriority = {
+    5: 80,
+    3: 64,
+    2: 46,
+    1: 18,
+  };
+
+  return (
+    comboPriority[candidate.size] +
+    getHandShapeBonus(candidate) -
+    getRankCost(candidate) -
+    remainingCards * 1.5 -
+    getSplitPenalty(candidate, hand)
+  );
+}
+
+function scoreBotResponse(candidate, hand, urgent) {
+  const controlBonus = urgent ? getControlValue(candidate) : getEfficientValue(candidate);
+
+  return (
+    candidate.size * 18 +
+    controlBonus +
+    getHandShapeBonus(candidate) -
+    getRankCost(candidate) -
+    getSplitPenalty(candidate, hand)
+  );
+}
+
+function getHandShapeBonus(candidate) {
+  if (candidate.size !== 5) return 0;
+
+  return {
+    straight: 6,
+    flush: 10,
+    "full house": 20,
+    "four of kind": 28,
+    "straight flush": 34,
+    "royal flush": 38,
+  }[candidate.type] || 0;
+}
+
+function getRankCost(candidate) {
+  const averageCard = candidate.values.reduce((total, card) => total + card, 0) / candidate.values.length;
+  return averageCard / (candidate.size === 1 ? 3 : 5);
+}
+
+function getControlValue(candidate) {
+  if (candidate.size === 5) return candidate.category * 10 + candidate.rank / 2;
+  return candidate.rank / 2;
+}
+
+function getEfficientValue(candidate) {
+  if (candidate.size === 5) return candidate.category * 4 - candidate.rank / 7;
+  return -candidate.rank / 4;
+}
+
+function getSplitPenalty(candidate, hand) {
+  if (candidate.size !== 1) return 0;
+
+  const number = cardsByValue[candidate.values[0]]?.number;
+  const sameNumberCount = hand.filter((card) => cardsByValue[card]?.number === number).length;
+  if (sameNumberCount >= 3) return 18;
+  if (sameNumberCount === 2) return 10;
+  return 0;
+}
+
+function isBotUnderPressure(room, bot) {
+  const botHandSize = room.hands?.[bot.seat]?.length || 0;
+  const opponentLowCards = (room.players || []).some((player) => {
+    if (player.seat === bot.seat) return false;
+    return (room.hands?.[player.seat]?.length || 0) <= 3;
+  });
+  const oneMorePassWinsTrick =
+    room.lastPlay && (room.passes || []).length >= (room.players || []).length - 2;
+
+  return botHandSize <= 5 || opponentLowCards || oneMorePassWinsTrick;
+}
+
+function getEvaluatedCandidates(hand, size) {
+  return getCandidateHands(hand, size)
+    .map((cards) => evaluateHand(cards))
+    .filter(Boolean)
+    .sort((a, b) => compareHands(a, b));
 }
 
 export function hasOpenLastTwoCallout(room) {

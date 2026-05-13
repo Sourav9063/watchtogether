@@ -71,7 +71,9 @@ flowchart TD
   H --> F
   F -- Yes --> I[Fill empty seats with bots]
   I --> J[Deal cards]
-  J --> K[Seat with 3 of clubs leads first]
+  J --> M{Any player has all 2s or 6 pairs?}
+  M -- Yes --> J
+  M -- No --> K[Seat with 3 of clubs leads first]
   K --> L[status = playing]
 ```
 
@@ -82,6 +84,8 @@ For `2` humans, seats alternate as human, bot, human, bot.
 For `3` humans, game starts with `1` bot.
 
 For `4` humans, game starts with no bots.
+
+Initial deals are disqualified and redealt if any player has all four `2`s or at least `6` pairs.
 
 ## Turn Flow
 
@@ -280,10 +284,11 @@ flowchart TD
 
 Bot play strategy:
 
-1. When leading, bot builds valid single, pair, three-card, and five-card options.
-2. Bot randomly chooses one available option group.
-3. Bot randomly chooses one play from that group.
-4. When answering table, bot randomly chooses one valid beating play of the required size.
+1. When leading, bot scores valid single, pair, three-card, and five-card options.
+2. Bot prefers shedding five-card hands, three of a kind, and pairs before singles.
+3. Bot avoids breaking pairs/triples for low-value singles unless needed.
+4. When answering table, bot uses an efficient winning play normally.
+5. Bot spends stronger cards to take control when its hand is short, an opponent is low on cards, or one more pass can win trick.
 
 If no beating play exists, bot passes.
 
