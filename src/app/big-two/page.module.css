@@ -733,6 +733,12 @@
     padding: 0.4rem;
   }
 
+  .seatPoints {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    margin-top: -0.1rem;
+  }
+
   .seatName,
   .seatCards,
   .pileText,
