@@ -29,6 +29,7 @@ import {
   playCards,
   restartRoom,
   runBotLastCardsCall,
+  runRandomBotLastCardsAttack,
   runBotTurn,
 } from "@/components/big-two/bigTwoFirebase";
 import { getCustomLink } from "@/helper/customFunc";
@@ -58,6 +59,7 @@ export default function BigTwoRoom() {
   const [autoPassWarningKey, setAutoPassWarningKey] = useState(null);
   const [playAnimation, setPlayAnimation] = useState(null);
   const botTimerRef = useRef(null);
+  const botLastCardsAttackTimerRef = useRef(null);
   const botLastCardsTimerRef = useRef(null);
   const humanAutoPassTimerRef = useRef(null);
   const humanAutoPassWarningTimerRef = useRef(null);
@@ -154,7 +156,7 @@ export default function BigTwoRoom() {
 
     setNow(Date.now());
     const tick = window.setInterval(() => setNow(Date.now()), 250);
-    const delay = Math.max(0, room.lastTwoCallout.expiresAt - Date.now());
+    const delay = Math.max(0, room.lastTwoCallout.expiresAt - Date.now() + 500);
     const expiry = window.setTimeout(() => {
       expireLastTwoCallout(room.roomId, room.updatedAt).catch(() => {});
     }, delay);
@@ -164,6 +166,23 @@ export default function BigTwoRoom() {
       window.clearTimeout(expiry);
     };
   }, [room?.lastTwoCallout, room?.roomId, room?.updatedAt]);
+
+  useEffect(() => {
+    window.clearTimeout(botLastCardsAttackTimerRef.current);
+    if (!room?.lastTwoCallout || room.botDriverId !== playerId) return undefined;
+
+    const attackers = (room.players || []).filter(
+      (player) => player.isBot && player.seat !== room.lastTwoCallout.seat
+    );
+    if (!attackers.length) return undefined;
+
+    const delay = Math.max(0, room.lastTwoCallout.expiresAt - Date.now() + 25);
+    botLastCardsAttackTimerRef.current = window.setTimeout(() => {
+      runRandomBotLastCardsAttack(room.roomId, room.updatedAt).catch(() => {});
+    }, delay);
+
+    return () => window.clearTimeout(botLastCardsAttackTimerRef.current);
+  }, [room?.lastTwoCallout, room?.roomId, room?.updatedAt, room?.botDriverId, playerId, room]);
 
   useEffect(() => {
     window.clearTimeout(botLastCardsTimerRef.current);

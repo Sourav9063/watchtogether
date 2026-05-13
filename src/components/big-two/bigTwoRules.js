@@ -3,7 +3,7 @@ import { CardData } from "./data/data";
 export const CARD_BACK = "/assets/card-svg/blue_back.png";
 export const ROOM_COLLECTION = "bigTwoRooms";
 export const ROOM_TTL_MS = 48 * 60 * 60 * 1000;
-export const LAST_TWO_CALL_MS = 5 * 1000;
+export const LAST_TWO_CALL_MS = 2 * 1000;
 
 const HUMAN_SEAT_ORDER = {
   1: [0],

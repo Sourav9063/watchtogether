@@ -170,6 +170,26 @@ export async function callOutMissedLastTwo(roomId, playerId) {
   });
 }
 
+export async function runRandomBotLastCardsAttack(roomId, expectedUpdatedAt) {
+  const roomRef = getRoomRef(roomId);
+
+  await runTransaction(db, async (transaction) => {
+    const snapshot = await transaction.get(roomRef);
+    if (!snapshot.exists()) throw new Error("Room not found.");
+    const room = snapshot.data();
+    if (room.updatedAt !== expectedUpdatedAt || !room.lastTwoCallout) return;
+    if (Date.now() < room.lastTwoCallout.expiresAt) return;
+
+    const attackers = (room.players || []).filter(
+      (player) => player.isBot && player.seat !== room.lastTwoCallout.seat
+    );
+    if (!attackers.length) return;
+
+    const attacker = attackers[Math.floor(Math.random() * attackers.length)];
+    transaction.set(roomRef, applyMissedLastTwoCallout(room, attacker.id));
+  });
+}
+
 export async function expireLastTwoCallout(roomId, expectedUpdatedAt) {
   const roomRef = getRoomRef(roomId);
 

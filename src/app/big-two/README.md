@@ -223,6 +223,8 @@ Owner must click:
 
 Other players always see `Call Last Two/One` button. No public notification or banner is shown. Players must watch visible card counts.
 
+If owner has not called after `2s`, creator client picks a random bot attacker, if available. That bot attacks and becomes leader.
+
 Successful attack:
 
 - missed player's last played cards return to hand
@@ -243,9 +245,10 @@ sequenceDiagram
   participant P as Player with 1/2 cards left
   participant R as Firestore room
   participant O as Other player
+  participant B as Random bot
   P->>R: playCards()
   R->>R: create lastTwoCallout
-  alt player calls in 5s
+  alt player calls in 2s
     P->>R: callLastTwo()
     R->>R: clear lastTwoCallout
   else other attacks
@@ -253,6 +256,11 @@ sequenceDiagram
     R->>R: return last played cards
     R->>R: clear table
     R->>R: attacker becomes leader
+  else random bot attacks after 2s
+    B->>R: runRandomBotLastCardsAttack()
+    R->>R: return last played cards
+    R->>R: clear table
+    R->>R: bot becomes leader
   else no one acts
     R->>R: expireLastTwoCallout()
     R->>R: return last played cards
@@ -297,11 +305,24 @@ Bot Last Two/One call:
 ```mermaid
 flowchart TD
   A[Bot play leaves 1 or 2 cards] --> B[lastTwoCallout opens]
-  B --> C[botDriverId client schedules random 0-5s timer]
+  B --> C[botDriverId client schedules timer inside 2s window]
   C --> D[runBotLastCardsCall transaction]
   D --> E{Callout still belongs to bot?}
   E -- Yes --> F[Bot calls Last Two/One]
   E -- No --> G[No-op]
+```
+
+Bot Last Two/One attack:
+
+```mermaid
+flowchart TD
+  A[Any player play leaves 1 or 2 cards] --> B[lastTwoCallout opens]
+  B --> C[botDriverId client waits 2s]
+  C --> D{Callout still open?}
+  D -- No --> E[No-op]
+  D -- Yes --> F[Pick random bot except missed player]
+  F --> G[runRandomBotLastCardsAttack transaction]
+  G --> H[Bot attacks and becomes leader]
 ```
 
 ## UI Behavior
