@@ -60,6 +60,7 @@ export default function BigTwoRoom() {
   const [hiddenNoticeAt, setHiddenNoticeAt] = useState(null);
   const [autoPassWarningKey, setAutoPassWarningKey] = useState(null);
   const [playAnimation, setPlayAnimation] = useState(null);
+  const [copiedJoinLink, setCopiedJoinLink] = useState(false);
   const botTimerRef = useRef(null);
   const botLastCardsAttackTimerRef = useRef(null);
   const botLastCardsTimerRef = useRef(null);
@@ -379,6 +380,18 @@ export default function BigTwoRoom() {
     }
   };
 
+  const handleCopyJoinLink = async () => {
+    const joinLink = `${window.location.origin}/big-two/${roomId}`;
+
+    try {
+      await navigator.clipboard.writeText(joinLink);
+      setCopiedJoinLink(true);
+      window.setTimeout(() => setCopiedJoinLink(false), 1800);
+    } catch (err) {
+      setError(err.message || "Could not copy join link.");
+    }
+  };
+
   const toggleCard = (card) => {
     if (!isMyTurn || !hasPlayableCards) return;
     setSelectedCards((cards) =>
@@ -456,9 +469,9 @@ export default function BigTwoRoom() {
           <h1 className={styles.tableTitle}>Big Two</h1>
           <p className={styles.scoreLimit}>Max point {room.maxPoint || 50}</p>
         </div>
-        <Link className={styles.smallLink} href="/big-two">
-          New room
-        </Link>
+        <button className={styles.smallLink} type="button" onClick={handleCopyJoinLink}>
+          {copiedJoinLink ? "Copied" : "Copy join link"}
+        </button>
       </header>
 
       {room.status === "waiting" && (
