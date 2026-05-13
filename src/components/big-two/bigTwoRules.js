@@ -22,6 +22,12 @@ const FIVE_CARD_RANK = {
   "straight flush": 5,
   "royal flush": 6,
 };
+const SUIT_RANK = {
+  clubs: 1,
+  diamonds: 2,
+  hearts: 3,
+  spades: 4,
+};
 const MAX_DEAL_ATTEMPTS = 200;
 
 export const cardsByValue = CardData.reduce((map, card) => {
@@ -126,6 +132,7 @@ export function evaluateHand(values) {
     uniqueNumbers.every((number, index) => index === 0 || number === uniqueNumbers[index - 1] + 1);
   const isFlush = new Set(suits).size === 1;
   const highestCard = sorted[sorted.length - 1];
+  const flushSuitRank = isFlush ? SUIT_RANK[suits[0]] || 0 : 0;
   const isRoyal =
     isStraight &&
     isFlush &&
@@ -157,6 +164,7 @@ export function evaluateHand(values) {
     type,
     size: 5,
     rank,
+    flushSuitRank,
     category: FIVE_CARD_RANK[type],
     values: sorted,
     label: type,
@@ -181,6 +189,11 @@ export function compareHands(left, right) {
   if (left.size === 5) {
     if (left.category !== right.category) {
       return left.category - right.category;
+    }
+    if (left.type === "flush" && right.type === "flush") {
+      if (left.flushSuitRank !== right.flushSuitRank) {
+        return left.flushSuitRank - right.flushSuitRank;
+      }
     }
     if (left.rank !== right.rank) {
       return left.rank - right.rank;
