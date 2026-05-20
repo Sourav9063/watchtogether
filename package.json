@@ -14,6 +14,7 @@
     "eslint-config-next": "^15.4.4",
     "firebase": "^10.1.0",
     "next": "15.4.10",
+    "nodemailer": "^8.0.7",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-player": "^2.16.1",
