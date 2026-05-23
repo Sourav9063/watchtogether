@@ -84,7 +84,7 @@ export default function TmdbSearch() {
             <input
               id="isAnime"
               type="checkbox"
-              value={isAnime}
+              checked={!!isAnime}
               onChange={(e) => setIsAnime(e.target.checked)}
             />
           </label>

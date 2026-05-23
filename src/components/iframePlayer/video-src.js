@@ -1,5 +1,5 @@
 "use client";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useMemo } from "react";
 import styles from "./iframePlayer.module.css";
 import config from "@/config";
 import { useStore } from "@/helper/hooks/useStore";
@@ -9,6 +9,7 @@ import { useTorrent } from "./TorrentContext";
 
 export default function VideoSrc() {
   const [iframeUrl, setIframeUrl] = useStore(Stores.iframeUrl);
+  const [isAnime] = useStore(Stores.isAnime);
   const {
     error,
     isTorrentEnabled,
@@ -72,13 +73,60 @@ export default function VideoSrc() {
         prefix = "Core";
         suffix = "";
         break;
+      case config.iframe.url38:
+        prefix = "VidSrc";
+        suffix = "";
+        break;
+      case config.iframe.url39:
+        prefix = "AMRI";
+        suffix = "";
+        break;
+      case config.iframe.url40:
+        prefix = "Megaplay";
+        suffix = "";
+        break;
+      case config.iframe.url41:
+        prefix = "Vidwish";
+        suffix = "";
+        break;
+      case config.iframe.url42:
+        prefix = "DropFile";
+        suffix = "";
+        break;
+      case config.iframe.url43:
+        prefix = "Ninja";
+        suffix = "";
+        break;
+      case config.iframe.url44:
+        prefix = "Cinezo";
+        suffix = "";
+        break;
       default:
         break;
     }
     return prefix + suffix;
   };
 
-  const selectedSource = iframeUrl?.baseUrl || config.iframe.urls[0];
+  const nonAnimeSources = useMemo(
+    () =>
+      config.iframe.urls.filter(
+        (url) =>
+          ![config.iframe.url40, config.iframe.url41, config.iframe.url43].includes(
+            url,
+          ),
+      ),
+    [],
+  );
+  const sourceUrls = useMemo(
+    () =>
+      isAnime || iframeUrl?.type === "anime"
+        ? config.iframe.animeUrls
+        : nonAnimeSources,
+    [iframeUrl?.type, isAnime, nonAnimeSources],
+  );
+  const selectedSource = sourceUrls.includes(iframeUrl?.baseUrl)
+    ? iframeUrl.baseUrl
+    : sourceUrls[0];
 
   useLayoutEffect(() => {
     if (!iframeUrl?.type || !iframeUrl?.id) return;
@@ -95,6 +143,15 @@ export default function VideoSrc() {
     iframeUrl?.type,
     isTorrentEnabled,
   ]);
+
+  useLayoutEffect(() => {
+    if (!sourceUrls.length || sourceUrls.includes(iframeUrl?.baseUrl)) return;
+
+    setIframeUrl((state) => ({
+      ...state,
+      baseUrl: sourceUrls[0],
+    }));
+  }, [iframeUrl?.baseUrl, setIframeUrl, sourceUrls]);
 
   return (
     <div
@@ -118,7 +175,7 @@ export default function VideoSrc() {
                 });
               }}
             >
-              {config.iframe.urls.map((url, index) => (
+              {sourceUrls.map((url, index) => (
                 <option key={url} value={url}>
                   {getSourceText(url, index)}
                 </option>

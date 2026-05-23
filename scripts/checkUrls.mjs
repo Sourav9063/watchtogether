@@ -37,8 +37,8 @@ function parseEnvFile(filePath) {
 
 const env = parseEnvFile(path.join(ROOT, ".env.local"));
 
-// Build url1..url32 map: envKey -> { name, url }
-const URL_COUNT = 32;
+// Build url1..url44 map: envKey -> { name, url }
+const URL_COUNT = 44;
 const urlEntries = [];
 for (let i = 1; i <= URL_COUNT; i++) {
   const key = `NEXT_PUBLIC_PERSONAL_url${i}`;

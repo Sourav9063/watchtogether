@@ -79,6 +79,7 @@ const structuredData = {
       featureList: [
         "Movie and TV show search",
         "Anime stream navigation",
+        "Anime source references",
         "Live sports stream navigation",
         "IPTV stream navigation",
         "Latest movie and TV additions",
