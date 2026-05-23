@@ -51,6 +51,8 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
         return getUrl27({ iframeUrl });
       case config.iframe.url30:
         return getUrl30({ iframeUrl });
+      case config.iframe.url38:
+        return getUrl38({ iframeUrl });
       default:
         return getDefaultUrl({ iframeUrl });
     }
@@ -151,6 +153,17 @@ const getUrl30 = ({ iframeUrl }) => {
   if (iframeUrl.type === "movie")
     return `${iframeUrl.baseUrl}/movie/?id=${iframeUrl.id}`;
   return `${iframeUrl.baseUrl}/tv/?id=${iframeUrl.id}&s=${iframeUrl.season}&e=${iframeUrl.episode}`;
+};
+
+const getUrl38 = ({ iframeUrl }) => {
+  if (iframeUrl.type === "movie")
+    return `${iframeUrl.baseUrl}/movie/${iframeUrl.id}`;
+  return `${iframeUrl.baseUrl}/tv/${iframeUrl.id}/${iframeUrl.season}-${iframeUrl.episode}`;
+};
+
+const getUrl39 = ({ iframeUrl }) => {
+  if (iframeUrl.type === "movie") return `${iframeUrl.baseUrl}/movie/${iframeUrl.id}`;
+  return `${iframeUrl.baseUrl}/tv/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
 };
 
 const getCinetaroUrl = ({ iframeUrl }) => {
