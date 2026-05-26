@@ -449,9 +449,10 @@ YOUTUBE_COOKIE=<server-only-logged-in-youtube-cookie>
 `DEEZER_PROXY_BASE_URL` is required for catalog requests.
 `YOUTUBE_INNERTUBE_FALLBACK_KEY` is used when a YouTube watch-page response
 does not yield an InnerTube API key. Datacenter deployments may require
-`YOUTUBE_COOKIE` from a dedicated logged-in account, containing `SAPISID` or
-`__Secure-3PAPISID`, so InnerTube requests can be authenticated. Keep this
-cookie private and refresh it when YouTube invalidates the session. Do not
+`YOUTUBE_COOKIE` from a dedicated logged-in account, containing `SAPISID`,
+`__Secure-1PAPISID`, and `__Secure-3PAPISID`, so InnerTube requests can be
+authenticated. Keep this cookie private and refresh it when YouTube
+invalidates the session. Do not
 prefix these settings with `NEXT_PUBLIC_`. Browser bundle must not receive
 InnerTube extraction configuration or server proxy settings.
 
