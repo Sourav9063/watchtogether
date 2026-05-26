@@ -444,6 +444,7 @@ Server environment variables:
 DEEZER_PROXY_BASE_URL=<server-only-deezer-proxy-base-url>
 YOUTUBE_INNERTUBE_FALLBACK_KEY=<server-only-optional-key>
 YOUTUBE_COOKIE=<server-only-logged-in-youtube-cookie>
+YOUTUBE_DATASYNC_ID=<server-only-youtube-account-datasync-id>
 ```
 
 `DEEZER_PROXY_BASE_URL` is required for catalog requests.
@@ -451,10 +452,33 @@ YOUTUBE_COOKIE=<server-only-logged-in-youtube-cookie>
 does not yield an InnerTube API key. Datacenter deployments may require
 `YOUTUBE_COOKIE` from a dedicated logged-in account, containing `SAPISID`,
 `__Secure-1PAPISID`, and `__Secure-3PAPISID`, so InnerTube requests can be
-authenticated. Keep this cookie private and refresh it when YouTube
-invalidates the session. Do not
-prefix these settings with `NEXT_PUBLIC_`. Browser bundle must not receive
-InnerTube extraction configuration or server proxy settings.
+authenticated. For blocked server egress, set `YOUTUBE_DATASYNC_ID` to the
+same session's `ytcfg.get("DATASYNC_ID")` browser value so `_u`
+authorization hashes can be generated. Keep cookie private and refresh it
+when YouTube invalidates session.
+
+To obtain YouTube server environment values:
+
+1. Sign in to `https://www.youtube.com` using dedicated account in browser.
+2. Open DevTools Network tab, reload YouTube, and select an authenticated
+   `youtubei/v1/*` request such as `guide`.
+3. Copy full request `Cookie` header value into server-only `YOUTUBE_COOKIE`.
+   It must contain `SAPISID`, `__Secure-1PAPISID`, and
+   `__Secure-3PAPISID`.
+4. In console on same signed-in YouTube tab, run:
+
+   ```js
+   ytcfg.get("DATASYNC_ID")
+   ```
+
+5. Copy returned string, including trailing `||` when present, into
+   server-only `YOUTUBE_DATASYNC_ID`.
+6. Configure both values in Vercel target environment and redeploy. Refresh
+   both values together if YouTube session changes or becomes invalid.
+
+Do not prefix these settings with `NEXT_PUBLIC_`. Browser bundle must not
+receive InnerTube extraction configuration, cookies, or server proxy
+settings.
 
 ## Security And Operations
 

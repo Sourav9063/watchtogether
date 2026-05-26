@@ -13,7 +13,16 @@ const DESKTOP_USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
   "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36";
 
-function getYoutubeApiAuthHeaders(cookie) {
+function parseDataSyncId(dataSyncId) {
+  if (!dataSyncId) return {};
+  const [first, second] = dataSyncId.split("||");
+  if (second) {
+    return { delegatedSessionId: first, userSessionId: second };
+  }
+  return { userSessionId: first };
+}
+
+function getYoutubeApiAuthHeaders(cookie, playerConfig) {
   if (!cookie) return {};
   const identityCookies = [
     ["SAPISIDHASH", "SAPISID"],
@@ -27,10 +36,14 @@ function getYoutubeApiAuthHeaders(cookie) {
         cookie,
       )?.[1];
       if (!value) return null;
+      const authPrefix = playerConfig.userSessionId
+        ? `${playerConfig.userSessionId} `
+        : "";
       const hash = createHash("sha1")
-        .update(`${timestamp} ${value} ${YOUTUBE_ORIGIN}`)
+        .update(`${authPrefix}${timestamp} ${value} ${YOUTUBE_ORIGIN}`)
         .digest("hex");
-      return `${authName} ${timestamp}_${hash}_u`;
+      const authSuffix = playerConfig.userSessionId ? "_u" : "";
+      return `${authName} ${timestamp}_${hash}${authSuffix}`;
     })
     .filter(Boolean)
     .join(" ");
@@ -38,9 +51,16 @@ function getYoutubeApiAuthHeaders(cookie) {
   return {
     Authorization: authorization,
     Cookie: cookie,
-    "X-Goog-AuthUser": "0",
+    ...(playerConfig.delegatedSessionId
+      ? { "X-Goog-PageId": playerConfig.delegatedSessionId }
+      : {}),
+    ...(playerConfig.delegatedSessionId || playerConfig.sessionIndex !== null
+      ? { "X-Goog-AuthUser": String(playerConfig.sessionIndex || 0) }
+      : {}),
     "X-Origin": YOUTUBE_ORIGIN,
-    "X-YouTube-Bootstrap-Logged-In": "true",
+    ...(playerConfig.loggedIn
+      ? { "X-YouTube-Bootstrap-Logged-In": "true" }
+      : {}),
   };
 }
 
@@ -184,7 +204,7 @@ async function searchVideoId(title, artist) {
           "Content-Type": "application/json",
           Origin: YOUTUBE_ORIGIN,
           "User-Agent": DESKTOP_USER_AGENT,
-          ...getYoutubeApiAuthHeaders(process.env.YOUTUBE_COOKIE),
+          ...getYoutubeApiAuthHeaders(process.env.YOUTUBE_COOKIE, playerConfig),
         },
         body: JSON.stringify({
           query,
@@ -245,6 +265,7 @@ async function searchVideoId(title, artist) {
 }
 
 async function fetchConfig(forced) {
+  const configuredDataSyncId = process.env.YOUTUBE_DATASYNC_ID;
   try {
     const cookie = process.env.YOUTUBE_COOKIE;
     const response = await timedFetch(
@@ -261,9 +282,22 @@ async function fetchConfig(forced) {
       const html = await response.text();
       const apiKey = /"INNERTUBE_API_KEY":"([^"]+)"/.exec(html)?.[1];
       const visitorData = /"VISITOR_DATA":"([^"]+)"/.exec(html)?.[1];
+      const loggedIn =
+        Boolean(configuredDataSyncId) || /"LOGGED_IN":true/.test(html);
+      const dataSyncId =
+        configuredDataSyncId ||
+        (loggedIn ? /"DATASYNC_ID":"([^"]+)"/.exec(html)?.[1] : null);
+      const sessionIndexMatch = /"SESSION_INDEX":(?:"(\d+)"|(\d+))/.exec(
+        html,
+      );
       return {
         apiKey: getApiKey(apiKey),
         visitorData,
+        ...parseDataSyncId(dataSyncId),
+        sessionIndex: Number(
+          sessionIndexMatch?.[1] || sessionIndexMatch?.[2] || 0,
+        ),
+        loggedIn,
         forced,
         expiresAt: Date.now() + CONFIG_TTL_MS,
       };
@@ -274,6 +308,9 @@ async function fetchConfig(forced) {
   return {
     apiKey: getApiKey(),
     visitorData: null,
+    ...parseDataSyncId(configuredDataSyncId),
+    sessionIndex: configuredDataSyncId ? 0 : null,
+    loggedIn: Boolean(configuredDataSyncId),
     forced,
     expiresAt: Date.now() + CONFIG_TTL_MS,
   };
@@ -308,7 +345,7 @@ async function fetchPlayer(videoId, playerConfig, client) {
         ...(playerConfig.visitorData
           ? { "X-Goog-Visitor-Id": playerConfig.visitorData }
           : {}),
-        ...getYoutubeApiAuthHeaders(process.env.YOUTUBE_COOKIE),
+        ...getYoutubeApiAuthHeaders(process.env.YOUTUBE_COOKIE, playerConfig),
       },
       body: JSON.stringify({
         videoId,
