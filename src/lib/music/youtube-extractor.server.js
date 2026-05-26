@@ -1,5 +1,6 @@
 import "server-only";
 import dns from "dns";
+import { createHash } from "crypto";
 
 dns.setDefaultResultOrder("ipv4first");
 
@@ -7,9 +8,27 @@ const FALLBACK_API_KEY = process.env.YOUTUBE_INNERTUBE_FALLBACK_KEY;
 const CONFIG_TTL_MS = 3 * 60 * 60 * 1000;
 const VIDEO_ID_TTL_MS = 12 * 60 * 60 * 1000;
 const REQUEST_TIMEOUT_MS = 15000;
+const YOUTUBE_ORIGIN = "https://www.youtube.com";
 const DESKTOP_USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
   "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36";
+
+function getYoutubeApiAuthHeaders(cookie) {
+  if (!cookie) return {};
+  const sapisid =
+    /(?:^|;\s*)SAPISID=([^;]+)/.exec(cookie)?.[1] ||
+    /(?:^|;\s*)__Secure-3PAPISID=([^;]+)/.exec(cookie)?.[1];
+  if (!sapisid) return { Cookie: cookie };
+  const timestamp = Math.floor(Date.now() / 1000);
+  const hash = createHash("sha1")
+    .update(`${timestamp} ${sapisid} ${YOUTUBE_ORIGIN}`)
+    .digest("hex");
+  return {
+    Authorization: `SAPISIDHASH ${timestamp}_${hash}`,
+    Cookie: cookie,
+    "X-Origin": YOUTUBE_ORIGIN,
+  };
+}
 
 const CLIENTS = [
   {
@@ -149,7 +168,9 @@ async function searchVideoId(title, artist) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Origin: YOUTUBE_ORIGIN,
           "User-Agent": DESKTOP_USER_AGENT,
+          ...getYoutubeApiAuthHeaders(process.env.YOUTUBE_COOKIE),
         },
         body: JSON.stringify({
           query,
@@ -259,7 +280,6 @@ async function ensureConfig(forceRefresh = false) {
 }
 
 async function fetchPlayer(videoId, playerConfig, client) {
-  const cookie = process.env.YOUTUBE_COOKIE;
   const response = await timedFetch(
     `https://www.youtube.com/youtubei/v1/player?key=${encodeURIComponent(playerConfig.apiKey)}`,
     {
@@ -267,14 +287,14 @@ async function fetchPlayer(videoId, playerConfig, client) {
       headers: {
         "Content-Type": "application/json",
         "Accept-Language": "en-US,en;q=0.9",
-        Origin: "https://www.youtube.com",
+        Origin: YOUTUBE_ORIGIN,
         "User-Agent": client.userAgent,
         "X-YouTube-Client-Name": client.id,
         "X-YouTube-Client-Version": client.version,
         ...(playerConfig.visitorData
           ? { "X-Goog-Visitor-Id": playerConfig.visitorData }
           : {}),
-        ...(cookie ? { Cookie: cookie } : {}),
+        ...getYoutubeApiAuthHeaders(process.env.YOUTUBE_COOKIE),
       },
       body: JSON.stringify({
         videoId,
