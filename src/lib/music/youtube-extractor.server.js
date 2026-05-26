@@ -15,18 +15,32 @@ const DESKTOP_USER_AGENT =
 
 function getYoutubeApiAuthHeaders(cookie) {
   if (!cookie) return {};
-  const sapisid =
-    /(?:^|;\s*)SAPISID=([^;]+)/.exec(cookie)?.[1] ||
-    /(?:^|;\s*)__Secure-3PAPISID=([^;]+)/.exec(cookie)?.[1];
-  if (!sapisid) return { Cookie: cookie };
+  const identityCookies = [
+    ["SAPISIDHASH", "SAPISID"],
+    ["SAPISID1PHASH", "__Secure-1PAPISID"],
+    ["SAPISID3PHASH", "__Secure-3PAPISID"],
+  ];
   const timestamp = Math.floor(Date.now() / 1000);
-  const hash = createHash("sha1")
-    .update(`${timestamp} ${sapisid} ${YOUTUBE_ORIGIN}`)
-    .digest("hex");
+  const authorization = identityCookies
+    .map(([authName, cookieName]) => {
+      const value = new RegExp(`(?:^|;\\s*)${cookieName}=([^;]+)`).exec(
+        cookie,
+      )?.[1];
+      if (!value) return null;
+      const hash = createHash("sha1")
+        .update(`${timestamp} ${value} ${YOUTUBE_ORIGIN}`)
+        .digest("hex");
+      return `${authName} ${timestamp}_${hash}_u`;
+    })
+    .filter(Boolean)
+    .join(" ");
+  if (!authorization) return { Cookie: cookie };
   return {
-    Authorization: `SAPISIDHASH ${timestamp}_${hash}`,
+    Authorization: authorization,
     Cookie: cookie,
+    "X-Goog-AuthUser": "0",
     "X-Origin": YOUTUBE_ORIGIN,
+    "X-YouTube-Bootstrap-Logged-In": "true",
   };
 }
 
