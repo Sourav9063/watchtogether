@@ -4,6 +4,7 @@ import { resolveAudioTrack } from "@/lib/music/youtube-extractor.server";
 import { cleanText } from "@/lib/music/validation";
 
 export const runtime = "nodejs";
+export const preferredRegion = "sin1";
 
 const windows = new Map();
 const RATE_WINDOW_MS = 60 * 1000;
