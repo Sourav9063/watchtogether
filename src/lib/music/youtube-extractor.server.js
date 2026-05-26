@@ -63,6 +63,36 @@ const CLIENTS = [
       gl: "US",
     },
   },
+  {
+    key: "web",
+    id: "1",
+    version: "2.20240228.06.00",
+    userAgent: DESKTOP_USER_AGENT,
+    context: {
+      clientName: "WEB",
+      clientVersion: "2.20240228.06.00",
+      osName: "Windows",
+      osVersion: "10.0",
+      platform: "DESKTOP",
+      hl: "en",
+      gl: "US",
+    },
+  },
+  {
+    key: "mweb",
+    id: "2",
+    version: "2.20240228.06.00",
+    userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1",
+    context: {
+      clientName: "MWEB",
+      clientVersion: "2.20240228.06.00",
+      osName: "iPhone",
+      osVersion: "16.6",
+      platform: "MOBILE",
+      hl: "en",
+      gl: "US",
+    },
+  },
 ];
 
 const videoIds = new Map();
@@ -106,19 +136,66 @@ async function searchVideoId(title, artist) {
   if (existing && existing.expiresAt > Date.now()) return existing.videoId;
   videoIds.delete(key);
 
-  const query = encodeURIComponent(`${title} ${artist} lyrics`);
+  const query = `${title} ${artist} lyrics`;
+
+  try {
+    const playerConfig = await ensureConfig(false);
+    const apiResponse = await timedFetch(
+      `https://www.youtube.com/youtubei/v1/search?key=${encodeURIComponent(playerConfig.apiKey)}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": DESKTOP_USER_AGENT,
+        },
+        body: JSON.stringify({
+          query,
+          context: {
+            client: {
+              clientName: "WEB",
+              clientVersion: "2.20240228.06.00",
+              hl: "en",
+              gl: "US",
+            },
+          },
+        }),
+      },
+    );
+    if (apiResponse.ok) {
+      const data = await apiResponse.json();
+      const items =
+        data.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents?.[0]?.itemSectionRenderer?.contents ||
+        data.contents?.sectionListRenderer?.contents?.[0]?.itemSectionRenderer?.contents;
+      if (items) {
+        const videoId = items.find((i) => i.videoRenderer)?.videoRenderer?.videoId;
+        if (videoId) {
+          videoIds.set(key, {
+            videoId,
+            expiresAt: Date.now() + VIDEO_ID_TTL_MS,
+          });
+          keepBounded(videoIds, 200);
+          return videoId;
+        }
+      }
+    }
+  } catch {
+    // Fall back to HTML scraping if API fails
+  }
+
+  const encodedQuery = encodeURIComponent(query);
   const response = await timedFetch(
-    `https://www.youtube.com/results?search_query=${query}`,
+    `https://www.youtube.com/results?search_query=${encodedQuery}`,
     {
       headers: {
         "User-Agent": DESKTOP_USER_AGENT,
         "Accept-Language": "en-US,en;q=0.9",
+        Cookie: "CONSENT=YES+20210329-01-0;",
       },
     },
   );
   if (!response.ok) throw new Error(`YouTube search returned ${response.status}`);
   const html = await response.text();
-  const match = /"videoId"\s*:\s*"([a-zA-Z0-9_-]{11})"/.exec(html);
+  const match = /(?:v=|videoId["']?\s*:\s*["']|watch\?v=)([a-zA-Z0-9_-]{11})/.exec(html);
   if (!match) return null;
   videoIds.set(key, {
     videoId: match[1],
