@@ -387,6 +387,7 @@
   .genreControls {
     align-items: stretch;
     flex-direction: column;
+    width: 100%;
   }
 
   .genreSelect,
