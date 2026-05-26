@@ -1,4 +1,7 @@
 import "server-only";
+import dns from "dns";
+
+dns.setDefaultResultOrder("ipv4first");
 
 const FALLBACK_API_KEY = process.env.YOUTUBE_INNERTUBE_FALLBACK_KEY;
 const CONFIG_TTL_MS = 3 * 60 * 60 * 1000;
@@ -195,7 +198,7 @@ async function searchVideoId(title, artist) {
   );
   if (!response.ok) throw new Error(`YouTube search returned ${response.status}`);
   const html = await response.text();
-  const match = /(?:v=|videoId["']?\s*:\s*["']|watch\?v=)([a-zA-Z0-9_-]{11})/.exec(html);
+  const match = /"videoId"\s*:\s*"([a-zA-Z0-9_-]{11})"/.exec(html);
   if (!match) return null;
   videoIds.set(key, {
     videoId: match[1],
@@ -322,7 +325,10 @@ async function resolveStream(videoId, forceRefresh = false) {
 
   const playerConfig = await ensureConfig(forceRefresh);
   for (const client of CLIENTS) {
-    if (client.requiresVisitorData && !playerConfig.visitorData) continue;
+    if (client.requiresVisitorData && !playerConfig.visitorData) {
+      console.error(`[YouTube Extractor] Skipping client ${client.key} because visitorData is missing`);
+      continue;
+    }
     try {
       const response = await fetchPlayer(videoId, playerConfig, client);
       const candidate = chooseAudio(response.streamingData);
@@ -335,9 +341,11 @@ async function resolveStream(videoId, forceRefresh = false) {
         streams.set(videoId, stream);
         keepBounded(streams, 100);
         return stream;
+      } else {
+        console.error(`[YouTube Extractor] Client ${client.key} returned no audio formats for ${videoId}. Playability:`, response.playabilityStatus?.status);
       }
-    } catch {
-      // Try next client context without exposing upstream extraction errors.
+    } catch (e) {
+      console.error(`[YouTube Extractor] Client ${client.key} failed for ${videoId}:`, e.message);
     }
   }
   if (!forceRefresh) return resolveStream(videoId, true);
@@ -346,9 +354,15 @@ async function resolveStream(videoId, forceRefresh = false) {
 
 export async function resolveAudioTrack({ id, title, artist }, forceRefresh = false) {
   const videoId = await searchVideoId(title, artist);
-  if (!videoId) return null;
+  if (!videoId) {
+    console.error("[YouTube Extractor] searchVideoId returned null for", { title, artist });
+    return null;
+  }
   const stream = await resolveStream(videoId, forceRefresh);
-  if (!stream) return null;
+  if (!stream) {
+    console.error("[YouTube Extractor] resolveStream returned null for videoId", videoId);
+    return null;
+  }
   return {
     trackId: id,
     videoId,
