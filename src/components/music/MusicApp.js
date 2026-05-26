@@ -429,8 +429,8 @@ function Sidebar({ view, navigate, currentTrack }) {
       <div className={styles.sidebarDivider} />
       <NavButton label="Home" icon="home" active={view === "home"} onClick={() => navigate("home")} />
       <NavButton label="Liked Songs" icon="heart" tone="pink" active={view === "liked"} onClick={() => navigate("liked")} />
-      <NavButton label="History" icon="history" active={view === "history"} onClick={() => navigate("history")} />
-      <NavButton label="Downloads" icon="download" tone="cyan" active={view === "downloads"} onClick={() => navigate("downloads")} />
+      <NavButton label="History" icon="history" tone="cyan" active={view === "history"} onClick={() => navigate("history")} />
+      {/* <NavButton label="Downloads" icon="download" tone="cyan" active={view === "downloads"} onClick={() => navigate("downloads")} /> */}
       <p className={styles.eyebrow}>LIBRARY</p>
       <NavButton label="Playlists" icon="playlist" active={view === "playlists" || view === "playlist"} onClick={() => navigate("playlists")} />
       <NavButton label="Albums" icon="album" tone="amber" active={view === "albums" || view === "album"} onClick={() => navigate("albums")} />
@@ -481,8 +481,8 @@ function MobileChips({ navigate }) {
   return (
     <nav className={styles.chips}>
       <NavButton label="Liked" icon="heart" tone="pink" onClick={() => navigate("liked")} />
-      <NavButton label="History" icon="history" onClick={() => navigate("history")} />
-      <NavButton label="Downloads" icon="download" tone="cyan" onClick={() => navigate("downloads")} />
+      <NavButton label="History" icon="history" tone="cyan" onClick={() => navigate("history")} />
+      {/* <NavButton label="Downloads" icon="download" tone="cyan" onClick={() => navigate("downloads")} /> */}
       <NavButton label="Playlists" icon="playlist" onClick={() => navigate("playlists")} />
       <NavButton label="Albums" icon="album" tone="amber" onClick={() => navigate("albums")} />
     </nav>
