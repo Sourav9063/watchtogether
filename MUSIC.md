@@ -173,6 +173,23 @@ cache for trending/album responses.
 | `GET /api/music/album/123` | album detail | `{ album, tracks }` |
 | `GET /api/music/related/123` | related tracks | `{ tracks }` |
 
+Routes wrap upstream provider work in Next.js `unstable_cache`, storing results
+in Next Data Cache. Successful responses also send matching public HTTP cache
+headers for browser/CDN reuse:
+
+| Route | Cache duration |
+| --- | --- |
+| `GET /api/music/trending` | 1 day |
+| `GET /api/music/search` | 10 minutes |
+| `GET /api/music/album/:id` | 1 year with `immutable`, effectively permanent metadata cache |
+| `GET /api/music/lyrics` | `revalidate: false`; HTTP response uses 1 year with `immutable` |
+| `GET /api/music/related/:id` | 10 minutes |
+
+Playback-resolution and download responses are not public-cacheable because
+audio source URLs expire and download responses stream user-triggered files.
+Indefinite album and lyrics entries can be invalidated through their
+`music-album` and `music-lyrics` cache tags when source content must refresh.
+
 Validation rejects:
 
 - Empty or overlong search strings.

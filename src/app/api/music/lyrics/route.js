@@ -1,7 +1,16 @@
 import { NextResponse } from "next/server";
+import { unstable_cache } from "next/cache";
 
 import { getLyrics } from "@/lib/music/lyrics.server";
 import { cleanText, integerParam } from "@/lib/music/validation";
+
+const CACHE_CONTROL = "public, max-age=31536000, s-maxage=31536000, immutable";
+const getCachedLyrics = unstable_cache(
+  async (trackName, artistName, albumName, duration) =>
+    getLyrics({ trackName, artistName, albumName, duration }),
+  ["music-lyrics"],
+  { revalidate: false, tags: ["music-lyrics"] },
+);
 
 export async function GET(request) {
   const params = new URL(request.url).searchParams;
@@ -16,9 +25,16 @@ export async function GET(request) {
     return NextResponse.json({ error: "Invalid lyrics query" }, { status: 400 });
   }
   try {
-    return NextResponse.json({
-      lyrics: await getLyrics({ trackName, artistName, albumName, duration }),
-    });
+    const lyrics = await getCachedLyrics(
+      trackName,
+      artistName,
+      albumName,
+      duration,
+    );
+    return NextResponse.json(
+      { lyrics },
+      { headers: { "Cache-Control": CACHE_CONTROL } },
+    );
   } catch {
     return NextResponse.json(
       { error: "Unable to load lyrics", lyrics: [] },
