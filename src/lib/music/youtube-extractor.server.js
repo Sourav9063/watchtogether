@@ -84,13 +84,13 @@ const CLIENTS = [
   {
     key: "mweb",
     id: "2",
-    version: "2.20240228.06.00",
-    userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1",
+    version: "2.20260522.01.00",
+    userAgent: "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Mobile Safari/537.36",
     context: {
       clientName: "MWEB",
-      clientVersion: "2.20240228.06.00",
-      osName: "iPhone",
-      osVersion: "16.6",
+      clientVersion: "2.20260522.01.00",
+      osName: "Android",
+      osVersion: "6.0",
       platform: "MOBILE",
       hl: "en",
       gl: "US",
@@ -186,13 +186,14 @@ async function searchVideoId(title, artist) {
   }
 
   const encodedQuery = encodeURIComponent(query);
+  const cookie = process.env.YOUTUBE_COOKIE || "CONSENT=YES+20210329-01-0;";
   const response = await timedFetch(
     `https://www.youtube.com/results?search_query=${encodedQuery}`,
     {
       headers: {
         "User-Agent": DESKTOP_USER_AGENT,
         "Accept-Language": "en-US,en;q=0.9",
-        Cookie: "CONSENT=YES+20210329-01-0;",
+        Cookie: cookie,
       },
     },
   );
@@ -210,12 +211,14 @@ async function searchVideoId(title, artist) {
 
 async function fetchConfig(forced) {
   try {
+    const cookie = process.env.YOUTUBE_COOKIE;
     const response = await timedFetch(
       "https://www.youtube.com/watch?v=dQw4w9WgXcQ&hl=en",
       {
         headers: {
           "User-Agent": DESKTOP_USER_AGENT,
           "Accept-Language": "en-US,en;q=0.9",
+          ...(cookie ? { Cookie: cookie } : {}),
         },
       },
     );
@@ -256,6 +259,7 @@ async function ensureConfig(forceRefresh = false) {
 }
 
 async function fetchPlayer(videoId, playerConfig, client) {
+  const cookie = process.env.YOUTUBE_COOKIE;
   const response = await timedFetch(
     `https://www.youtube.com/youtubei/v1/player?key=${encodeURIComponent(playerConfig.apiKey)}`,
     {
@@ -270,6 +274,7 @@ async function fetchPlayer(videoId, playerConfig, client) {
         ...(playerConfig.visitorData
           ? { "X-Goog-Visitor-Id": playerConfig.visitorData }
           : {}),
+        ...(cookie ? { Cookie: cookie } : {}),
       },
       body: JSON.stringify({
         videoId,
