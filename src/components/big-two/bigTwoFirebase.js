@@ -169,6 +169,11 @@ export async function callOutMissedLastTwo(roomId, playerId) {
     const snapshot = await transaction.get(roomRef);
     if (!snapshot.exists()) throw new Error("Room not found.");
     const room = snapshot.data();
+    if (room.lastTwoCallout?.playerId === playerId) {
+      transaction.set(roomRef, applyLastTwoCall(room, playerId));
+      return;
+    }
+
     transaction.set(
       roomRef,
       room.lastTwoCallout
