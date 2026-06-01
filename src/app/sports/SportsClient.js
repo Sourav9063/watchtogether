@@ -259,7 +259,19 @@ function Dialog({ title, children, onClose }) {
             onClick={onClose}
             aria-label="Close"
           >
-            X
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            >
+              <path d="M6 6l12 12" />
+              <path d="M18 6L6 18" />
+            </svg>
           </button>
         </div>
         {children}

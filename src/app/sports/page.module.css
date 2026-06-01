@@ -485,10 +485,10 @@
 .dialog {
   display: grid;
   gap: 0.9rem;
-  width: min(100%, 820px);
-  max-height: min(720px, calc(100vh - 2rem));
+  width: min(100%, 1040px);
+  max-height: min(820px, calc(100vh - 2rem));
   overflow: auto;
-  padding: 1rem;
+  padding: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 8px;
   background: rgb(10, 14, 22);
@@ -515,6 +515,10 @@
   height: 36px;
   padding: 0;
   color: #fff;
+}
+
+.iconButton svg {
+  display: block;
 }
 
 .dialogList {
