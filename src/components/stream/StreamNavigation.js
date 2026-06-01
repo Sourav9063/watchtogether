@@ -8,7 +8,8 @@ export default function StreamNavigation() {
       <Link href="/music">Music</Link>
       <Link href="/live">Live</Link>
       <Link href="/stream/anime">Anime</Link>
-      <Link href="/stream/livesports">Live Sports</Link>
+      <Link href="/sports">Live Sports</Link>
+      <Link href="/stream/livesports">Sports</Link>
       <Link href="/stream/iptv">IPTV</Link>
       <Link href="/stream/manga">Manga</Link>
       <Link href="/stream/kdrama">Kdrama</Link>
