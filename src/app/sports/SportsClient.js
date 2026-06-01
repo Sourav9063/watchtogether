@@ -298,6 +298,22 @@ export default function SportsClient() {
   const [channelDialog, setChannelDialog] = useState(null);
   const [player, setPlayer] = useState(null);
 
+  const syncPlayerUrl = useCallback((url) => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const pageUrl = new URL(window.location.href);
+
+    if (url) {
+      pageUrl.searchParams.set("url", url);
+    } else {
+      pageUrl.searchParams.delete("url");
+    }
+
+    window.history.replaceState(null, "", `${pageUrl.pathname}${pageUrl.search}${pageUrl.hash}`);
+  }, []);
+
   const activeProvider = PROVIDERS.find((item) => item.id === provider);
   const styleVars = {
     "--sports-accent": activeProvider.accent,
@@ -363,6 +379,14 @@ export default function SportsClient() {
     loadData();
   }, [loadData]);
 
+  useEffect(() => {
+    const sharedUrl = new URLSearchParams(window.location.search).get("url");
+
+    if (sharedUrl) {
+      setPlayer({ title: "Shared sports stream", url: sharedUrl });
+    }
+  }, []);
+
   const tabs = useMemo(
     () =>
       categoryTabs(provider, sports, streamedMatches, ppvStreams, cdnSports),
@@ -414,8 +438,14 @@ export default function SportsClient() {
     }
 
     setPlayer({ title, url });
+    syncPlayerUrl(url);
     setNotice("");
-  }, []);
+  }, [syncPlayerUrl]);
+
+  const closePlayer = useCallback(() => {
+    setPlayer(null);
+    syncPlayerUrl("");
+  }, [syncPlayerUrl]);
 
   const loadStreamsForSource = useCallback(
     async (match, source) => {
@@ -860,7 +890,7 @@ export default function SportsClient() {
       )}
 
       {player && (
-        <Dialog title={player.title} onClose={() => setPlayer(null)}>
+        <Dialog title={player.title} onClose={closePlayer}>
           <div className={styles.playerFrame}>
             <iframe
               src={player.url}
