@@ -216,6 +216,27 @@
   align-items: stretch;
 }
 
+.groupList {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.matchGroup {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.4rem;
+}
+
+.matchGroup h2 {
+  font-size: 1.15rem;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+.groupGrid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+}
+
 .matchCard,
 .eventCard,
 .channelCard,

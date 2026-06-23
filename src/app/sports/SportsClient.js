@@ -160,7 +160,9 @@ function formatMatchTime(timestamp) {
   if (!timestamp) return "Time TBA";
   const value = timestamp > 100000000000 ? timestamp : timestamp * 1000;
 
-  return new Date(value).toLocaleTimeString([], {
+  return new Date(value).toLocaleString([], {
+    month: "short",
+    day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
   });
@@ -208,7 +210,8 @@ function categoryTabs(provider, sports, streamedMatches, ppvStreams, cdnSports) 
     const presentIds = new Set(streamedMatches.map((match) => match.category));
     return sports
       .filter((sport) => presentIds.has(sport.id))
-      .map((sport) => ({ id: sport.id, label: sport.name }));
+      .map((sport) => ({ id: sport.id, label: sport.name }))
+      .sort(compareFootballFirst);
   }
 
   if (provider === "ppv") {
@@ -220,6 +223,22 @@ function categoryTabs(provider, sports, streamedMatches, ppvStreams, cdnSports) 
   return Array.from(
     new Set(cdnSports.map((event) => event.tournament).filter(Boolean)),
   ).map((tournament) => ({ id: tournament, label: tournament }));
+}
+
+function isFootballCategory(category) {
+  const text = asString(category).toLowerCase();
+  return text.includes("football") || text.includes("soccer");
+}
+
+function compareFootballFirst(a, b) {
+  const aFootball = isFootballCategory(`${a.id} ${a.label}`);
+  const bFootball = isFootballCategory(`${b.id} ${b.label}`);
+
+  if (aFootball !== bFootball) {
+    return aFootball ? -1 : 1;
+  }
+
+  return asString(a.label || a.id).localeCompare(asString(b.label || b.id));
 }
 
 function EmptyState({ title, detail }) {
@@ -282,7 +301,7 @@ function Dialog({ title, children, onClose }) {
 
 export default function SportsClient() {
   const [provider, setProvider] = useState("streamed");
-  const [viewMode, setViewMode] = useState("live");
+  const [viewMode, setViewMode] = useState("today");
   const [sportFilter, setSportFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -315,6 +334,8 @@ export default function SportsClient() {
   }, []);
 
   const activeProvider = PROVIDERS.find((item) => item.id === provider);
+  const streamedBadgeLabel =
+    VIEW_MODES.find((mode) => mode.id === viewMode)?.label || "Match";
   const styleVars = {
     "--sports-accent": activeProvider.accent,
     "--sports-tint": activeProvider.tint,
@@ -400,6 +421,24 @@ export default function SportsClient() {
         : streamedMatches.filter((match) => match.category === sportFilter),
     [sportFilter, streamedMatches],
   );
+
+  const groupedStreamed = useMemo(() => {
+    const sportLabels = new Map(sports.map((sport) => [sport.id, sport.name]));
+    const groupMap = filteredStreamed.reduce((groups, match) => {
+      const id = match.category || "sports";
+      const group = groups.get(id) || {
+        id,
+        label: sportLabels.get(id) || id,
+        matches: [],
+      };
+
+      group.matches.push(match);
+      groups.set(id, group);
+      return groups;
+    }, new Map());
+
+    return Array.from(groupMap.values()).sort(compareFootballFirst);
+  }, [filteredStreamed, sports]);
 
   const filteredPpv = useMemo(
     () =>
@@ -627,56 +666,65 @@ export default function SportsClient() {
               detail="Try another mode or refresh provider data."
             />
           ) : (
-            <div className={styles.grid}>
-              {filteredStreamed.map((match) => {
-                const poster = streamedPoster(match);
-                const homeBadge = badgeUrl(match.teams.home.badge);
-                const awayBadge = badgeUrl(match.teams.away.badge);
+            <div className={styles.groupList}>
+              {groupedStreamed.map((group) => (
+                <section className={styles.matchGroup} key={group.id}>
+                  <h2>{group.label}</h2>
+                  <div className={`${styles.grid} ${styles.groupGrid}`}>
+                    {group.matches.map((match) => {
+                      const poster = streamedPoster(match);
+                      const homeBadge = badgeUrl(match.teams.home.badge);
+                      const awayBadge = badgeUrl(match.teams.away.badge);
 
-                return (
-                  <button
-                    type="button"
-                    className={styles.matchCard}
-                    style={
-                      poster
-                        ? { backgroundImage: `url(${poster})` }
-                        : undefined
-                    }
-                    onClick={() => openMatch(match)}
-                    key={`${match.id}-${match.title}`}
-                  >
-                    <span className={styles.cardTag}>{match.category}</span>
-                    <span className={styles.liveBadge}>Live</span>
-                    <span className={styles.teamRow}>
-                      {homeBadge ? (
-                        <span
-                          className={styles.logoImage}
-                          style={{ backgroundImage: `url(${homeBadge})` }}
-                        />
-                      ) : (
-                        <span className={styles.avatarInitial}>
-                          {initials(match.teams.home.name || match.title)}
-                        </span>
-                      )}
-                      <span className={styles.playMark}>Play</span>
-                      {awayBadge ? (
-                        <span
-                          className={styles.logoImage}
-                          style={{ backgroundImage: `url(${awayBadge})` }}
-                        />
-                      ) : (
-                        <span className={styles.avatarInitial}>
-                          {initials(match.teams.away.name || match.title)}
-                        </span>
-                      )}
-                    </span>
-                    <span className={styles.cardTitleBlock}>
-                      <strong>{match.title}</strong>
-                      <small>{formatMatchTime(match.date)}</small>
-                    </span>
-                  </button>
-                );
-              })}
+                      return (
+                        <button
+                          type="button"
+                          className={styles.matchCard}
+                          style={
+                            poster
+                              ? { backgroundImage: `url(${poster})` }
+                              : undefined
+                          }
+                          onClick={() => openMatch(match)}
+                          key={`${match.id}-${match.title}`}
+                        >
+                          <span className={styles.cardTag}>{match.category}</span>
+                          <span className={styles.liveBadge}>
+                            {streamedBadgeLabel}
+                          </span>
+                          <span className={styles.teamRow}>
+                            {homeBadge ? (
+                              <span
+                                className={styles.logoImage}
+                                style={{ backgroundImage: `url(${homeBadge})` }}
+                              />
+                            ) : (
+                              <span className={styles.avatarInitial}>
+                                {initials(match.teams.home.name || match.title)}
+                              </span>
+                            )}
+                            <span className={styles.playMark}>Play</span>
+                            {awayBadge ? (
+                              <span
+                                className={styles.logoImage}
+                                style={{ backgroundImage: `url(${awayBadge})` }}
+                              />
+                            ) : (
+                              <span className={styles.avatarInitial}>
+                                {initials(match.teams.away.name || match.title)}
+                              </span>
+                            )}
+                          </span>
+                          <span className={styles.cardTitleBlock}>
+                            <strong>{match.title}</strong>
+                            <small>{formatMatchTime(match.date)}</small>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </section>
+              ))}
             </div>
           )}
         </>
