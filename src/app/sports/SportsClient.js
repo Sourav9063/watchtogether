@@ -225,17 +225,33 @@ function categoryTabs(provider, sports, streamedMatches, ppvStreams, cdnSports) 
   ).map((tournament) => ({ id: tournament, label: tournament }));
 }
 
-function isFootballCategory(category) {
-  const text = asString(category).toLowerCase();
-  return text.includes("football") || text.includes("soccer");
+function footballCategoryRank(category) {
+  const fields = [category?.label, category?.id].map((field) =>
+    asString(field).toLowerCase(),
+  );
+
+  if (fields.some((field) => field === "football" || field === "soccer")) {
+    return 0;
+  }
+
+  if (
+    fields.some((field) => {
+      const words = field.split(/[^a-z0-9]+/).filter(Boolean);
+      return words.includes("football") || words.includes("soccer");
+    })
+  ) {
+    return 1;
+  }
+
+  return 2;
 }
 
 function compareFootballFirst(a, b) {
-  const aFootball = isFootballCategory(`${a.id} ${a.label}`);
-  const bFootball = isFootballCategory(`${b.id} ${b.label}`);
+  const aRank = footballCategoryRank(a);
+  const bRank = footballCategoryRank(b);
 
-  if (aFootball !== bFootball) {
-    return aFootball ? -1 : 1;
+  if (aRank !== bRank) {
+    return aRank - bRank;
   }
 
   return asString(a.label || a.id).localeCompare(asString(b.label || b.id));
