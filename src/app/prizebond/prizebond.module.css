@@ -69,7 +69,7 @@
     flex-direction: column;
   }
 
-  .exportButton, .importButton, .copyButton, .clearButton {
+  .exportButton, .importButton, .copyButton, .clearButton, .checkAllButton {
     width: 100%;
     margin-top: 5px;
   }
@@ -401,7 +401,7 @@
   flex-wrap: wrap;
 }
 
-.exportButton, .importButton {
+.exportButton, .importButton, .checkAllButton {
   text-align: center;
   border: none;
   padding: 8px 16px;
@@ -429,4 +429,87 @@
 
 .importButton:hover {
   background-color: #138496;
+}
+
+.checkAllButton {
+  background-color: #6f42c1;
+}
+
+.checkAllButton:hover:not(:disabled) {
+  background-color: #59359a;
+}
+
+.checkAllButton:disabled {
+  background-color: #9b8bb8;
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.checkError,
+.checkResults {
+  margin: 0 10px 20px;
+  padding: 14px;
+  border-radius: 8px;
+}
+
+.checkError {
+  color: #842029;
+  background: #f8d7da;
+  border: 1px solid #f5c2c7;
+}
+
+.checkResults {
+  color: #173b24;
+  background: #eaf7ee;
+  border: 1px solid #badbcc;
+}
+
+.checkSummary {
+  font-weight: 700;
+}
+
+.noMatches {
+  margin: 10px 0 0;
+}
+
+.matchList {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.matchItem {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  background: white;
+  border-radius: 6px;
+}
+
+.matchItem strong {
+  font-family: "Courier New", monospace;
+  letter-spacing: 1px;
+}
+
+.matchItem strong + span {
+  margin-left: 8px;
+}
+
+.matchItem a,
+.claimLink {
+  color: #0056b3;
+  font-weight: 600;
+}
+
+.claimLink {
+  display: inline-block;
+  margin-top: 14px;
+}
+
+@media (max-width: 768px) {
+  .matchItem {
+    grid-template-columns: 1fr 1fr;
+  }
 }

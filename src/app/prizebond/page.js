@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import * as XLSX from "xlsx";
 import styles from "./prizebond.module.css";
@@ -13,11 +13,10 @@ const PrizeBondOCR = dynamic(() => import("@/components/PrizeBondOCR"), {
 export default function PrizeBondPage() {
   const [savedNumbers, setSavedNumbers] = useState([]);
   const [showCheckButtons, setShowCheckButtons] = useState(false);
-  const [winningNumbers, setWinningNumbers] = useState({
-    first: "0544222",
-    second: ["0241768"],
-    third: ["0553845", "0964052"],
-    fourth: ["0054382", "0197142"],
+  const [irdCheck, setIrdCheck] = useState({
+    status: "idle",
+    data: null,
+    error: "",
   });
 
   useEffect(() => {
@@ -110,24 +109,86 @@ export default function PrizeBondPage() {
       });
   };
 
-  const exportToExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(
-      savedNumbers.map((entry) => ({ Number: entry.number })),
-      { skipHeader: true },
+  const getValidNumbers = () =>
+    savedNumbers
+      .map((entry) => String(entry.number).trim())
+      .filter((number) => /^\d{1,7}$/.test(number))
+      .map((number) => number.padStart(7, "0"));
+
+  const createWorkbook = () => {
+    const ws = XLSX.utils.aoa_to_sheet(
+      getValidNumbers().map((number) => [number]),
     );
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Prize Bonds");
+    return wb;
+  };
+
+  const getExportFilename = () => {
     const now = new Date();
     const dateTime = `${now.getFullYear()}-${String(
       now.getMonth() + 1,
     ).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}_${String(
       now.getHours(),
     ).padStart(2, "0")}-${String(now.getMinutes()).padStart(2, "0")}`;
-    XLSX.writeFile(wb, `prizebond-backup-${dateTime}.xlsx`);
+    return `prizebond-backup-${dateTime}.xlsx`;
+  };
 
-    setTimeout(() => {
-      window.open("https://prizebond.ird.gov.bd/MultipleNumbers.php", "_blank");
-    }, 1000);
+  const exportToExcel = () => {
+    XLSX.writeFile(createWorkbook(), getExportFilename());
+  };
+
+  const checkAllWithIrd = async () => {
+    const validNumbers = getValidNumbers();
+    if (validNumbers.length === 0) {
+      setIrdCheck({
+        status: "error",
+        data: null,
+        error: "Add at least one valid prize bond number before checking.",
+      });
+      return;
+    }
+
+    if (validNumbers.length !== savedNumbers.length) {
+      setIrdCheck({
+        status: "error",
+        data: null,
+        error: "Every saved prize bond must contain no more than 7 digits.",
+      });
+      return;
+    }
+
+    setIrdCheck({ status: "loading", data: null, error: "" });
+
+    try {
+      const workbookBytes = XLSX.write(createWorkbook(), {
+        bookType: "xlsx",
+        type: "array",
+      });
+      const file = new File([workbookBytes], getExportFilename(), {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/prizebond/check", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Prize bond check failed.");
+      }
+
+      setIrdCheck({ status: "success", data: result, error: "" });
+    } catch (error) {
+      setIrdCheck({
+        status: "error",
+        data: null,
+        error: error.message || "Prize bond check failed.",
+      });
+    }
   };
 
   const handleCheck = (chunkIndex) => {
@@ -186,18 +247,6 @@ export default function PrizeBondPage() {
     e.target.value = null; // Reset file input
   };
 
-  const checkWinning = (number) => {
-    if (number === winningNumbers.first)
-      return { prize: "First Prize", amount: "৳6,00,000" };
-    if (winningNumbers.second.includes(number))
-      return { prize: "Second Prize", amount: "৳3,25,000" };
-    if (winningNumbers.third.includes(number))
-      return { prize: "Third Prize", amount: "৳1,00,000" };
-    if (winningNumbers.fourth.includes(number))
-      return { prize: "Fourth Prize", amount: "৳50,000" };
-    return null;
-  };
-
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -244,6 +293,15 @@ export default function PrizeBondPage() {
                     className={styles.exportButton}
                   >
                     Export
+                  </button>
+                  <button
+                    onClick={checkAllWithIrd}
+                    className={styles.checkAllButton}
+                    disabled={
+                      savedNumbers.length === 0 || irdCheck.status === "loading"
+                    }
+                  >
+                    {irdCheck.status === "loading" ? "Checking..." : "Check All"}
                   </button>
                   <label className={styles.importButton}>
                     Import
@@ -297,27 +355,67 @@ export default function PrizeBondPage() {
               </div>
             </div>
 
+            {irdCheck.status === "error" && (
+              <div className={styles.checkError} role="alert">
+                {irdCheck.error}
+              </div>
+            )}
+
+            {irdCheck.status === "success" && (
+              <div className={styles.checkResults} aria-live="polite">
+                <div className={styles.checkSummary}>
+                  Checked {irdCheck.data.uploadedCount} number(s). Found{" "}
+                  {irdCheck.data.matchedCount} match(es).
+                </div>
+                {irdCheck.data.matches.length === 0 ? (
+                  <p className={styles.noMatches}>No winning numbers found.</p>
+                ) : (
+                  <div className={styles.matchList}>
+                    {irdCheck.data.matches.map((match) => (
+                      <div key={`${match.number}-${match.drawDate}`} className={styles.matchItem}>
+                        <strong>{match.number}</strong>
+                        <span>{match.prize}</span>
+                        <span>৳{Number(match.amount).toLocaleString("en-US")}</span>
+                        <span>{match.drawDate}</span>
+                        {match.drawPdfUrl && (
+                          <a
+                            href={match.drawPdfUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Draw details
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {irdCheck.data.claimFormUrl && irdCheck.data.matchedCount > 0 && (
+                  <a
+                    className={styles.claimLink}
+                    href={irdCheck.data.claimFormUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Download prize claim form
+                  </a>
+                )}
+              </div>
+            )}
+
             <div className={styles.numbersList}>
               {savedNumbers.length === 0 ? (
                 <p className={styles.emptyState}>No numbers scanned yet</p>
               ) : (
-                savedNumbers.reverse().map((entry, index) => {
-                  const winning = checkWinning(entry.number);
+                [...savedNumbers].reverse().map((entry, index) => {
                   return (
                     <div
                       key={index}
-                      className={`${styles.numberItem} ${
-                        winning ? styles.winning : ""
-                      }`}
+                      className={styles.numberItem}
                     >
                       <span className={styles.number}>
                         {entry.number?.padStart(7, "0")}
                       </span>
-                      {winning && (
-                        <span className={styles.winLabel}>
-                          {winning.prize} - {winning.amount}
-                        </span>
-                      )}
                       <div className={styles.actions}>
                         <button
                           onClick={() => handleEdit(entry.number)}
