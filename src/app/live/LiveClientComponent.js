@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useDeferredValue,
+  useMemo,
+} from "react";
 import { useSearchParams } from "next/navigation";
 import styles from "./page.module.css";
 import Channel from "../../components/Channel/Channel";
@@ -12,6 +18,9 @@ import {
   removeLocalStorage,
 } from "@/helper/functions/localStorageFn";
 import { Constants } from "@/helper/CONSTANTS";
+import { useDebounce } from "@/hooks/useDebounce";
+
+const IPTV_ORG_M3U_URL = "https://iptv-org.github.io/iptv/index.m3u";
 
 const SingleM3u8Form = ({ setCurrentChannel }) => {
   const [m3u8Url, setM3u8Url] = useState("");
@@ -58,6 +67,10 @@ const LiveClientComponent = ({ serverInitialChannels }) => {
   const [m3uUrl, setM3uUrl] = useState("");
   const [currentChannel, setCurrentChannel] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [useIptvOrg, setUseIptvOrg] = useState(false);
+  const debouncedSearchTerm = useDebounce(searchTerm, 250);
+  const deferredSearchTerm = useDeferredValue(debouncedSearchTerm);
+  const isSearchStale = deferredSearchTerm !== debouncedSearchTerm;
 
   const searchParams = useSearchParams();
 
@@ -128,6 +141,29 @@ const LiveClientComponent = ({ serverInitialChannels }) => {
     clientFetchM3U(m3uUrl || DEFAULT_M3U_URL);
   };
 
+  // Pre-compute lowercased name once per channel so the filter pass is
+  // O(n) cheap string `includes` instead of O(n) `toLowerCase + includes`.
+  const indexedChannels = useMemo(
+    () => channels.map((c) => ({ ...c, _lname: (c.name || "").toLowerCase() })),
+    [channels],
+  );
+
+  const filteredChannels = useMemo(() => {
+    const q = deferredSearchTerm.toLowerCase();
+    if (!q) return indexedChannels;
+    return indexedChannels.filter((c) => c._lname.includes(q));
+  }, [indexedChannels, deferredSearchTerm]);
+
+  useEffect(() => {
+    const url = useIptvOrg ? IPTV_ORG_M3U_URL : DEFAULT_M3U_URL;
+    if (url) {
+      clientFetchM3U(url);
+      setSearchTerm("");
+    }
+    // clientFetchM3U is stable (useCallback []), so this only re-runs on toggle
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [useIptvOrg]);
+
   if (loading) {
     return <div className={styles.container}>Loading channels...</div>;
   }
@@ -156,7 +192,20 @@ const LiveClientComponent = ({ serverInitialChannels }) => {
       />
       <div className={styles.content}>
         <div className={styles.headerWrapper}>
-          <h1>Live Channels</h1>
+          <div className={styles.titleRow}>
+            <h1>Live Channels</h1>
+            <label
+              className={styles.iptvCheckboxLabel}
+              title="When checked, loads the IPTV-org master playlist; when unchecked, loads the default playlist"
+            >
+              <input
+                type="checkbox"
+                checked={useIptvOrg}
+                onChange={(e) => setUseIptvOrg(e.target.checked)}
+              />
+              <span>IPTV-org</span>
+            </label>
+          </div>
           <input
             type="text"
             placeholder="Search channels..."
@@ -167,18 +216,17 @@ const LiveClientComponent = ({ serverInitialChannels }) => {
         </div>
 
         {!loading && !error && channels.length > 0 && (
-          <ul className={styles.channelList}>
-            {channels
-              .filter((channel) =>
-                channel.name?.toLowerCase().includes(searchTerm.toLowerCase()),
-              )
-              .map((channel, index) => (
-                <Channel
-                  key={index + channel.url}
-                  channel={channel}
-                  onClick={handleChannelClick}
-                />
-              ))}
+          <ul
+            className={styles.channelList}
+            style={{ opacity: isSearchStale ? 0.6 : 1 }}
+          >
+            {filteredChannels.map((channel, index) => (
+              <Channel
+                key={index + channel.url}
+                channel={channel}
+                onClick={handleChannelClick}
+              />
+            ))}
           </ul>
         )}
         <form className={styles.inputContainer}>

@@ -95,6 +95,28 @@
   width: 50%;
 }
 
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.iptvCheckboxLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9em;
+  color: #555;
+  cursor: pointer;
+  user-select: none;
+}
+.iptvCheckboxLabel input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  margin: 0;
+}
+
 @media (max-width: 768px) {
   .inputContainer {
     flex-direction: column;
