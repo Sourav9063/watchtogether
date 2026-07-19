@@ -11,7 +11,9 @@ export default function PrizeBondHero({ count }) {
         <div className={css("pb-hero-emblem")} aria-hidden="true">
           <span />
         </div>
-        <h1>{TEXTS.hero.title}</h1>
+        <h1 className={css("pb-display-title", "pb-hero-title")}>
+          {TEXTS.hero.title}
+        </h1>
         <div className={css("pb-denomination")}>{TEXTS.hero.denomination}</div>
         <p className={css("pb-hero-subtitle")}>{TEXTS.hero.subtitle}</p>
         <div className={css("pb-hero-meta")}>

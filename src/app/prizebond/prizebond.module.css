@@ -224,13 +224,16 @@
   letter-spacing: 0.03em;
 }
 
-.pb-hero h1 {
-  margin: 4px 0 0;
+.pb-display-title {
   color: var(--pb-ink-deep);
-  font-size: clamp(2rem, 9vw, 3.6rem);
   font-weight: 800;
   line-height: 1.05;
   text-shadow: 0 1px #fff, 0 3px rgba(215, 158, 163, 0.28);
+}
+
+.pb-hero-title {
+  margin: 4px 0 0;
+  font-size: clamp(2rem, 9vw, 3.6rem);
 }
 
 .pb-hero-emblem {
@@ -397,11 +400,9 @@
   text-align: center;
 }
 
-.pb-panel-heading h2 {
+.pb-page-title {
   margin: 0;
-  color: var(--pb-ink-deep);
   font-size: clamp(1.65rem, 7vw, 2.4rem);
-  line-height: 1.15;
 }
 
 .pb-panel-heading > div > p:last-child {

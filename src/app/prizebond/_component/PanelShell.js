@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { TEXTS } from "../texts";
 import ActionIcon from "./ActionIcon";
 import { css } from "./styles";
@@ -12,7 +14,12 @@ export default function PanelShell({ title, intro, children }) {
         </Link>
         <div>
           <p className={css("pb-panel-kicker")}>{TEXTS.hero.bank}</p>
-          <h2 id="pb-panel-title">{title}</h2>
+          <h2
+            className={css("pb-display-title", "pb-page-title")}
+            id="pb-panel-title"
+          >
+            {title}
+          </h2>
           <p>{intro}</p>
         </div>
       </div>
@@ -20,4 +27,3 @@ export default function PanelShell({ title, intro, children }) {
     </section>
   );
 }
-import Link from "next/link";
