@@ -121,29 +121,30 @@
 }
 
 .pb-ornamental-frame > .pb-corner-ornament {
-  --pb-corner-inset: 18px;
+  --pb-corner-inset-x: 18px;
+  --pb-corner-inset-y: 11px;
 }
 
 .pb-corner-top-left {
-  top: var(--pb-corner-inset, 17px);
-  left: var(--pb-corner-inset, 17px);
+  top: var(--pb-corner-inset-y, var(--pb-corner-inset, 17px));
+  left: var(--pb-corner-inset-x, var(--pb-corner-inset, 17px));
 }
 
 .pb-corner-top-right {
-  top: var(--pb-corner-inset, 17px);
-  right: var(--pb-corner-inset, 17px);
+  top: var(--pb-corner-inset-y, var(--pb-corner-inset, 17px));
+  right: var(--pb-corner-inset-x, var(--pb-corner-inset, 17px));
   transform: scaleX(-1);
 }
 
 .pb-corner-bottom-left {
-  bottom: var(--pb-corner-inset, 17px);
-  left: var(--pb-corner-inset, 17px);
+  bottom: var(--pb-corner-inset-y, var(--pb-corner-inset, 17px));
+  left: var(--pb-corner-inset-x, var(--pb-corner-inset, 17px));
   transform: scaleY(-1);
 }
 
 .pb-corner-bottom-right {
-  right: var(--pb-corner-inset, 17px);
-  bottom: var(--pb-corner-inset, 17px);
+  right: var(--pb-corner-inset-x, var(--pb-corner-inset, 17px));
+  bottom: var(--pb-corner-inset-y, var(--pb-corner-inset, 17px));
   transform: scale(-1);
 }
 
