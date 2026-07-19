@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { TEXTS } from "../texts";
 import ActionIcon from "./ActionIcon";
+import CornerOrnament from "./AnotherCornerOrnament";
 import { css } from "./styles";
 
 const ACTIONS = ["scan", "manage", "transfer", "check"];
@@ -25,6 +26,12 @@ export default function ActionGrid() {
               href={ACTION_ROUTES[action]}
               key={action}
             >
+              <CornerOrnament
+                className={css("pb-card-corner")}
+                color="var(--pb-ink)"
+                position="bottom-right"
+                size={72}
+              />
               <span className={css("pb-action-icon")}>
                 <ActionIcon name={action} size={30} />
               </span>

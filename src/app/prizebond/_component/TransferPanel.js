@@ -4,6 +4,7 @@ import { TEXTS } from "../texts";
 import { formatCount } from "../numberUtils";
 import { createWorkbook, getExportFilename, getValidNumbers } from "../workbook";
 import ActionIcon from "./ActionIcon";
+import CornerOrnament from "./AnotherCornerOrnament";
 import PanelShell from "./PanelShell";
 import { css } from "./styles";
 
@@ -44,6 +45,12 @@ export default function TransferPanel({ store, onImportSuccess }) {
     >
       <div className={css("pb-transfer-grid")}>
         <article className={css("pb-transfer-card")}>
+          <CornerOrnament
+            className={css("pb-card-corner")}
+            color="var(--pb-rose)"
+            position="bottom-left"
+            size={92}
+          />
           <span className={css("pb-large-icon")}><ActionIcon name="download" size={34} /></span>
           <h3>{TEXTS.transfer.export}</h3>
           <p>{TEXTS.transfer.exportHint}</p>
@@ -59,6 +66,12 @@ export default function TransferPanel({ store, onImportSuccess }) {
         </article>
 
         <article className={css("pb-transfer-card")}>
+          <CornerOrnament
+            className={css("pb-card-corner")}
+            color="var(--pb-gold)"
+            position="top-right"
+            size={92}
+          />
           <span className={css("pb-large-icon")}><ActionIcon name="upload" size={34} /></span>
           <h3>{TEXTS.transfer.import}</h3>
           <p>{TEXTS.transfer.importHint}</p>
