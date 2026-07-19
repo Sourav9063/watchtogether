@@ -46,7 +46,7 @@ function getCells(rowHtml) {
 
 export function parsePrizeBondResult(html) {
   if (typeof html !== "string" || !/<table\b/i.test(html)) {
-    throw new Error("IRD response did not contain a result table");
+    throw new Error("missing result table");
   }
 
   const normalizedText = toAsciiDigits(textContent(html));
@@ -54,9 +54,7 @@ export function parsePrizeBondResult(html) {
     /Excel Sheet\s*এ\s*(\d+)টির মধ্যে[\s\S]*?(?:(\d+)টি নম্বর ম্যাচ|কোনো নম্বর ম্যাচ করেনি)/i,
   );
 
-  if (!summaryMatch) {
-    throw new Error("IRD response summary could not be recognized");
-  }
+  if (!summaryMatch) throw new Error("missing result summary");
 
   const matches = [];
   for (const rowMatch of html.matchAll(/<tr\b[^>]*>(.*?)<\/tr\s*>/gis)) {
@@ -82,9 +80,7 @@ export function parsePrizeBondResult(html) {
   const uploadedCount = Number(summaryMatch[1]);
   const matchedCount = summaryMatch[2] ? Number(summaryMatch[2]) : 0;
 
-  if (matchedCount !== matches.length) {
-    throw new Error("IRD result count did not match the result table");
-  }
+  if (matchedCount !== matches.length) throw new Error("result count mismatch");
 
   return {
     uploadedCount,

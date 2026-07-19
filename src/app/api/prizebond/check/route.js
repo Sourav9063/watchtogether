@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { parsePrizeBondResult } from "@/helper/prizebondResult.server";
+import { API_MESSAGES } from "../_lib/messages";
+import { parsePrizeBondResult } from "../_lib/resultParser";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,7 +25,7 @@ export async function POST(request) {
   try {
     formData = await request.formData();
   } catch {
-    return json({ error: "A multipart Excel upload is required." }, 400);
+    return json({ error: API_MESSAGES.multipartRequired }, 400);
   }
 
   const file = formData.get("file");
@@ -33,13 +34,13 @@ export async function POST(request) {
   const mimeIsValid = !file?.type || EXCEL_MIME_TYPES.has(file.type);
 
   if (!file || typeof file.arrayBuffer !== "function") {
-    return json({ error: "Excel file is required." }, 400);
+    return json({ error: API_MESSAGES.fileRequired }, 400);
   }
   if (!file.size || file.size > MAX_FILE_SIZE) {
-    return json({ error: "Excel file must be between 1 byte and 4 MB." }, 400);
+    return json({ error: API_MESSAGES.invalidSize }, 400);
   }
   if (!extensionIsValid || !mimeIsValid) {
-    return json({ error: "Only .xlsx or .xls files are supported." }, 400);
+    return json({ error: API_MESSAGES.invalidType }, 400);
   }
 
   const upstreamForm = new FormData();
@@ -63,19 +64,19 @@ export async function POST(request) {
     });
 
     if (!response.ok) {
-      return json({ error: "IRD result service rejected the request." }, 502);
+      return json({ error: API_MESSAGES.rejected }, 502);
     }
 
     const contentType = response.headers.get("content-type") || "";
     if (!contentType.includes("text/html")) {
-      return json({ error: "IRD result service returned an unexpected response." }, 502);
+      return json({ error: API_MESSAGES.unexpected }, 502);
     }
 
     try {
       return json(parsePrizeBondResult(await response.text()));
     } catch {
       return json(
-        { error: "IRD result format changed or could not be recognized." },
+        { error: API_MESSAGES.changed },
         502,
       );
     }
@@ -84,8 +85,8 @@ export async function POST(request) {
     return json(
       {
         error: timedOut
-          ? "IRD result service timed out. Try again."
-          : "Could not connect to the IRD result service.",
+          ? API_MESSAGES.timeout
+          : API_MESSAGES.unavailable,
       },
       timedOut ? 504 : 502,
     );
