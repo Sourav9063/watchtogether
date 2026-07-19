@@ -22,7 +22,7 @@ export const TEXTS = {
       description: "ক্যামেরায় নম্বর পড়ে সংরক্ষণ করুন",
     },
     manage: {
-      title: "আপনার বন্ড সাজান",
+      title: "আপনার বন্ড দেখুন",
       description: "নম্বর সম্পাদনা, কপি বা মুছুন",
     },
     transfer: {
