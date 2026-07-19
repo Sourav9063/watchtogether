@@ -7,7 +7,7 @@ import ActionIcon from "./ActionIcon";
 import PanelShell from "./PanelShell";
 import { css } from "./styles";
 
-export default function TransferPanel({ store, onHome, onImportSuccess }) {
+export default function TransferPanel({ store, onImportSuccess }) {
   const exportNumbers = async () => {
     const numbers = getValidNumbers(store.entries);
     if (!numbers.length) {
@@ -40,7 +40,6 @@ export default function TransferPanel({ store, onHome, onImportSuccess }) {
   return (
     <PanelShell
       intro={TEXTS.transfer.intro}
-      onHome={onHome}
       title={TEXTS.transfer.title}
     >
       <div className={css("pb-transfer-grid")}>

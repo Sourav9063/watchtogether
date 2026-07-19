@@ -6,11 +6,11 @@ import ActionIcon from "./ActionIcon";
 import PanelShell from "./PanelShell";
 import { css } from "./styles";
 
-export default function CheckPanel({ entries, resultState, onCheck, onFallback, onHome }) {
+export default function CheckPanel({ entries, resultState, onCheck, onFallback }) {
   const chunkCount = Math.ceil(entries.length / 100);
 
   return (
-    <PanelShell intro={TEXTS.check.intro} onHome={onHome} title={TEXTS.check.title}>
+    <PanelShell intro={TEXTS.check.intro} title={TEXTS.check.title}>
       <div className={css("pb-check-callout")}>
         <span className={css("pb-large-icon")}><ActionIcon name="check" size={38} /></span>
         <strong>{TEXTS.common.savedCount(formatCount(entries.length))}</strong>

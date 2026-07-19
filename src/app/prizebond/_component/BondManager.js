@@ -6,7 +6,7 @@ import ActionIcon from "./ActionIcon";
 import PanelShell from "./PanelShell";
 import { css } from "./styles";
 
-export default function BondManager({ store, onHome }) {
+export default function BondManager({ store }) {
   const { entries } = store;
 
   const editNumber = (number) => {
@@ -43,7 +43,6 @@ export default function BondManager({ store, onHome }) {
   return (
     <PanelShell
       intro={TEXTS.manager.intro}
-      onHome={onHome}
       title={TEXTS.manager.title}
     >
       <div className={css("pb-toolbar")}>

@@ -149,6 +149,30 @@
   padding: 34px 30px;
 }
 
+.pb-route-certificate {
+  padding-top: 12px;
+}
+
+.pb-route-content {
+  min-height: calc(100vh - 92px);
+  padding: 12px 4px 34px;
+  background:
+    radial-gradient(ellipse 42% 28% at 12% 12%, rgba(215, 158, 163, 0.17), transparent 74%),
+    radial-gradient(ellipse 40% 25% at 88% 26%, rgba(254, 165, 82, 0.15), transparent 75%),
+    radial-gradient(ellipse 35% 24% at 18% 82%, rgba(8, 60, 27, 0.065), transparent 75%),
+    radial-gradient(ellipse 38% 24% at 86% 90%, rgba(215, 158, 163, 0.12), transparent 76%),
+    rgba(255, 255, 255, 0.91);
+  box-shadow: 0 16px 42px rgba(8, 60, 27, 0.11);
+}
+
+.pb-route-content .pb-panel {
+  margin-top: 0;
+  border: 1px solid var(--pb-line);
+  border-top: 4px double var(--pb-gold);
+  border-bottom: 4px double var(--pb-rose);
+  background: rgba(255, 253, 250, 0.78);
+}
+
 .pb-hero-frame {
   min-height: 318px;
   background:
@@ -866,6 +890,10 @@
     padding: 42px 50px;
   }
 
+  .pb-route-content {
+    padding: 24px 28px 48px;
+  }
+
   .pb-hero-meta {
     width: min(68%, 480px);
   }
@@ -940,6 +968,10 @@
   .pb-footer {
     margin-right: 28px;
     margin-left: 28px;
+  }
+
+  .pb-route-certificate {
+    padding-top: 24px;
   }
 
   .pb-scanner-layout {

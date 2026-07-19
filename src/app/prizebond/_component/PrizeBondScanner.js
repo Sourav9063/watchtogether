@@ -10,7 +10,7 @@ import ActionIcon from "./ActionIcon";
 import PanelShell from "./PanelShell";
 import { css } from "./styles";
 
-export default function PrizeBondScanner({ onAdd, onHome }) {
+export default function PrizeBondScanner({ onAdd }) {
   const videoRef = useRef(null);
   const workerRef = useRef(null);
   const canvasRef = useRef(null);
@@ -242,7 +242,6 @@ export default function PrizeBondScanner({ onAdd, onHome }) {
   return (
     <PanelShell
       intro={TEXTS.scanner.intro}
-      onHome={onHome}
       title={TEXTS.scanner.title}
     >
       <div className={css("pb-scanner-layout")}>
