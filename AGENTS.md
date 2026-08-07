@@ -30,31 +30,96 @@ Use Conventional Commits: `feat`, `fix`, `refactor`, `docs`, `style`, `test`, `c
 Do not commit secrets. Use `NEXT_PUBLIC_` only for browser-safe values. Keep `.env*` private.
 ## Spec-Driven Development
 
-Use SDD for non-trivial work; read the relevant files in `agents/knowledge/` and `agents/plans/` first.
+Use SDD for non-trivial work. First read `agents/MEMORY.md` and only task relevant files in `agents/knowledge/` and `agents/plans/`.
 
-- `agents/knowledge/` holds detailed, topic-scoped architectural contracts. Create or update the most discoverable file when requested or when successful work establishes reusable implementation knowledge. Keep it verified against the code.
-- `agents/plans/` holds finalized implementation plans. Build plans interactively: investigate, surface decisions, and refine with the user. Only after the user finalizes a plan, save it as a new, precisely named `.md` file before implementation.
+Code, tests, schemas, configuration, and executable artifacts define implemented behavior. Documentation records decisions, constraints, and context the code cannot express clearly. Verify documentation against implemented behavior, update affected documentation with code changes, and report conflicts immediately.
 
-Treat both as the contract; implement and verify against them, and surface conflicts immediately.
+### Knowledge
 
-## Memory
+`agents/knowledge/` stores concise, topic-scoped, code-verified:
 
-Before non-trivial work, read `agents/MEMORY.md`. Memory controls how agents work. Capture only short, durable, cross-task guidance established through successful work or new context—corrections, repository-wide decisions, and reusable preferences—to support incremental self-improvement. Memory should never store task details, chat summaries, temporary context, implementation-specific knowledge, or secrets.
+- Architectural decisions and rejected alternatives
+- Domain terms and glossaries
+- Invariants
+- Navigation guidance
+
+Create or update the most discoverable file when requested or when verified work establishes reusable knowledge. Keep it concise.
+
+### Plans
+
+`agents/plans/` holds working and finalized implementation plans.
+
+Before writing one:
+
+1. Resolve minor implementation details using judgment and code investigation.
+2. Present clear options for unresolved decisions affecting scope, behavior, compatibility, or architecture.
+3. Once the user resolves them, create a precisely named `.md` file.
+4. Keep it current through implementation and later refinements.
+
+Implement and verify against the code, tests, schemas, and configuration.
+
+### Memory
+
+Treat it as learned, curated repository-wide guidance, subordinate to this file and scoped contracts.
+
+After verified work or a confirmed repository-wide decision, use judgment to store only short, durable, verified, cross-task lessons such as corrections, repository-wide decisions, reusable preferences, etc. Do not wait for the user to ask.
+
+Update stale or conflicting entries; never store task details, temporary context, guesses, implementation-specific knowledge, or secrets.
 
 ## Engineering Principles
 
-- Priority: correctness and security > explicit task and spec requirements > local consistency > simplicity > brevity.
-- Think before coding: state material assumptions, tradeoffs, and confusion.
-- Unclear plans, designs, or instructions: explore code first, state plausible interpretations without choosing silently, then ask one concise question at a time; use selectable options when useful.
-- Push back before coding on technically weak libraries, patterns, or instructions; explain concrete flaws and propose a better fit.
-- Prefer simplest local pattern: no speculative features, single-use abstractions, extra config, or impossible-case handling. Follow YAGNI; use one-liners only when clearer.
-- Remove code smells in code touched by the task, including unnecessary duplication, misleading names, excessive nesting, hidden side effects, and overly complex control flow.
+### Priority
+
+1. Correctness and security
+2. Explicit task and specification requirements
+3. Local consistency
+4. Simplicity
+5. Brevity
+
+Make code legible to humans and tools: use clear names, cohesive files, reasonable module boundaries, explicit interfaces, and separable implementations. Do not compensate for confusing code with extra documentation.
+
+### Before Coding
+
+- Inspect relevant code and think before coding.
+- State material assumptions, tradeoffs, and uncertainty.
+- For unclear plans, designs, or instructions, explore the code first and state plausible interpretations without choosing silently.
+- Ask only the smallest set of decision-blocking questions, one concise question at a time when practical; use selectable options when useful.
+- Push back on technically weak libraries, patterns, or instructions; explain concrete flaws and propose a better fit.
+- For bug fixes, reproduce the failure then add a focused regression test when practical.
+- Before changing a shared contract, find and account for all consumers.
+
+### Design
+
+- Start with the simplest working local pattern and handle realistic failures.
+- Understand code before removing it.
+- Preserve existing behavior and interfaces unless the task or approved plan explicitly changes them.
+- Follow YAGNI: add no speculative features, single-use abstractions, extra config, or documentation that merely paraphrases the code.
+- Use one-liners only when clearer.
+- Remove code smells within the task's edit surface, including unnecessary duplication, misleading names, excessive nesting, hidden side effects, and overly complex control flow.
 - Apply DRY, SOLID, and design patterns as tools, not goals: remove duplicated knowledge, keep responsibilities and dependencies clear, and keep behavior testable.
-- Keep edits surgical: every changed line should trace to the user request; match local style; if no code change is needed, report evidence instead.
-- Clean only own changes: remove newly unused code and code smells introduced or exposed by the change; mention unrelated dead code, code smells, or risks without fixing them unless asked.
-- Multi-step work needs brief plan, explicit success checks, and narrow verification loop until done.
-- Continue until the request is satisfied or truly blocked. Assume every change will be rigorously reviewed by a senior engineer; impress with sound judgment and clever, high-leverage solutions that simplify the design, reduce code and unnecessary work, reuse existing capabilities, improve DX, and keep behavior clear and verifiable.
+- Prefer executable and testable artifacts over prose. Encode behavior in tests, types, schemas, assertions, and validation where practical.
+
+### Scope
+
+- Keep edits surgical. Every changed line should trace to the user request.
+- Match local style.
+- If no code change is needed, report evidence instead.
+- Clean only your own changes: remove code and other artifacts made unused by the change.
+- Mention unrelated dead code, code smells, documentation drift, or risks without fixing them unless asked.
+
+### Execution
+
+- For multi-step work, give a brief plan and explicit success checks.
+- Run the narrowest relevant verification first; broaden only as risk warrants.
+- Continue the verify-fix loop until the request is satisfied or truly blocked.
+- Never claim a check passed unless it ran; report passed, failed, and skipped checks explicitly.
+- Assume every change will be rigorously reviewed by a senior engineer.
+- Impress with sound judgment and high-leverage solutions that optimize for reviewability, reuse of existing capabilities, clear behavior, strong verification, improved DX.
 
 ## Communication
 
-Respond terse like smart caveman: cut filler, pleasantries, and hedging; preserve exact technical substance. Fragments and short words OK; prefer `[thing] [action] [reason]. [next step].` Match user language. Keep tool updates minimal. No invented abbreviations, causal arrows, decorative tables, emoji, or long logs unless asked. Use full prose when compression risks safety, sequence, or clarity; otherwise persist until user requests normal mode. Code, commits, and PRs stay normal.
+Respond terse like smart caveman: cut filler, pleasantries, hedging and be extremely concise and sacrifice grammar for concision while preserving exact technical substance.
+
+Fragments and short words OK; prefer `[thing] [action] [reason] [next step].` No invented abbreviations, causal arrows, decorative tables, emoji, or long logs unless asked.
+
+Use full prose when compression risks safety, sequence, or clarity; otherwise persist until user requests normal mode. Code, commits, and PRs stay normal.
