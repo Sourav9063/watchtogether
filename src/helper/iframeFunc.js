@@ -15,7 +15,7 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
 
     switch (iframeUrl.baseUrl) {
       case config.iframe.url1:
-        return getVsembedUrl({ iframeUrl });
+        return getUrl1({ iframeUrl });
       case config.iframe.url3:
         return getUrl3({ iframeUrl });
       case config.iframe.url4:
@@ -39,7 +39,7 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
       case config.iframe.url17:
         return getUrl17({ iframeUrl });
       case config.iframe.url21:
-        return getDefaultUrl({ iframeUrl }) + "?play=true";
+        return getUrl21({ iframeUrl });
       case config.iframe.url23:
         return getUrl23({ iframeUrl });
       case config.iframe.url27:
@@ -50,15 +50,55 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
         return getUrl38({ iframeUrl });
       case config.iframe.url39:
         return getUrl39({ iframeUrl });
+      case config.iframe.url32:
+        return getUrl32({ iframeUrl });
+      case config.iframe.url35:
+        return getUrl35({ iframeUrl });
+      case config.iframe.url45:
+        return getUrl45({ iframeUrl });
       case config.iframe.url40:
       case config.iframe.url41:
-        return getAnilistAnimeEmbedUrl({ iframeUrl });
+        return getUrl40_41({ iframeUrl });
       case config.iframe.url42:
-        return getDropfileUrl({ iframeUrl });
+        return getUrl42({ iframeUrl });
       case config.iframe.url43:
-        return getNinjaAnimeUrl({ iframeUrl });
+        return getUrl43({ iframeUrl });
       case config.iframe.url44:
-        return getCinezoUrl({ iframeUrl });
+        return getUrl44({ iframeUrl });
+      case config.iframe.url47:
+        return getUrl47({ iframeUrl });
+      case config.iframe.url48:
+        return getUrl48_49({ iframeUrl });
+      case config.iframe.url49:
+        return getUrl48_49({ iframeUrl, premium: true });
+      case config.iframe.url50:
+        return getUrl50({ iframeUrl });
+      case config.iframe.url51:
+        return `${getDefaultUrl({ iframeUrl })}?autoplay=true`;
+      case config.iframe.url53:
+        return getUrl53({ iframeUrl });
+      case config.iframe.url55:
+        return getUrl55({ iframeUrl });
+      case config.iframe.url56:
+        return getUrl56({ iframeUrl });
+      case config.iframe.url57:
+        return getUrl57({ iframeUrl });
+      case config.iframe.url58:
+        return getUrl58({ iframeUrl });
+      case config.iframe.url59:
+        return getUrl59({ iframeUrl });
+      case config.iframe.url61:
+        return getUrl61({ iframeUrl });
+      case config.iframe.url62:
+        return getUrl62({ iframeUrl });
+      case config.iframe.url63:
+        return getUrl13_14({ iframeUrl });
+      case config.iframe.url64:
+        return getUrl64({ iframeUrl });
+      case config.iframe.url65:
+        return getUrl65({ iframeUrl });
+      case config.iframe.url66:
+        return getUrl66({ iframeUrl });
       default:
         return getDefaultUrl({ iframeUrl });
     }
@@ -79,7 +119,7 @@ const getDefaultUrl = ({ iframeUrl }) => {
   }
 };
 
-const getVsembedUrl = ({ iframeUrl }) => {
+const getUrl1 = ({ iframeUrl }) => {
   if (iframeUrl.type === "movie")
     return `${iframeUrl.baseUrl}/movie/${iframeUrl.id}`;
   return `${iframeUrl.baseUrl}/tv/${iframeUrl.id}/${iframeUrl.season}-${iframeUrl.episode}`;
@@ -149,7 +189,13 @@ const getUrl27 = ({ iframeUrl }) => {
   return `${iframeUrl.baseUrl}/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
 };
 const getUrl16 = ({ iframeUrl }) => {
-  return getDefaultUrl({ iframeUrl });
+  const params =
+    "primaryColor=white&secondaryColor=white&iconColor=white&title=false&poster=true&autoplay=true";
+  const baseUrl =
+    iframeUrl.type === "anime"
+      ? `${iframeUrl.baseUrl}/anime/${iframeUrl.id}/${iframeUrl.episode}`
+      : getDefaultUrl({ iframeUrl });
+  return `${baseUrl}?${params}`;
 };
 
 const getUrl25 = ({ iframeUrl }) => {
@@ -184,7 +230,128 @@ const getUrl39 = ({ iframeUrl }) => {
   return `${iframeUrl.baseUrl}/tv/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
 };
 
-const getDropfileUrl = ({ iframeUrl }) => {
+const getUrl21 = ({ iframeUrl }) => {
+  const episodeSelector = iframeUrl.type === "tv" ? "&episodeSelector=true" : "";
+  return `${getDefaultUrl({ iframeUrl })}?autoplay=true${episodeSelector}`;
+};
+
+const getUrl32 = ({ iframeUrl }) => {
+  const tvParams =
+    iframeUrl.type === "tv" ? "&nextbutton=false&episodeselector=false" : "";
+  return `${getDefaultUrl({ iframeUrl })}?autoplay=true${tvParams}`;
+};
+
+const getUrl35 = ({ iframeUrl }) => {
+  return `${getDefaultUrl({ iframeUrl })}?autoPlay=true&sub=en`;
+};
+
+const getUrl45 = ({ iframeUrl }) => {
+  return `${getDefaultUrl({ iframeUrl })}?lang=en&autoplay=true&sub=en`;
+};
+
+const getUrl47 = ({ iframeUrl }) => {
+  if (iframeUrl.type === "movie")
+    return `${iframeUrl.baseUrl}/${iframeUrl.id}`;
+
+  return `${iframeUrl.baseUrl}/${iframeUrl.id}/${iframeUrl.season}-${iframeUrl.episode}`;
+};
+
+const getUrl48_49 = ({ iframeUrl, premium = false }) => {
+  const baseUrl = getDefaultUrl({ iframeUrl });
+  if (!premium) return `${baseUrl}?autoplay=true`;
+  if (iframeUrl.type === "movie")
+    return `${baseUrl}?autoplay=true&download=true`;
+
+  return `${baseUrl}?autoplay=true&autonext=true&nextbutton=true&poster=true&download=true`;
+};
+
+const getUrl50 = ({ iframeUrl }) => {
+  if (iframeUrl.type !== "anime") return getDefaultUrl({ iframeUrl });
+  return `${iframeUrl.baseUrl}/anime/${iframeUrl.id}/${iframeUrl.episode}?dub=${Boolean(
+    iframeUrl.dub,
+  )}`;
+};
+
+const getPreferredId = ({ iframeUrl, idType }) => {
+  if (idType === "imdb") return iframeUrl.imdbId || iframeUrl.id;
+  if (idType === "mal") return iframeUrl.malId || iframeUrl.id;
+  return iframeUrl.id;
+};
+
+const getUrl53 = ({ iframeUrl }) => {
+  if (iframeUrl.type === "movie") {
+    const id = getPreferredId({ iframeUrl, idType: "imdb" });
+    return `${iframeUrl.baseUrl}/movie?imdb=${id}`;
+  }
+
+  return `${iframeUrl.baseUrl}/tv?tmdb=${iframeUrl.id}&season=${iframeUrl.season}&episode=${iframeUrl.episode}`;
+};
+
+const getUrl55 = ({ iframeUrl }) => {
+  const id = getPreferredId({ iframeUrl, idType: "imdb" });
+  return `${iframeUrl.baseUrl}?type=${iframeUrl.type}&id=${id}`;
+};
+
+const getUrl56 = ({ iframeUrl }) => {
+  const params =
+    "autoplay=true&autonext=true&audio=true&title=true&download=true";
+  return `${getDefaultUrl({ iframeUrl })}?${params}`;
+};
+
+const getUrl57 = ({ iframeUrl }) => {
+  if (iframeUrl.type === "movie")
+    return `${iframeUrl.baseUrl}/movie?id=${iframeUrl.id}`;
+
+  return `${iframeUrl.baseUrl}/tv?id=${iframeUrl.id}&s=${iframeUrl.season}&e=${iframeUrl.episode}`;
+};
+
+const getUrl58 = ({ iframeUrl }) => {
+  const id = getPreferredId({
+    iframeUrl,
+    idType: iframeUrl.type === "movie" ? "imdb" : "tmdb",
+  });
+  if (iframeUrl.type === "movie") return `${iframeUrl.baseUrl}/movie/${id}`;
+  return `${iframeUrl.baseUrl}/tv/${id}/${iframeUrl.season}/${iframeUrl.episode}`;
+};
+
+const getUrl59 = ({ iframeUrl }) => {
+  if (iframeUrl.type === "anime")
+    return `${iframeUrl.baseUrl}/anime/${iframeUrl.id}/${iframeUrl.episode}`;
+
+  return getDefaultUrl({ iframeUrl });
+};
+
+const getUrl61 = ({ iframeUrl }) => {
+  if (iframeUrl.type === "movie")
+    return `${iframeUrl.baseUrl}/filme/${iframeUrl.id}`;
+
+  return `${iframeUrl.baseUrl}/serie/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
+};
+
+const getUrl62 = ({ iframeUrl }) => {
+  if (iframeUrl.type === "movie")
+    return `${iframeUrl.baseUrl}/film.php?id=${iframeUrl.id}`;
+
+  return `${iframeUrl.baseUrl}/serie.php?id=${iframeUrl.id}&sa=${iframeUrl.season}&epi=${iframeUrl.episode}`;
+};
+
+const getUrl64 = ({ iframeUrl }) => {
+  if (iframeUrl.type === "movie")
+    return `${iframeUrl.baseUrl}/movie/?id=${iframeUrl.id}`;
+
+  return `${iframeUrl.baseUrl}/tv/?id=${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}`;
+};
+
+const getUrl65 = ({ iframeUrl }) => {
+  return `${getDefaultUrl({ iframeUrl })}?autoplay=true&sub=English`;
+};
+
+const getUrl66 = ({ iframeUrl }) => {
+  const id = getPreferredId({ iframeUrl, idType: "mal" });
+  return `${iframeUrl.baseUrl}?id=${id}&e=${iframeUrl.episode}`;
+};
+
+const getUrl42 = ({ iframeUrl }) => {
   const audio = iframeUrl.dub ? "dub" : "sub";
 
   if (iframeUrl.type === "movie")
@@ -196,17 +363,17 @@ const getDropfileUrl = ({ iframeUrl }) => {
   return `${iframeUrl.baseUrl}/tv/${iframeUrl.id}/${iframeUrl.season}/${iframeUrl.episode}?audio=${audio}&lang=en`;
 };
 
-const getAnilistAnimeEmbedUrl = ({ iframeUrl }) => {
+const getUrl40_41 = ({ iframeUrl }) => {
   const audio = iframeUrl.dub ? "dub" : "sub";
   return `${iframeUrl.baseUrl}/stream/ani/${iframeUrl.id}/${iframeUrl.episode}/${audio}`;
 };
 
-const getNinjaAnimeUrl = ({ iframeUrl }) => {
+const getUrl43 = ({ iframeUrl }) => {
   const audio = iframeUrl.dub ? "dub" : "sub";
   return `${iframeUrl.baseUrl}/${iframeUrl.id}/${iframeUrl.episode}/${audio}`;
 };
 
-const getCinezoUrl = ({ iframeUrl }) => {
+const getUrl44 = ({ iframeUrl }) => {
   if (iframeUrl.type === "movie")
     return `${iframeUrl.baseUrl}/movie/${iframeUrl.id}`;
 

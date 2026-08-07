@@ -1,5 +1,5 @@
 "use client";
-import { useLayoutEffect, useMemo } from "react";
+import { useLayoutEffect } from "react";
 import styles from "./iframePlayer.module.css";
 import config from "@/config";
 import { useStore } from "@/helper/hooks/useStore";
@@ -107,23 +107,10 @@ export default function VideoSrc() {
     return prefix + suffix;
   };
 
-  const nonAnimeSources = useMemo(
-    () =>
-      config.iframe.urls.filter(
-        (url) =>
-          ![config.iframe.url40, config.iframe.url41, config.iframe.url43].includes(
-            url,
-          ),
-      ),
-    [],
-  );
-  const sourceUrls = useMemo(
-    () =>
-      isAnime || iframeUrl?.type === "anime"
-        ? config.iframe.animeUrls
-        : nonAnimeSources,
-    [iframeUrl?.type, isAnime, nonAnimeSources],
-  );
+  const sourceUrls =
+    isAnime || iframeUrl?.type === "anime"
+      ? config.iframe.animeUrls
+      : config.iframe.nonAnimeUrls;
   const selectedSource = sourceUrls.includes(iframeUrl?.baseUrl)
     ? iframeUrl.baseUrl
     : sourceUrls[0];
