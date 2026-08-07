@@ -44,8 +44,8 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
         return getUrl23({ iframeUrl });
       case config.iframe.url27:
         return getUrl27({ iframeUrl });
-      case config.iframe.url30:
-        return getUrl30({ iframeUrl });
+      // case config.iframe.url30:
+      //   return getUrl30({ iframeUrl });
       case config.iframe.url38:
         return getUrl38({ iframeUrl });
       case config.iframe.url39:
