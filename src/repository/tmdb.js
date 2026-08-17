@@ -53,6 +53,17 @@ export const getTvSeason = (id, season) => {
   });
 };
 
+export const getRecommendations = (type, id, page = 1) => {
+  requireApiKey();
+  return tmdbApiRequest.GET(`${type}/${id}/recommendations`, {
+    query: { page },
+    next: {
+      revalidate: DETAILS_REVALIDATE_SECONDS,
+      tags: [`tmdb-recommendations`],
+    },
+  });
+};
+
 export const getExternalIds = (type, id) => {
   requireApiKey();
   return tmdbApiRequest.GET(`${type}/${id}/external_ids`, {

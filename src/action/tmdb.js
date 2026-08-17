@@ -5,6 +5,7 @@ import {
   getTmdbImdbId,
   getTmdbMediaDetails,
   getTmdbMediaDetailsMap,
+  getTmdbRecommendations,
   getTmdbSeasonEpisodes,
   getTmdbTvDetails,
   searchTmdbMedia,
@@ -35,6 +36,16 @@ export const getMediaDetailsMapAction = createAction.public(
   async (rawType, rawIds) => {
     const ids = Array.isArray(rawIds) ? rawIds : [];
     return getTmdbMediaDetailsMap(String(rawType ?? ""), ids);
+  },
+);
+
+export const getRecommendationsAction = createAction.public(
+  async (rawType, rawId) => {
+    const type = String(rawType ?? "");
+    const tmdbType = type === "movie" ? "movie" : "tv";
+    const resultType = type === "anime" ? "anime" : tmdbType;
+
+    return getTmdbRecommendations(tmdbType, String(rawId ?? ""), resultType);
   },
 );
 

@@ -1,6 +1,7 @@
 import {
   getExternalIds,
   getMediaDetails,
+  getRecommendations,
   getTvDetails,
   getTvSeason,
   searchMovies,
@@ -109,6 +110,22 @@ export const getTmdbMediaDetailsMap = async (type, ids = []) => {
     acc[details.id] = details;
     return acc;
   }, {});
+};
+
+/**
+ * Recommendations for whatever is currently playing. `resultType` lets anime
+ * keep its own media type even though TMDB serves it from the tv endpoint.
+ */
+export const getTmdbRecommendations = async (type, id, resultType = type) => {
+  if (!id) {
+    throw new Error("TMDB id is required");
+  }
+
+  const data = await getRecommendations(requireMediaType(type), id);
+
+  return (data?.results ?? [])
+    .filter((result) => result?.id && (result.poster_path || result.backdrop_path))
+    .map((result) => mapSearchResult(result, resultType));
 };
 
 export const getTmdbImdbId = async (type, id) => {

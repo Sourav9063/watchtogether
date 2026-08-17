@@ -5,6 +5,7 @@ import config from "@/config";
 import { useStore } from "@/helper/hooks/useStore";
 import { Stores } from "@/helper/CONSTANTS";
 import TorrentStreamList from "./TorrentStreamList";
+import Recommendations from "./Recommendations";
 import { useTorrent } from "./TorrentContext";
 
 export default function VideoSrc() {
@@ -211,6 +212,7 @@ export default function VideoSrc() {
           "*If current server doesn't work please try other servers. Use content you have rights to stream."
         }
       </p>
+      <Recommendations />
     </div>
   );
 }
