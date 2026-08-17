@@ -1,10 +1,23 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export function useDragScroll() {
-  const elRef = useRef(null);
+  const [element, setElement] = useState(null);
+  // A callback ref (rather than a plain ref object) so rows that mount later —
+  // e.g. a list rendered only once its data arrives — still get their
+  // listeners. `.current` is kept so callers can read/scroll the node.
+  const elRef = useMemo(() => {
+    const setRef = (node) => {
+      setRef.current = node;
+      setElement(node);
+    };
+
+    setRef.current = null;
+
+    return setRef;
+  }, []);
 
   useEffect(() => {
-    const el = elRef.current;
+    const el = element;
     if (!el) return;
 
     const dragMultiplier = 1.15;
@@ -196,7 +209,7 @@ export function useDragScroll() {
       cancelMomentum();
       resetClickSuppressor();
     };
-  }, []);
+  }, [element]);
 
   return elRef;
 }
