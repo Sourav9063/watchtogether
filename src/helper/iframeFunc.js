@@ -79,15 +79,34 @@ export const getIframeUrl = ({ iframeUrl, full = true }) => {
       case config.iframe.url59:
         return getUrl59({ iframeUrl });
       case config.iframe.url61:
+      case config.iframe.url88:
+      case config.iframe.url89:
+      case config.iframe.url90:
         return getUrl61({ iframeUrl });
       case config.iframe.url62:
         return getUrl62({ iframeUrl });
       case config.iframe.url63:
+      case config.iframe.url85:
+      case config.iframe.url92:
+      case config.iframe.url96:
         return getUrl13_14({ iframeUrl });
       case config.iframe.url64:
         return getUrl64({ iframeUrl });
       case config.iframe.url66:
         return getUrl66({ iframeUrl });
+      case config.iframe.url75:
+        return getUrl53({ iframeUrl });
+      case config.iframe.url79:
+      case config.iframe.url81:
+      case config.iframe.url82:
+        return getUrlSmashy({ iframeUrl });
+      case config.iframe.url80:
+        return getUrlSmashyEmbed({ iframeUrl });
+      case config.iframe.url83:
+      case config.iframe.url84:
+        return getUrlAutoembed({ iframeUrl });
+      case config.iframe.url94:
+        return getUrl4({ iframeUrl });
       default:
         return getDefaultUrl({ iframeUrl });
     }
@@ -138,9 +157,9 @@ const getUrl23 = ({ iframeUrl }) => {
 
 const getUrl4 = ({ iframeUrl }) => {
   if (iframeUrl.type === "movie") {
-    return `${iframeUrl.baseUrl}/embed/{iframeUrl.id}`;
+    return `${iframeUrl.baseUrl}/embed/${iframeUrl.id}`;
   }
-  return `${iframeUrl.baseUrl}/embedtv/${iframeUrl.id}?s=${iframeUrl.season}&s=1`;
+  return `${iframeUrl.baseUrl}/embedtv/${iframeUrl.id}?s=${iframeUrl.season}&e=${iframeUrl.episode}`;
 };
 
 const getUrl3 = ({ iframeUrl }) => {
@@ -269,6 +288,24 @@ const getUrl64 = ({ iframeUrl }) => {
 const getUrl66 = ({ iframeUrl }) => {
   const id = getPreferredId({ iframeUrl, idType: "mal" });
   return `${iframeUrl.baseUrl}?id=${id}&e=${iframeUrl.episode}`;
+};
+
+const getUrlSmashy = ({ iframeUrl }) => {
+  if (iframeUrl.type === "movie")
+    return `${iframeUrl.baseUrl}/movie/${iframeUrl.id}`;
+  return `${iframeUrl.baseUrl}/tv/${iframeUrl.id}?s=${iframeUrl.season}&e=${iframeUrl.episode}`;
+};
+
+const getUrlSmashyEmbed = ({ iframeUrl }) => {
+  if (iframeUrl.type === "movie")
+    return `${iframeUrl.baseUrl}/playere.php?tmdb=${iframeUrl.id}`;
+  return `${iframeUrl.baseUrl}/playere.php?tmdb=${iframeUrl.id}&season=${iframeUrl.season}&episode=${iframeUrl.episode}`;
+};
+
+const getUrlAutoembed = ({ iframeUrl }) => {
+  if (iframeUrl.type === "movie")
+    return `${iframeUrl.baseUrl}/movie/tmdb/${iframeUrl.id}`;
+  return `${iframeUrl.baseUrl}/tv/tmdb/${iframeUrl.id}-${iframeUrl.season}-${iframeUrl.episode}`;
 };
 
 const getUrl42 = ({ iframeUrl }) => {

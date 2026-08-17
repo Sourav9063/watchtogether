@@ -11,7 +11,9 @@ import { registerHooks } from "node:module";
 import path from "path";
 import { fileURLToPath, pathToFileURL } from "url";
 
-const query = "0-tv-220102-1-1";
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
+const query = process.argv[2] || "0-tv-220102-1-1";
 const TIMEOUT_MS = 8000;
 const RELATIVE_URL_ORIGIN = "http://localhost:3000";
 
