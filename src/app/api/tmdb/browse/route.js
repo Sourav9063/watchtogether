@@ -1,4 +1,5 @@
-import { fetchTmdbBrowse } from "@/components/tmdbBrowse/tmdbBrowseData";
+import { browseTmdb } from "@/action/tmdb-browse";
+import { actionData } from "@/lib/create-action";
 import {
   discoverySortOptions,
   getTmdbDiscoveryParams,
@@ -55,10 +56,10 @@ export async function GET(request) {
     endpoint === "/discover/movie" || endpoint === "/discover/tv"
       ? getTmdbDiscoveryParams(mediaType, discoverFilters)
       : {};
-  const data = await fetchTmdbBrowse(endpoint, {
-    page,
-    ...discoverParams,
-  });
+  const data = await actionData(
+    browseTmdb(endpoint, { page, ...discoverParams }),
+    { error: "TMDB request failed", results: [], total_pages: 1 },
+  );
 
   return Response.json(data);
 }

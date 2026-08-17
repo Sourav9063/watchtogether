@@ -1,4 +1,3 @@
-import config from "@/config";
 import { useEffect, useState } from "react";
 import { useDebounce } from "./useDebounce";
 import {
@@ -9,6 +8,11 @@ import {
 import { Constants, Stores } from "../CONSTANTS";
 import { useStore } from "./useStore";
 import { searchAnime } from "@/components/tmdbSearch/WatchAnime";
+import {
+  getSeasonEpisodesAction,
+  getTvDetailsAction,
+  searchTmdb,
+} from "@/action/tmdb";
 
 export const useTmdbSearch = () => {
   const [status, setStatus] = useState("idle"); // "idle" | "loading" | "success" | "error"
@@ -53,85 +57,20 @@ export const useTmdbSearch = () => {
     }
     if (debounce && !isAnime) {
       const fn = async () => {
-        try {
-          const [movieRes, tvRes] = await Promise.all([
-            fetch(
-              `https://api.themoviedb.org/3/search/movie?api_key=${config.tmdbApiKey}&query=${debounce}&include_adult=true`,
-            ),
-            fetch(
-              `https://api.themoviedb.org/3/search/tv?api_key=${config.tmdbApiKey}&query=${debounce}&include_adult=true`,
-            ),
-          ]);
-          const [movieData, tvData] = await Promise.all([
-            movieRes.json(),
-            tvRes.json(),
-          ]);
-          for (const result of movieData.results) {
-            result.type = "movie";
-            result.title =
-              result.title ||
-              result.name ||
-              result.original_title ||
-              result.original_name;
-            result.poster_image_url = result.poster_path
-              ? `https://image.tmdb.org/t/p/w500${result.poster_path}`
-              : null;
-            result.backdrop_image_url = result.backdrop_path
-              ? `https://image.tmdb.org/t/p/w500${result.backdrop_path}`
-              : null;
-          }
-          for (const result of tvData.results) {
-            result.type = "tv";
-            result.title =
-              result.title ||
-              result.name ||
-              result.original_title ||
-              result.original_name;
-            result.poster_image_url = `https://image.tmdb.org/t/p/w500${result.poster_path}`;
-            result.backdrop_image_url = `https://image.tmdb.org/t/p/w500${result.backdrop_path}`;
-          }
-          const combinedResults = [];
-          for (
-            let i = 0;
-            i <
-            Math.max(
-              movieData.results?.length || 0,
-              tvData.results?.length || 0,
-            );
-            i++
-          ) {
-            if (tvData.results[i]) {
-              combinedResults.push(tvData.results[i]);
-            }
-            if (movieData.results[i]) {
-              combinedResults.push(movieData.results[i]);
-            }
-          }
-          setSearchResults({ type: "SEARCH", value: combinedResults });
-          setStatus("success");
-        } catch (err) {
-          console.log(err);
+        const result = await searchTmdb(debounce);
+
+        if (!result.success) {
           setStatus("error");
+          return;
         }
+
+        setSearchResults({ type: "SEARCH", value: result.data || [] });
+        setStatus("success");
       };
       fn();
     }
   }, [debounce, isAnime]);
   return status;
-};
-
-const getTmdbUrl = (path) => {
-  return `https://api.themoviedb.org/3${path}?api_key=${config.tmdbApiKey}`;
-};
-
-const fetchTmdbJson = async ({ path, signal }) => {
-  const response = await fetch(getTmdbUrl(path), { signal });
-
-  if (!response.ok) {
-    throw new Error(`TMDB request failed: ${response.status}`);
-  }
-
-  return response.json();
 };
 
 export const useTmdbTvDetails = ({ id, enabled = true } = {}) => {
@@ -140,14 +79,14 @@ export const useTmdbTvDetails = ({ id, enabled = true } = {}) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!enabled || !id || !config.tmdbApiKey) {
+    if (!enabled || !id) {
       setDetails(null);
       setStatus("idle");
       setError(null);
       return;
     }
 
-    const controller = new AbortController();
+    let cancelled = false;
     const cacheKey = String(id);
     const cachedDetails = getLocalStorageCache({
       key: Constants.LocalStorageKey.TMDB_TV_DETAILS_CACHE,
@@ -165,32 +104,30 @@ export const useTmdbTvDetails = ({ id, enabled = true } = {}) => {
       setStatus("loading");
       setError(null);
 
-      try {
-        const data = await fetchTmdbJson({
-          path: `/tv/${id}`,
-          signal: controller.signal,
-        });
-        setDetails(data);
-        setLocalStorageCache({
-          key: Constants.LocalStorageKey.TMDB_TV_DETAILS_CACHE,
-          cacheKey,
-          value: data,
-        });
-        setStatus("success");
-      } catch (err) {
-        if (err.name === "AbortError") return;
+      const result = await getTvDetailsAction(id);
 
-        console.log(err);
+      if (cancelled) return;
+
+      if (!result.success) {
         setDetails(null);
-        setError(err);
+        setError(result.error);
         setStatus("error");
+        return;
       }
+
+      setDetails(result.data);
+      setLocalStorageCache({
+        key: Constants.LocalStorageKey.TMDB_TV_DETAILS_CACHE,
+        cacheKey,
+        value: result.data,
+      });
+      setStatus("success");
     }
 
     fetchData();
 
     return () => {
-      controller.abort();
+      cancelled = true;
     };
   }, [id, enabled]);
 
@@ -207,14 +144,14 @@ export const useTmdbSeasonEpisodes = ({
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!enabled || !id || !season || !config.tmdbApiKey) {
+    if (!enabled || !id || !season) {
       setSeasonEpisodes(null);
       setStatus("idle");
       setError(null);
       return;
     }
 
-    const controller = new AbortController();
+    let cancelled = false;
     const cacheKey = `${id}:${season}`;
     const cachedSeasonEpisodes = getLocalStorageCache({
       key: Constants.LocalStorageKey.TMDB_SEASON_EPISODES_CACHE,
@@ -232,32 +169,30 @@ export const useTmdbSeasonEpisodes = ({
       setStatus("loading");
       setError(null);
 
-      try {
-        const data = await fetchTmdbJson({
-          path: `/tv/${id}/season/${season}`,
-          signal: controller.signal,
-        });
-        setSeasonEpisodes(data);
-        setLocalStorageCache({
-          key: Constants.LocalStorageKey.TMDB_SEASON_EPISODES_CACHE,
-          cacheKey,
-          value: data,
-        });
-        setStatus("success");
-      } catch (err) {
-        if (err.name === "AbortError") return;
+      const result = await getSeasonEpisodesAction(id, season);
 
-        console.log(err);
+      if (cancelled) return;
+
+      if (!result.success) {
         setSeasonEpisodes(null);
-        setError(err);
+        setError(result.error);
         setStatus("error");
+        return;
       }
+
+      setSeasonEpisodes(result.data);
+      setLocalStorageCache({
+        key: Constants.LocalStorageKey.TMDB_SEASON_EPISODES_CACHE,
+        cacheKey,
+        value: result.data,
+      });
+      setStatus("success");
     }
 
     fetchData();
 
     return () => {
-      controller.abort();
+      cancelled = true;
     };
   }, [id, season, enabled]);
 

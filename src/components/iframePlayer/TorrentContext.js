@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import config from "@/config";
 import { createDataContext } from "@/helper/createContext";
+import { getImdbIdAction } from "@/action/tmdb";
 
 const DEFAULT_STREMIO_ADDON_URL =
   process.env.NEXT_PUBLIC_STREMIO_ADDON_URL || "";
@@ -57,34 +57,30 @@ function createStremioStreamUrl(addonBaseUrl, iframeUrl, imdbId) {
   }.json`;
 }
 
-async function getTmdbExternalId(iframeUrl, signal) {
+async function getTmdbExternalId(iframeUrl) {
   const type = iframeUrl?.type === "movie" ? "movie" : "tv";
   const id = iframeUrl?.id;
 
-  if (!id || !config.tmdbApiKey) return "";
+  if (!id) return "";
 
   const cacheKey = `${type}-${id}`;
   const cachedId = tmdbExternalIdCache.get(cacheKey);
 
   if (cachedId) return cachedId;
 
-  const response = await fetch(
-    `https://api.themoviedb.org/3/${type}/${id}/external_ids?api_key=${config.tmdbApiKey}`,
-    { signal },
-  );
+  const result = await getImdbIdAction(type, id);
 
-  if (!response.ok) {
-    throw new Error(`TMDB external id failed: ${response.status}`);
+  if (!result.success) {
+    throw new Error(result.error.message);
   }
 
-  const data = await response.json();
-  const imdbId = data.imdb_id || "";
+  const imdbId = result.data;
 
   if (imdbId) {
     tmdbExternalIdCache.set(cacheKey, imdbId);
   }
 
-  return imdbId;
+  return imdbId || "";
 }
 
 function createMagnetFromInfoHash(infoHash, sources = []) {
@@ -283,7 +279,10 @@ export function TorrentProvider({ children, iframeUrl }) {
       setError("");
 
       try {
-        const imdbId = await getTmdbExternalId(iframeUrl, controller.signal);
+        const imdbId = await getTmdbExternalId(iframeUrl);
+
+        // The server action cannot be aborted, so drop stale results here.
+        if (controller.signal.aborted) return;
 
         if (!imdbId) {
           throw new Error("IMDb id missing for selected title");

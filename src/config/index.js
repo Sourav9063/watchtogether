@@ -153,7 +153,7 @@ const config = {
       process.env.NEXT_PUBLIC_PERSONAL_tab_url2,
       process.env.NEXT_PUBLIC_PERSONAL_tab_url3,
   ],
-  tmdbApiKey: process.env.NEXT_PUBLIC_PERSONAL_tmdb_api_key,
+  // TMDB key is server-only; see src/repository/tmdb.js.
   latestMediaUrl: process.env.NEXT_PUBLIC_LATEST_MEDIA_url,
   latestMediaUrl1: process.env.NEXT_PUBLIC_LATEST_MEDIA_url1,
 };

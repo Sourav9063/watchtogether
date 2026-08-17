@@ -1,4 +1,3 @@
-import config from "@/config";
 import {
   createTmdbBrowseKey,
   getDefaultDiscoveryFilters,
@@ -6,10 +5,8 @@ import {
   getTmdbDiscoveryParams,
   mediaSections,
   PREFETCH_TMDB_PAGE_COUNT,
-  TMDB_REVALIDATE_SECONDS,
-} from "./tmdbBrowseConstants";
-
-export const TMDB_API_BASE = "https://api.themoviedb.org/3";
+} from "@/components/tmdbBrowse/tmdbBrowseConstants";
+import { getBrowse } from "@/repository/tmdb";
 
 const allowedEndpoints = new Set([
   ...mediaSections.map((section) => section.endpoint),
@@ -23,56 +20,21 @@ export function isAllowedTmdbBrowseEndpoint(endpoint) {
   return allowedEndpoints.has(endpoint);
 }
 
-export function getTmdbUrl(endpoint, params = {}) {
-  const url = new URL(`${TMDB_API_BASE}${endpoint}`);
-  url.searchParams.set("api_key", config.tmdbApiKey || "");
-  url.searchParams.set("include_adult", "true");
-
-  Object.entries(params).forEach(([key, value]) => {
-    if (value === undefined || value === null || value === "") return;
-    url.searchParams.set(key, value);
-  });
-
-  return url.toString();
-}
+const emptyBrowseResult = (error) => ({
+  error,
+  results: [],
+  total_pages: 1,
+});
 
 export async function fetchTmdbBrowse(endpoint, params = {}) {
-  if (!config.tmdbApiKey) {
-    return {
-      error: "TMDB API key missing",
-      results: [],
-      total_pages: 1,
-    };
-  }
-
   if (!isAllowedTmdbBrowseEndpoint(endpoint)) {
-    return {
-      error: "TMDB endpoint not allowed",
-      results: [],
-      total_pages: 1,
-    };
+    return emptyBrowseResult("TMDB endpoint not allowed");
   }
 
   try {
-    const response = await fetch(getTmdbUrl(endpoint, params), {
-      next: { revalidate: TMDB_REVALIDATE_SECONDS },
-    });
-
-    if (!response.ok) {
-      return {
-        error: `TMDB request failed: ${response.status}`,
-        results: [],
-        total_pages: 1,
-      };
-    }
-
-    return response.json();
+    return await getBrowse(endpoint, params);
   } catch (error) {
-    return {
-      error: error?.message || "TMDB request failed",
-      results: [],
-      total_pages: 1,
-    };
+    return emptyBrowseResult(error?.message || "TMDB request failed");
   }
 }
 

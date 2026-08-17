@@ -1,6 +1,8 @@
 import styles from "./LatestMedia.module.css";
 import config from "@/config";
 import LatestMediaClient from "./LatestMediaClient";
+import { getMediaDetailsMapAction } from "@/action/tmdb";
+import { actionData } from "@/lib/create-action";
 
 export const LatestType = {
   MOVIE_NEW: "/movie/new",
@@ -35,21 +37,18 @@ export async function getLatest({
     }
     return acc;
   }, []);
-  const tmdbDetailsUrls = resultsArray.map((item) => {
-    const { tmdb_id: id, type } = item;
-    if (!id) return null;
-    return `https://api.themoviedb.org/3/${type}/${id}?api_key=${config.tmdbApiKey}`;
-  });
-  const tmdbDetails = await Promise.all(
-    tmdbDetailsUrls.map((url) => {
-      if (!url) return null;
-      return fetchFn(url);
-    })
-  );
-  const tmdbDetailsMap = tmdbDetails.reduce((acc, cur) => {
-    if (!cur) return acc;
-    return { ...acc, [cur.id]: cur };
+  // Items carry their own media type, so details are resolved per type.
+  const idsByType = resultsArray.reduce((acc, item) => {
+    if (!item.tmdb_id) return acc;
+    acc[item.type] = [...(acc[item.type] || []), item.tmdb_id];
+    return acc;
   }, {});
+  const detailMaps = await Promise.all(
+    Object.entries(idsByType).map(([mediaType, ids]) =>
+      actionData(getMediaDetailsMapAction(mediaType, ids), {}),
+    ),
+  );
+  const tmdbDetailsMap = Object.assign({}, ...detailMaps);
   return {
     data: resultsArray.map((item, i) => {
       const { tmdb_id, imdb_id, type, title } = item;

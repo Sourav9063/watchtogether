@@ -1,7 +1,13 @@
 import { Suspense } from "react";
 import TmdbBrowseClient from "./TmdbBrowseClient";
-import { getTmdbBrowseInitialData } from "./tmdbBrowseData";
+import { getBrowseInitialDataAction } from "@/action/tmdb-browse";
+import { actionData } from "@/lib/create-action";
 import styles from "./TmdbBrowse.module.css";
+
+const EMPTY_INITIAL_DATA = {
+  genres: { movie: [], tv: [] },
+  initialMediaByKey: {},
+};
 
 function TmdbBrowseFallback() {
   return (
@@ -12,7 +18,11 @@ function TmdbBrowseFallback() {
 }
 
 export default function TmdbBrowse() {
-  const initialDataPromise = getTmdbBrowseInitialData();
+  // Streamed to the client; a failed action degrades to empty sections.
+  const initialDataPromise = actionData(
+    getBrowseInitialDataAction(),
+    EMPTY_INITIAL_DATA,
+  );
 
   return (
     <Suspense fallback={<TmdbBrowseFallback />}>
